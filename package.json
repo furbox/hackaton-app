@@ -1,0 +1,15 @@
+{
+  "name": "hackaton-app",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "bun run --cwd apps/backend dev & bun run --cwd apps/frontend dev",
+    "backend": "bun run --cwd apps/backend dev",
+    "frontend": "bun run --cwd apps/frontend dev"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}
