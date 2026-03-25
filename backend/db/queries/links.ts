@@ -579,3 +579,30 @@ export function incrementViews(id: number): boolean {
 
   return result.changes > 0;
 }
+
+// ============================================================================
+// SHORT CODE LOOKUP
+// ============================================================================
+
+const getLinkByShortCodeStmt = () =>
+  getDb().prepare(`SELECT * FROM links WHERE short_code = ? LIMIT 1`);
+
+/**
+ * Retrieves a link by its short code.
+ *
+ * Used by the short-link redirect handler to resolve /s/:code URLs.
+ *
+ * @param code - The short code identifier (e.g. "abc123")
+ * @returns Link record or null if not found
+ *
+ * @example
+ * ```typescript
+ * const link = getLinkByShortCode("abc123");
+ * if (link) {
+ *   // redirect to link.url
+ * }
+ * ```
+ */
+export function getLinkByShortCode(code: string): Link | null {
+  return getLinkByShortCodeStmt().get(code) as Link | null;
+}

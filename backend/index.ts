@@ -2,6 +2,7 @@
 // Ultra-fast JavaScript runtime with native SQLite support
 
 import { verifyDatabaseConnection } from "./db/verify";
+import { handleShortRoute } from "./routes/api/short.js";
 import { handleAuthRoute } from "./routes/api/auth/index.js";
 import { handleAuditLogRoute } from "./routes/api/audit-log/index.js";
 import { handleAdminAuditLogRoute } from "./routes/api/admin/audit-log.js";
@@ -30,6 +31,12 @@ const server = Bun.serve({
 	async fetch(req) {
 		const url = new URL(req.url);
 		const path = url.pathname;
+
+		// Route: /api/s/:code → short-link redirect (must be before other /api/* routes)
+		if (path.startsWith("/api/s/")) {
+			const r = await handleShortRoute(req, path);
+			if (r !== null) return r;
+		}
 
 		// Route: /api/auth/* → auth router
 		if (path.startsWith("/api/auth/")) {

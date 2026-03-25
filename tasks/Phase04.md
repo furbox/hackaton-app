@@ -238,11 +238,17 @@
 
 ### 4.10 Create short link redirect handler in `backend/routes/short.ts`
 
-- [ ] 4.10.1 Create `backend/services/short-links.service.ts` with `resolveShortCode` use case
-- [ ] 4.10.2 Extend `backend/db/queries.ts` with short-code lookup + atomic view increment helper
-- [ ] 4.10.3 Create `backend/routes/short.ts` with `GET /s/:code` handler delegating to short-links service
-- [ ] 4.10.4 Return HTTP redirect response on success and 404 response when code is missing/invalid
-- [ ] 4.10.5 Wire `/s/*` dispatch in `backend/index.ts` without leaking redirect logic into server entrypoint
+- [x] 4.10.1 Create `backend/services/short-links.service.ts` with `resolveShortCode` use case
+- [x] 4.10.2 Extend `backend/db/queries/links.ts` with short-code lookup + atomic view increment helper
+- [x] 4.10.3 Create `backend/routes/short.ts` with `GET /s/:code` handler delegating to short-links service
+- [x] 4.10.4 Return HTTP redirect response on success and 404 response when code is missing/invalid
+- [x] 4.10.5 Wire `/s/*` dispatch in `backend/index.ts` without leaking redirect logic into server entrypoint
+
+**4.10 Evidence (Phase 4.10 apply)**
+- `bun test test/db/__tests__/queries.short-links.test.ts` ✅ pass (2 tests)
+- `bun test test/services/__tests__/short-links.service.test.ts` ✅ pass (4 tests)
+- `bun test test/routes/__tests__/short.test.ts` ✅ pass (6 tests)
+- Total: 12 tests, 0 fail, 27 expect() calls
 
 **Acceptance Criteria**
 - Redirect flow resolves via service and db helper chain (`route -> service -> db`)

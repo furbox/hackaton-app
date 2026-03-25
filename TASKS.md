@@ -1,6 +1,6 @@
 # Tasks: URLoft - Complete Implementation
 
-> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`.
+> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`, `tasks/Phase04.md`.
 > Status below is synchronized with those phase files.
 
 ## Architecture Guardrails
@@ -39,19 +39,19 @@
 - [x] 3.10 Set up admin plugin integration (role management, ban/unban, impersonation)
 - [x] 3.11 Apply admin schema migration and initial admin bootstrap strategy
 
-## Phase 4: Core Backend APIs (11 tasks)
+## Phase 4: Core Backend APIs (11 tasks) ✅
 
-- [ ] 4.0 Architecture checkpoint: validar boundary `routes -> services -> db` antes de abrir nuevos endpoints
-- [ ] 4.1 Create `backend/services/links.service.ts` with createLink, getLinks, getLinkById, updateLink, deleteLink
-- [ ] 4.2 Create `backend/routes/api/links.ts` with GET/POST/PUT/DELETE endpoints for links
-- [ ] 4.3 Create `backend/routes/api/links.ts` with like/favorite toggle endpoints (`POST /:id/like`, `POST /:id/favorite`)
-- [ ] 4.4 Create `backend/routes/api/links.ts` with preview endpoint (`POST /preview` - OG metadata extraction)
-- [ ] 4.5 Create `backend/services/categories.service.ts` with CRUD operations
-- [ ] 4.6 Create `backend/routes/api/categories.ts` with category endpoints
-- [ ] 4.7 Create `backend/routes/api/stats.ts` with user stats and global stats endpoints
-- [ ] 4.8 Create `backend/routes/api/users.ts` with profile endpoints (get public profile, update profile, change password)
-- [ ] 4.9 Create `backend/routes/api/keys.ts` with API key CRUD and hashing logic
-- [ ] 4.10 Create short link redirect handler in `backend/routes/short.ts` (`GET /s/:code`)
+- [x] 4.0 Architecture checkpoint: validar boundary `routes -> services -> db` antes de abrir nuevos endpoints
+- [x] 4.1 Create `backend/services/links.service.ts` with createLink, getLinks, getLinkById, updateLink, deleteLink
+- [x] 4.2 Create `backend/routes/api/links.ts` with GET/POST/PUT/DELETE endpoints for links
+- [x] 4.3 Create `backend/routes/api/links.ts` with like/favorite toggle endpoints (`POST /:id/like`, `POST /:id/favorite`)
+- [x] 4.4 Create `backend/routes/api/links.ts` with preview endpoint (`POST /preview` - OG metadata extraction)
+- [x] 4.5 Create `backend/services/categories.service.ts` with CRUD operations
+- [x] 4.6 Create `backend/routes/api/categories.ts` with category endpoints
+- [x] 4.7 Create `backend/routes/api/stats.ts` with user stats and global stats endpoints
+- [x] 4.8 Create `backend/routes/api/users.ts` with profile endpoints (get public profile, update profile, change password)
+- [x] 4.9 Create `backend/routes/api/keys.ts` with API key CRUD and hashing logic
+- [x] 4.10 Create short link redirect handler in `backend/routes/api/short.ts` (`GET /api/s/:code`)
 
 ## Phase 5: Background Workers (6 tasks)
 

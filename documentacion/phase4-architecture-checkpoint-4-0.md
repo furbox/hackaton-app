@@ -1,8 +1,14 @@
-# Documentacion - Phase 4.0 Architecture Checkpoint
+# Documentacion - Phase 4 Architecture Checkpoint
 
-> Checkpoint tecnico previo a Phase 4.1+.
+> Checkpoint tecnico que aplica a todas las sub-fases de Phase 4 (4.0 – 4.10).
 >
 > Objetivo: bloquear acoplamiento `routes -> db` y fijar contratos route/service antes de implementar endpoints funcionales.
+
+---
+
+## Estado de Phase 4
+
+**Completa.** Las 56 sub-tareas (4.0 – 4.10) fueron implementadas y verificadas.
 
 ---
 
@@ -25,7 +31,9 @@ Este checkpoint no implementa endpoints de negocio (4.1-4.10).
 
 ## Contrato de errores (deterministico)
 
-Definido en `backend/routes/api/contracts/service-error.ts`.
+Definido en `backend/contracts/service-error.ts`.
+
+> **Nota:** el archivo fue movido de `backend/routes/api/contracts/service-error.ts` a `backend/contracts/service-error.ts` durante la implementacion. La carpeta `routes/api/contracts/` fue eliminada. El modulo `backend/contracts/` es una capa neutral reutilizable por servicios y rutas por igual.
 
 - `VALIDATION_ERROR -> 400`
 - `UNAUTHORIZED -> 401`
@@ -36,15 +44,87 @@ Definido en `backend/routes/api/contracts/service-error.ts`.
 
 ---
 
-## Comandos de verificacion
+## DB Queries modularizadas
+
+El archivo monolitico `backend/db/queries.ts` fue reemplazado por una carpeta modular:
+
+```
+backend/db/queries/
+  users.ts          # CRUD de usuarios
+  links.ts          # CRUD de links + short codes
+  categories.ts     # CRUD de categorias
+  interactions.ts   # likes y favoritos
+  search.ts         # FTS5 full-text search
+  stats.ts          # estadisticas globales y por usuario
+  api-keys.ts       # API keys (creacion, revocacion, lookup)
+  index.ts          # barrel export
+```
+
+Los consumidores importan desde `backend/db/queries/index.ts` (o directamente del modulo especifico). El shim `backend/db/queries.ts` fue eliminado por completo.
+
+---
+
+## Middleware de auth modularizado
+
+El archivo monolitico `backend/auth/middleware.ts` fue reemplazado por:
+
+```
+backend/middleware/auth/
+  errors.ts         # tipos de error de auth
+  session.ts        # validacion de sesion stateful
+  fingerprint.ts    # hashing de fingerprint (IP + User-Agent)
+  rbac.ts           # control de acceso basado en roles
+  session-admin.ts  # variante admin de validacion de sesion
+  index.ts          # barrel export
+```
+
+Los consumidores importan desde `backend/middleware/auth/index.ts`.
+
+---
+
+## Tests consolidados
+
+Todos los tests fueron movidos a `backend/test/` (estructura centralizada):
+
+```
+backend/test/
+  auth/__tests__/       # tests de auth y sesiones
+  db/__tests__/         # tests de schema, migraciones, queries
+  emails/__tests__/     # tests de templates de email
+  routes/api/__tests__/ # tests de endpoints HTTP
+  routes/auth/__tests__/ # tests de rutas de auth
+  routes/admin/__tests__/ # tests de rutas admin
+  routes/__tests__/     # tests de short links route
+  scripts/__tests__/    # tests del check de arquitectura
+  services/__tests__/   # tests unitarios de servicios
+```
+
+### Comandos de verificacion
 
 Desde `backend/`:
 
 ```bash
 bun run check:route-boundaries
 bun run check:phase4-architecture
-bun test routes/api/contracts/__tests__/service-error.contract.test.ts scripts/__tests__/check-route-boundaries.test.ts
+bun test backend/test/routes/api/contracts/__tests__/service-error.contract.test.ts backend/test/scripts/__tests__/check-route-boundaries.test.ts
 ```
+
+Para correr todos los tests:
+
+```bash
+bun test
+```
+
+---
+
+## Short Links (4.10) — Diseno interno
+
+La ruta de short links **no** es un endpoint browser-facing. Diseno deliberado:
+
+- **Ruta:** `GET /api/s/:code` (prefijada con `/api/`, no `/s/:code` directamente)
+- **Archivo:** `backend/routes/api/short.ts`
+- **Flujo:** el frontend SvelteKit recibe el codigo, llama a `/api/s/:code`, y hace el redirect del lado del cliente.
+- **Por que:** mantiene el short link bajo el mismo contrato de autenticacion y rate limiting que el resto de la API; evita exponer un redirect HTTP 302 directo al browser sin pasar por el middleware.
 
 ---
 
