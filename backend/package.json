@@ -1,0 +1,30 @@
+{
+  "name": "urloft",
+  "version": "1.0.0",
+  "description": "🔗 Your personal link manager with superpowers",
+  "type": "module",
+  "engines": {
+    "bun": ">=1.0"
+  },
+  "scripts": {
+    "dev": "bun run index.ts",
+    "test": "bun test",
+    "db:setup": "bun run db/setup.ts"
+  },
+  "keywords": [
+    "url",
+    "bookmarks",
+    "link-manager",
+    "svelte",
+    "bun"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/bun": "^1.3.11"
+  },
+  "dependencies": {
+    "better-auth": "^1.5.6",
+    "resend": "^6.9.4"
+  }
+}
