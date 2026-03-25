@@ -32,7 +32,7 @@
   - **Svelte 5 "Runes"** (`$state`, `$derived`) para una reactividad granular, eliminando la necesidad de librerías de manejo de estado externas (como Redux).
   - **Actions nativas** (`use:action`) y transiciones/animaciones integradas para manejar comportamientos de UI complejos (como Drag & Drop) sin recurrir a dependencias pesadas.
   - **SvelteKit** provee enrutamiento basado en archivos (file-based routing) y soporte impecable para PWA out-of-the-box.
-- **Better Auth** es nuestra solución de autenticación porque soporta SQLite de forma nativa con un adapter específico para `bun:sqlite`, se integra perfectamente con SvelteKit sin dependencias de framework, y usa sesiones stateful (validadas contra la DB en cada request) en lugar de JWTs stateless, lo que nos permite revocación inmediata de sesiones y máxima seguridad sin el overhead criptográfico.
+- **Better Auth** es nuestra solución de autenticación porque soporta SQLite de forma nativa (integración directa con `bun:sqlite`, sin adapter adicional), se integra perfectamente con SvelteKit sin dependencias de framework, y usa sesiones stateful (validadas contra la DB en cada request) en lugar de JWTs stateless, lo que nos permite revocación inmediata de sesiones y máxima seguridad sin el overhead criptográfico.
 - **SQLite** es perfecta para hackathons: cero setup, un solo archivo, queries rápidas — con FTS5 para búsqueda full-text sin servicios externos
 - **Resend** envía emails con una sola llamada a su API, sin configurar SMTP ni servicios complejos
 
@@ -43,36 +43,61 @@
 1. **Procesamiento Asíncrono (Background Jobs):** La extracción de texto (Reader Mode), validación de links (Health Checker) y el guardado en Internet Archive (Wayback Machine) NO bloquean la creación del link. Al guardar un link, se responde inmediatamente al cliente (alta velocidad/UX) y estas tareas pesadas o que dependen de APIs lentas se ejecutan en background (Eventual Consistency), actualizando la base de datos de forma silenciosa al terminar.
 2. **SQLite WAL Mode y Backups:** Al usar `PRAGMA journal_mode=WAL;`, SQLite genera 3 archivos (`.sqlite`, `-wal`, y `-shm`) permitiendo lecturas y escrituras concurrentes. Para la función de Backup, el sistema ejecuta un `PRAGMA wal_checkpoint(TRUNCATE);` para consolidar los datos y luego simplemente hace un stream del archivo principal `.sqlite` al usuario, garantizando un backup íntegro en milisegundos sin bloquear la base de datos.
 
+### Convención de Arquitectura Backend (Feature-First + Layered Modular)
+
+El backend se implementa como **monolito modular** sobre Bun (no microservicios distribuidos), organizado por feature con capas internas bien definidas.
+
+**Flujo estándar para cualquier endpoint nuevo:**
+
+`Route (HTTP) -> Service (use case/lógica de negocio) -> Repository/DB (persistencia)`
+
+#### Responsabilidades por capa
+
+- **Routes (`backend/routes/`)**: parsean request/params, validan input HTTP, llaman servicios, serializan response y códigos de estado.
+- **Services (`backend/services/`)**: concentran reglas de negocio, orquestación de casos de uso, permisos y coordinación con workers u otros servicios.
+- **Repository/DB (`backend/db/`)**: encapsulan acceso a datos (queries, transacciones, mapeo básico) sin reglas de negocio.
+
+#### Dirección de dependencias y anti-patterns
+
+- **Dirección permitida:** `routes -> services -> db`.
+- **No permitido:** rutas consultando `db` directo para saltarse servicios.
+- **No permitido:** lógica de negocio (ranking, permisos, reglas de visibilidad) en handlers HTTP.
+- **No permitido:** servicios acoplados a detalles HTTP (`Request`, `Response`) o a rendering.
+- **Nota MVC:** evitamos lenguaje MVC pesado porque este backend es **API-first**; no renderiza vistas del servidor, expone contratos JSON para frontend Svelte/SvelteKit, extensión y clientes MCP.
+
+#### Nomenclatura y ubicación para nuevas features
+
+- Crear archivos por dominio funcional con sufijos explícitos: `*.route.ts`, `*.service.ts`, `*.repository.ts` (si aplica) o integración en `backend/db/queries.ts` cuando corresponda.
+- Mantener rutas en `backend/routes/` y servicios en `backend/services/`; si la feature crece, crear subcarpetas por feature para mantener cohesión.
+- Nombrar casos de uso con verbos claros (`createLink`, `toggleFavorite`, `importBookmarks`) y evitar nombres genéricos (`processData`, `handleAction`).
+
+#### Guía de testing por capa
+
+- **Routes:** tests de integración HTTP (status codes, payloads, auth/rate-limit middleware).
+- **Services:** tests unitarios de reglas de negocio con dependencias mockeadas.
+- **Repository/DB:** tests de persistencia con SQLite en memoria para queries, constraints y triggers.
+- **End-to-end opcional:** validar flujos críticos completos sin reemplazar cobertura por capa.
+
 ---
 
 ## 📂 Estructura del Proyecto
 
 ```
 urloft/
-├── src/
-│   ├── frontend/          # Svelte app
-│   │   ├── components/    # Componentes reutilizables (LinkCard, SearchBar, etc.)
-│   │   ├── pages/         # Vistas principales
-│   │   │   ├── Home.svelte          # Página principal (/)
-│   │   │   ├── Explore.svelte       # Explorar links públicos (/explore)
-│   │   │   ├── Profile.svelte       # Perfil público (/u/:username)
-│   │   │   ├── Dashboard.svelte     # Panel privado (/dashboard)
-│   │   │   ├── DashLinks.svelte     # Mis links (/dashboard/links)
-│   │   │   ├── DashCategories.svelte # Mis categorías (/dashboard/categories)
-│   │   │   ├── DashKeys.svelte      # Mis API keys (/dashboard/keys)
-│   │   │   ├── DashFavorites.svelte # Mis favoritos (/dashboard/favorites)
-│   │   │   ├── DashImport.svelte    # Importar bookmarks (/dashboard/import)
-│   │   │   └── DashProfile.svelte   # Editar perfil (/dashboard/profile)
-│   │   ├── stores/        # Estado global (Svelte stores)
-│   │   └── lib/           # Utilidades del frontend
-│   ├── backend/           # API server (Bun)
-│   │   ├── routes/        # Endpoints de la API
-│   │   ├── middleware/    # Auth, rate limiting, etc.
-│   │   ├── db/            # Esquema y queries SQLite
-│   │   ├── emails/        # Templates de email (Resend)
-│   │   ├── mcp/           # MCP Server (tools y handlers)
-│   │   ├── skill/         # Web Skill (search y extract)
-│   │   └── services/      # Lógica de negocio
+├── backend/               # API server (Bun)
+│   ├── auth/              # Better Auth config, middleware y permisos
+│   ├── routes/            # Endpoints de la API (auth, audit, admin)
+│   ├── middleware/        # Cross-cutting middleware (rate limiting, etc.)
+│   ├── db/                # Esquema, conexión, migraciones y tests SQLite
+│   ├── emails/            # Templates de email (Resend)
+│   ├── mcp/               # MCP Server (tools y handlers)
+│   ├── skill/             # Web Skill (search y extract)
+│   └── services/          # Lógica de negocio
+├── frontend/              # SvelteKit app
+│   ├── src/
+│   │   ├── routes/        # Rutas file-based (públicas + dashboard)
+│   │   └── lib/           # Utilidades y componentes compartidos
+│   └── static/            # Assets estáticos del frontend
 ├── extension/             # Extensión de Chrome
 │   ├── manifest.json      # Manifest V3
 │   ├── popup/             # UI del popup (Svelte)
@@ -82,9 +107,9 @@ urloft/
 │   ├── manifest.json      # Web App Manifest (PWA)
 │   ├── sw.js              # Service Worker (PWA)
 │   └── icons/             # Iconos PWA (192x192, 512x512)
-├── database.sqlite        # BD (generada automáticamente)
-├── bunfig.toml            # Configuración de Bun
-├── package.json
+├── backend/db/database.sqlite # BD principal (generada automáticamente)
+├── backend/package.json
+├── frontend/package.json
 └── README.md
 ```
 
@@ -102,11 +127,11 @@ Aprovechamos la flexibilidad de SvelteKit para usar **diferentes modos de render
 - **Rutas PRIVADAS (Dashboard)** → **CSR (Client-Side Rendering)**
   - Todo lo bajo `/(dashboard)/`
   - **Por qué:** Experiencia de usuario ultrarrápida tipo SPA. Una vez cargado el JS, todas las navegaciones y filtros son instantáneos sin hit al servidor.
-  - **Config:** `export const ssr = false;` en `routes/(dashboard)/+layout.ts`
+  - **Config:** `export const ssr = false;` en `frontend/src/routes/(dashboard)/+layout.ts`
 
 **Implementación en SvelteKit:**
 ```typescript
-// src/routes/(dashboard)/+layout.ts
+// frontend/src/routes/(dashboard)/+layout.ts
 export const ssr = false; // Client-Side Rendering
 export const csr = true;  // Forzar hydratación en cliente
 ```
@@ -353,11 +378,11 @@ CREATE TABLE favorites (
   FOREIGN KEY (link_id) REFERENCES links(id) ON DELETE CASCADE
 );
 
--- Sesiones (fingerprint de JWT)
+-- Sesiones (fingerprint por sesión)
 CREATE TABLE sessions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL,
-  token_jti TEXT UNIQUE NOT NULL,       -- JWT ID único
+  token_jti TEXT UNIQUE NOT NULL,       -- ID único de sesión
   ip_address TEXT NOT NULL,
   user_agent TEXT NOT NULL,
   fingerprint TEXT NOT NULL,            -- hash(IP + User-Agent)
@@ -445,7 +470,7 @@ Para componentes de UI Svelte, usamos Vitest con `@testing-library/svelte` para 
 
 ```bash
 # Correr tests de componentes
-npm run test:ui  # (o bunx vitest --ui)
+bun run --cwd frontend test:unit -- --run
 ```
 
 ### Prioridad 3: E2E (Playwright) - Opcional
@@ -490,7 +515,7 @@ export default {
 ```
 
 ```css
-/* src/frontend/app.css (o punto de entrada CSS) */
+/* frontend/src/app.css (o punto de entrada CSS) */
 @import "tailwindcss";
 
 /* Opcional: customizaciones de tema */
@@ -606,20 +631,23 @@ La **arquitectura simple** hace esta migración trivial.
 git clone https://github.com/tu-usuario/urloft.git
 cd urloft
 
-# Instalar dependencias
-bun install
+# Instalar dependencias (backend + frontend)
+cd backend && bun install
+cd ../frontend && bun install
+cd ..
 
-# Configurar variables de entorno
-cp .env.example .env
+# Configurar variables de entorno del backend
+cp .env.example backend/.env
 
 # Inicializar la base de datos
-bun run db:setup
+cd backend && bun run db:setup
+cd ..
 
-# Iniciar en modo desarrollo
-bun run dev
+# Iniciar backend (terminal 1)
+cd backend && bun run dev
 
-# (Opcional) Compilar extensión de Chrome
-bun run ext:build
+# Iniciar frontend (terminal 2)
+cd frontend && bun run dev
 ```
 
 ### Variables de Entorno
@@ -632,10 +660,10 @@ HOST=localhost
 # Database
 DATABASE_URL=./database.sqlite
 
-# Auth
-JWT_SECRET=tu-secreto-super-seguro
-JWT_EXPIRY=7d
-FINGERPRINT_STRICT=true           # Rechazar tokens si cambia IP o User-Agent
+# Auth (Better Auth)
+BETTER_AUTH_SECRET=tu-secreto-super-seguro
+BETTER_AUTH_URL=http://localhost:3000
+TRUST_PROXY=false                 # Habilitar solo detrás de proxy confiable
 
 # Email (Resend)
 RESEND_API_KEY=re_xxxxxxxxxx
@@ -665,7 +693,7 @@ API_RATE_LIMIT=100                 # Requests por minuto por key
 - [x] Sistema de rangos
 - [x] Verificación de email (Resend)
 - [x] Recuperación de contraseña (Resend)
-- [x] Autenticación JWT con fingerprint de sesión
+- [x] Autenticación Better Auth con sesiones stateful + fingerprint
 - [x] Audit log de eventos de seguridad
 - [x] Sistema de API Keys
 - [x] MCP Server (CRUD de links para IAs)
@@ -709,4 +737,4 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 ---
 
-> Hecho con ❤️ para el Hackathon 2026
+> Hecho con ❤️ para el Hackathon 2026 midudev

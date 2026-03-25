@@ -233,6 +233,15 @@ Migra todos tus favoritos del navegador a URLoft en segundos:
 
 > 📖 **Para más detalles técnicos y arquitectura, ver [AGENTS.md](AGENTS.md)**
 
+### 🧱 Estándar de Arquitectura Backend
+
+Para mantener consistencia en nuevas features del backend usamos **Feature-First + Layered Modular** sobre Bun, dentro de un monolito modular (no microservicios distribuidos).
+
+- **Flujo obligatorio:** `Route (HTTP) -> Service (caso de uso/lógica de negocio) -> Repository/DB (persistencia)`
+- **Regla de diseño:** cada feature agrupa sus endpoints y casos de uso, evitando lógica de negocio en rutas
+- **Nota:** no usamos MVC clásico pesado con vistas del servidor; al ser backend API-first, la capa HTTP expone contratos JSON y la UI vive en Svelte/SvelteKit
+- **Contratos técnicos detallados:** responsabilidades por capa, anti-patterns y testing en [AGENTS.md](AGENTS.md)
+
 ---
 
 ## 📦 Instalación
@@ -248,25 +257,28 @@ Migra todos tus favoritos del navegador a URLoft en segundos:
 git clone https://github.com/tu-usuario/urloft.git
 cd urloft
 
-# Instalar dependencias
-bun install
+# Instalar dependencias (backend + frontend)
+cd backend && bun install
+cd ../frontend && bun install
+cd ..
 
-# Configurar variables de entorno
-cp .env.example .env
+# Configurar variables de entorno del backend
+cp .env.example backend/.env
 
 # Inicializar la base de datos
-bun run db:setup
+cd backend && bun run db:setup
+cd ..
 
-# Iniciar en modo desarrollo
-bun run dev
+# Iniciar backend (terminal 1)
+cd backend && bun run dev
 
-# (Opcional) Compilar extensión de Chrome
-bun run ext:build
+# Iniciar frontend (terminal 2)
+cd frontend && bun run dev
 ```
 
 ### Variables de Entorno
 
-Crea un archivo `.env` con las siguientes variables:
+Crea un archivo `backend/.env` con las siguientes variables:
 
 ```env
 # Server
@@ -276,9 +288,10 @@ HOST=localhost
 # Database
 DATABASE_URL=./database.sqlite
 
-# Auth
-JWT_SECRET=tu-secreto-super-seguro
-JWT_EXPIRY=7d
+# Auth (Better Auth - sesiones stateful)
+BETTER_AUTH_SECRET=tu-secreto-super-seguro
+BETTER_AUTH_URL=http://localhost:3000
+TRUST_PROXY=false
 
 # Email (Resend)
 RESEND_API_KEY=re_xxxxxxxxxx

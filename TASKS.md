@@ -1,63 +1,77 @@
 # Tasks: URLoft - Complete Implementation
 
-## Phase 1: Foundation Setup (3 tasks)
+> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`.
+> Status below is synchronized with those phase files.
 
-- [ ] 1.1 Initialize Bun project with standard structure (`src/backend/`, `src/frontend/`)
-- [ ] 1.2 Install Tailwind CSS v4 + `@tailwindcss/vite` and create `app.css` with `@import "tailwindcss"`
-- [ ] 1.3 Set up `package.json` with scripts (`dev`, `build`, `test`, `db:setup`)
+## Architecture Guardrails
 
-## Phase 2: Database & Schema (7 tasks)
+- Backend estándar obligatorio: **Feature-First + Layered Modular** en Bun, manteniendo monolito modular.
+- Flujo requerido en nuevas features backend: **`Route (HTTP) -> Service (use case/lógica de negocio) -> Repository/DB (persistencia)`**.
+- Evitar MVC pesado para backend API-first: no mezclar reglas de negocio en handlers HTTP ni acoplar servicios a rendering.
 
-- [ ] 2.1 Create `src/backend/db/schema.sql` with all tables (users, links, categories, likes, favorites, sessions, audit_logs, api_keys, password_resets)
-- [ ] 2.2 Add FTS5 virtual table `links_fts` with title, description, url, content_text columns
-- [ ] 2.3 Create SQLite triggers (links_ai, links_ad, links_au) to sync FTS5 with links table
-- [ ] 2.4 Create `src/backend/db/connection.ts` with `bun:sqlite` Database wrapper and `PRAGMA foreign_keys=ON`
-- [ ] 2.5 Create `src/backend/db/migrations.ts` with schema initialization and WAL mode setup
-- [ ] 2.6 Add `src/backend/db/queries.ts` with prepared statements for CRUD operations
-- [ ] 2.7 Write `src/backend/db/__tests__/schema.test.ts` using in-memory SQLite to verify tables and triggers
+## Phase 1: Foundation Setup (3 tasks) ✅
 
-## Phase 3: Authentication Layer (8 tasks)
+- [x] 1.1 Initialize Bun project with standard structure (`backend/`, `frontend/`)
+- [x] 1.2 Install Tailwind CSS v4 + `@tailwindcss/vite` and create `app.css` with `@import "tailwindcss"`
+- [x] 1.3 Set up `package.json` with scripts (`dev`, `test`, `db:setup`)
 
-- [ ] 3.1 Install `better-auth` and configure SQLite adapter for `bun:sqlite` in backend
-- [ ] 3.2 Create `src/backend/auth/config.ts` with Better Auth setup (JWT, session options, email verification)
-- [ ] 3.3 Create `src/backend/auth/middleware.ts` with session validation and fingerprint checking
-- [ ] 3.4 Create auth endpoints: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`
-- [ ] 3.5 Create email verification endpoints: `GET /api/auth/verify/:token`, resend verification email
-- [ ] 3.6 Create password reset endpoints: `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`
-- [ ] 3.7 Set up Resend email templates in `src/backend/emails/` (verification, password reset)
-- [ ] 3.8 Create audit log service to track auth events (login, logout, password_change)
+## Phase 2: Database & Schema (7 tasks) ✅
 
-## Phase 4: Core Backend APIs (10 tasks)
+- [x] 2.1 Create `backend/db/schema.sql` with all tables (users, links, categories, likes, favorites, sessions, audit_logs, api_keys, password_resets)
+- [x] 2.2 Add FTS5 virtual table `links_fts` with title, description, url, content_text columns
+- [x] 2.3 Create SQLite triggers (links_ai, links_ad, links_au) to sync FTS5 with links table
+- [x] 2.4 Create `backend/db/connection.ts` with `bun:sqlite` Database wrapper and `PRAGMA foreign_keys=ON`
+- [x] 2.5 Create `backend/db/migrations.ts` with schema initialization and WAL mode setup
+- [x] 2.6 Add `backend/db/queries.ts` with prepared statements for CRUD operations
+- [x] 2.7 Write `backend/db/__tests__/schema.test.ts` using in-memory SQLite to verify tables and triggers
 
-- [ ] 4.1 Create `src/backend/services/links.service.ts` with createLink, getLinks, getLinkById, updateLink, deleteLink
-- [ ] 4.2 Create `src/backend/routes/api/links.ts` with GET/POST/PUT/DELETE endpoints for links
-- [ ] 4.3 Create `src/backend/routes/api/links.ts` with like/favorite toggle endpoints (`POST /:id/like`, `POST /:id/favorite`)
-- [ ] 4.4 Create `src/backend/routes/api/links.ts` with preview endpoint (`POST /preview` - OG metadata extraction)
-- [ ] 4.5 Create `src/backend/services/categories.service.ts` with CRUD operations
-- [ ] 4.6 Create `src/backend/routes/api/categories.ts` with category endpoints
-- [ ] 4.7 Create `src/backend/routes/api/stats.ts` with user stats and global stats endpoints
-- [ ] 4.8 Create `src/backend/routes/api/users.ts` with profile endpoints (get public profile, update profile, change password)
-- [ ] 4.9 Create `src/backend/routes/api/keys.ts` with API key CRUD and hashing logic
-- [ ] 4.10 Create short link redirect handler in `src/backend/routes/short.ts` (`GET /s/:code`)
+## Phase 3: Authentication Layer (11 tasks) ✅
 
-## Phase 5: Background Workers (5 tasks)
+- [x] 3.1 Install `better-auth` and configure native `bun:sqlite` integration in backend
+- [x] 3.2 Create `backend/auth/config.ts` with Better Auth setup (stateful sessions + email verification)
+- [x] 3.3 Create `backend/auth/middleware.ts` with session validation and fingerprint checking
+- [x] 3.4 Create auth endpoints: `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`
+- [x] 3.5 Create email verification endpoints: `GET /api/auth/verify/:token`, resend verification email
+- [x] 3.6 Create password reset endpoints: `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`
+- [x] 3.7 Set up Resend email templates in `backend/emails/` (verification, password reset)
+- [x] 3.8 Create audit log service to track auth events (login, logout, password_change)
+- [x] 3.9 Consolidate auth test suite and DB verification coverage
+- [x] 3.10 Set up admin plugin integration (role management, ban/unban, impersonation)
+- [x] 3.11 Apply admin schema migration and initial admin bootstrap strategy
 
-- [ ] 5.1 Create `src/backend/workers/health-checker.worker.ts` with periodic link status verification
-- [ ] 5.2 Create `src/backend/workers/reader-mode.worker.ts` with text extraction using Readability
-- [ ] 5.3 Create `src/backend/workers/wayback.worker.ts` with Internet Archive API integration
-- [ ] 5.4 Create `src/backend/workers/pool.ts` to manage worker lifecycle and message passing
+## Phase 4: Core Backend APIs (11 tasks)
+
+- [ ] 4.0 Architecture checkpoint: validar boundary `routes -> services -> db` antes de abrir nuevos endpoints
+- [ ] 4.1 Create `backend/services/links.service.ts` with createLink, getLinks, getLinkById, updateLink, deleteLink
+- [ ] 4.2 Create `backend/routes/api/links.ts` with GET/POST/PUT/DELETE endpoints for links
+- [ ] 4.3 Create `backend/routes/api/links.ts` with like/favorite toggle endpoints (`POST /:id/like`, `POST /:id/favorite`)
+- [ ] 4.4 Create `backend/routes/api/links.ts` with preview endpoint (`POST /preview` - OG metadata extraction)
+- [ ] 4.5 Create `backend/services/categories.service.ts` with CRUD operations
+- [ ] 4.6 Create `backend/routes/api/categories.ts` with category endpoints
+- [ ] 4.7 Create `backend/routes/api/stats.ts` with user stats and global stats endpoints
+- [ ] 4.8 Create `backend/routes/api/users.ts` with profile endpoints (get public profile, update profile, change password)
+- [ ] 4.9 Create `backend/routes/api/keys.ts` with API key CRUD and hashing logic
+- [ ] 4.10 Create short link redirect handler in `backend/routes/short.ts` (`GET /s/:code`)
+
+## Phase 5: Background Workers (6 tasks)
+
+- [ ] 5.0 Architecture checkpoint: workers coordinan con servicios sin saltar la capa de negocio
+- [ ] 5.1 Create `backend/workers/health-checker.worker.ts` with periodic link status verification
+- [ ] 5.2 Create `backend/workers/reader-mode.worker.ts` with text extraction using Readability
+- [ ] 5.3 Create `backend/workers/wayback.worker.ts` with Internet Archive API integration
+- [ ] 5.4 Create `backend/workers/pool.ts` to manage worker lifecycle and message passing
 - [ ] 5.5 Integrate worker pool with link creation (fire-and-forget pattern with DB updates)
 
 ## Phase 6: MCP Server & Web Skill (4 tasks)
 
-- [ ] 6.1 Create `src/backend/mcp/server.ts` with MCP protocol implementation and API key auth
+- [ ] 6.1 Create `backend/mcp/server.ts` with MCP protocol implementation and API key auth
 - [ ] 6.2 Implement MCP tools: create_link, get_links, get_link, update_link, delete_link, search_links, get_categories
-- [ ] 6.3 Create `src/backend/skill/search.ts` with full-text search using FTS5
-- [ ] 6.4 Create `src/backend/skill/extract.ts` with link metadata extraction endpoint
+- [ ] 6.3 Create `backend/skill/search.ts` with full-text search using FTS5
+- [ ] 6.4 Create `backend/skill/extract.ts` with link metadata extraction endpoint
 
 ## Phase 7: Frontend - SvelteKit Setup (6 tasks)
 
-- [ ] 7.1 Initialize SvelteKit project in `src/frontend/` with TypeScript and Tailwind
+- [ ] 7.1 Initialize SvelteKit project in `frontend/` with TypeScript and Tailwind
 - [ ] 7.2 Create file-based routing structure: `routes/`, `routes/(dashboard)/`, `routes/api/`
 - [ ] 7.3 Set up Svelte 5 Runes in `app.html` and configure `$state`, `$derived` stores
 - [ ] 7.4 Create shared layout `routes/+layout.svelte` with navigation and auth state
@@ -106,27 +120,27 @@
 
 ## Phase 13: Security & Rate Limiting (4 tasks)
 
-- [ ] 13.1 Create `src/backend/middleware/rate-limit.ts` with IP-based limiting using in-memory Map
+- [ ] 13.1 Create `backend/middleware/rate-limit.ts` with IP-based limiting using in-memory Map
 - [ ] 13.2 Create API key rate limiter with per-key quotas and Redis-like in-memory storage
 - [ ] 13.3 Add security headers (CORS, CSP, X-Frame-Options) in server middleware
 - [ ] 13.4 Implement session fingerprint validation (IP + User-Agent hash) in auth middleware
 
 ## Phase 14: Testing Suite (5 tasks)
 
-- [ ] 14.1 Write `src/backend/__tests__/auth.test.ts` with register, login, logout flows
-- [ ] 14.2 Write `src/backend/__tests__/links.test.ts` with CRUD and pagination tests
-- [ ] 14.3 Write `src/backend/__tests__/workers.test.ts` with mock worker messaging
+- [ ] 14.1 Write `backend/__tests__/auth.test.ts` with register, login, logout flows
+- [ ] 14.2 Write `backend/__tests__/links.test.ts` with CRUD and pagination tests
+- [ ] 14.3 Write `backend/__tests__/workers.test.ts` with mock worker messaging
 - [ ] 14.4 Install Vitest + `@testing-library/svelte` and write component tests for LinkCard, SearchBar
 - [ ] 14.5 Set up Playwright E2E tests for critical flows (register → create link → verify in dashboard)
 
 ## Phase 15: Deployment & Build (4 tasks)
 
-- [ ] 15.1 Create `bun.lockb` and verify workspace dependencies resolve correctly
-- [ ] 15.2 Add `bun run build` script to compile SvelteKit and prepare production bundle
-- [ ] 15.3 Create `.env.example` with all required variables (JWT_SECRET, RESEND_API_KEY, DATABASE_URL)
+- [ ] 15.1 Verify `backend/bun.lock` and `frontend/bun.lock` are committed and dependencies resolve correctly
+- [ ] 15.2 Ensure frontend build command exists (`frontend/package.json` → `bun run build`) for production bundle
+- [ ] 15.3 Create `.env.example` with all required variables (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `TRUST_PROXY`, `RESEND_API_KEY`, `DATABASE_URL`)
 - [ ] 15.4 Write deployment scripts for Railway/Fly.io with health check and startup commands
 
-**Total Tasks: 85**
+**Total Tasks: 88**
 
 ---
 
