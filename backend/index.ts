@@ -2,16 +2,21 @@
 // Ultra-fast JavaScript runtime with native SQLite support
 
 import { verifyDatabaseConnection } from "./db/verify";
-import { handleAuthRoute } from "./routes/auth/index.js";
-import { handleAuditLogRoute } from "./routes/audit-log/index.js";
-import { handleAdminAuditLogRoute } from "./routes/admin/audit-log.js";
+import { handleAuthRoute } from "./routes/api/auth/index.js";
+import { handleAuditLogRoute } from "./routes/api/audit-log/index.js";
+import { handleAdminAuditLogRoute } from "./routes/api/admin/audit-log.js";
+import { handleLinksRoute } from "./routes/api/links.js";
+import { handleCategoriesRoute } from "./routes/api/categories.js";
+import { handleKeysRoute } from "./routes/api/keys.js";
+import { handleStatsRoute } from "./routes/api/stats.js";
+import { handleUsersRoute } from "./routes/api/users.js";
 import {
   setRoleHandler,
   banUserHandler,
   unbanUserHandler,
   startImpersonationHandler,
   endImpersonationHandler
-} from "./routes/admin/index.js";
+} from "./routes/api/admin/index.js";
 
 // Verify database before starting server
 if (!verifyDatabaseConnection()) {
@@ -40,6 +45,31 @@ const server = Bun.serve({
 		if (path === "/api/admin/audit-log") {
 			const adminAuditResponse = await handleAdminAuditLogRoute(req, path);
 			if (adminAuditResponse !== null) return adminAuditResponse;
+		}
+
+		if (path === "/api/links" || path.startsWith("/api/links/")) {
+			const linksResponse = await handleLinksRoute(req, path);
+			if (linksResponse !== null) return linksResponse;
+		}
+
+		if (path === "/api/categories" || path.startsWith("/api/categories/")) {
+			const categoriesResponse = await handleCategoriesRoute(req, path);
+			if (categoriesResponse !== null) return categoriesResponse;
+		}
+
+		if (path === "/api/keys" || path.startsWith("/api/keys/")) {
+			const keysResponse = await handleKeysRoute(req, path);
+			if (keysResponse !== null) return keysResponse;
+		}
+
+		if (path === "/api/stats/me" || path === "/api/stats/global") {
+			const statsResponse = await handleStatsRoute(req, path);
+			if (statsResponse !== null) return statsResponse;
+		}
+
+		if (path.startsWith("/api/users")) {
+			const usersResponse = await handleUsersRoute(req, path);
+			if (usersResponse !== null) return usersResponse;
 		}
 
 		// Admin routes: /api/admin/users/:id/...

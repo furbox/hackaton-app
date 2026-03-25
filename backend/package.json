@@ -1,6 +1,6 @@
 {
   "name": "urloft",
-  "version": "1.0.0",
+  "version": "0.4.0",
   "description": "🔗 Your personal link manager with superpowers",
   "type": "module",
   "engines": {
@@ -9,7 +9,9 @@
   "scripts": {
     "dev": "bun run index.ts",
     "test": "bun test",
-    "db:setup": "bun run db/setup.ts"
+    "db:setup": "bun run db/setup.ts",
+    "check:route-boundaries": "bun run scripts/check-route-boundaries.ts",
+    "check:phase4-architecture": "bun run check:route-boundaries"
   },
   "keywords": [
     "url",

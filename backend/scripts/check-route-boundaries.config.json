@@ -1,0 +1,52 @@
+{
+  "routeGlobs": [
+    "backend/routes/api/**/*.ts"
+  ],
+  "indexFiles": [
+    "backend/index.ts"
+  ],
+  "ignoreGlobs": [
+    "**/__tests__/**",
+    "**/*.test.ts"
+  ],
+  "forbiddenRoutePatterns": [
+    {
+      "id": "route-no-bun-sqlite",
+      "pattern": "from\\s+[\"']bun:sqlite[\"']",
+      "flags": "g",
+      "message": "Phase 4 routes must not import bun:sqlite directly."
+    },
+    {
+      "id": "route-no-db-queries-import",
+      "pattern": "from\\s+[\"'][^\"']*db/queries(?:\\.ts)?[\"']",
+      "flags": "g",
+      "message": "Phase 4 routes must call services, not backend/db/queries."
+    },
+    {
+      "id": "route-no-get-database",
+      "pattern": "\\bgetDatabase\\s*\\(",
+      "flags": "g",
+      "message": "Phase 4 routes must not access DB connections directly."
+    }
+  ],
+  "forbiddenIndexPatterns": [
+    {
+      "id": "index-no-db-import",
+      "pattern": "from\\s+[\"'][^\"']*db/(?:queries|connection)(?:\\.ts|\\.js)?[\"']",
+      "flags": "g",
+      "message": "backend/index.ts must remain wiring-only and avoid db imports."
+    },
+    {
+      "id": "index-no-direct-db-call",
+      "pattern": "\\bgetDatabase\\s*\\(",
+      "flags": "g",
+      "message": "backend/index.ts must not call getDatabase()."
+    },
+    {
+      "id": "index-no-sql-literals",
+      "pattern": "\\b(SELECT|INSERT|UPDATE|DELETE|PRAGMA|CREATE\\s+TABLE)\\b",
+      "flags": "gi",
+      "message": "backend/index.ts must not embed SQL/domain data logic."
+    }
+  ]
+}

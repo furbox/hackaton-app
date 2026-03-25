@@ -1,7 +1,7 @@
 import {
   getUserVerificationByToken,
   markUserEmailVerified,
-} from "../db/queries.js";
+} from "../db/queries/index.js";
 
 export type VerifyEmailResult =
   | { status: "TOKEN_INVALID" }

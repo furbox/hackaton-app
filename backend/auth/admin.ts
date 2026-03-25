@@ -45,7 +45,7 @@
 
 import { getDatabase } from "../db/connection.js";
 import { createAuditLog, extractRequestInfo } from "../services/audit-log.service.js";
-import { requireAdmin, isAdmin, type Session } from "./middleware.js";
+import { requireAdmin, isAdmin, type Session } from "../middleware/auth/index.js";
 
 // ============================================================================
 // UTILITY FUNCTIONS

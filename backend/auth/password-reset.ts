@@ -16,7 +16,7 @@ import {
   insertPasswordResetRow,
   getPasswordResetByToken,
   markPasswordResetAsUsed,
-} from "../db/queries.js";
+} from "../db/queries/index.js";
 import { loadTemplate } from "../emails/load-template.js";
 
 // ---------------------------------------------------------------------------
