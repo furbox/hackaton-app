@@ -9,6 +9,9 @@ import {
   previewLink,
   toggleFavorite,
   toggleLike,
+  updateLinkContentText,
+  updateLinkArchiveUrl,
+  updateLinkStatusCode,
   updateLink,
 } from "../links.service.js";
 
@@ -442,5 +445,159 @@ describe("links.service previewLink", () => {
       .query("SELECT COUNT(*) as total FROM links")
       .get() as { total: number };
     expect(after.total).toBe(before.total);
+  });
+});
+
+describe("links.service updateLinkStatusCode", () => {
+  test("validates linkId and statusCode shape", () => {
+    const invalidId = updateLinkStatusCode(0, 200);
+    expect(invalidId.ok).toBe(false);
+    if (!invalidId.ok) {
+      expect(invalidId.error.code).toBe("VALIDATION_ERROR");
+    }
+
+    const invalidStatus = updateLinkStatusCode(1, 99);
+    expect(invalidStatus.ok).toBe(false);
+    if (!invalidStatus.ok) {
+      expect(invalidStatus.error.code).toBe("VALIDATION_ERROR");
+    }
+  });
+
+  test("persists synthetic and HTTP status codes", () => {
+    const created = createLink({ userId: 1 }, {
+      url: "https://status.example.com",
+      title: "status",
+      shortCode: "stc111",
+    });
+    if (!created.ok) throw new Error("seed failed");
+
+    const synthetic = updateLinkStatusCode(created.data.id, -1);
+    expect(synthetic.ok).toBe(true);
+    if (synthetic.ok) {
+      expect(synthetic.data.updated).toBe(true);
+    }
+
+    const rowAfterSynthetic = testDb
+      .query("SELECT status_code FROM links WHERE id = ?")
+      .get(created.data.id) as { status_code: number } | null;
+    expect(rowAfterSynthetic?.status_code).toBe(-1);
+
+    const httpStatus = updateLinkStatusCode(created.data.id, 204);
+    expect(httpStatus.ok).toBe(true);
+    if (httpStatus.ok) {
+      expect(httpStatus.data.updated).toBe(true);
+    }
+
+    const rowAfterHttp = testDb
+      .query("SELECT status_code FROM links WHERE id = ?")
+      .get(created.data.id) as { status_code: number } | null;
+    expect(rowAfterHttp?.status_code).toBe(204);
+  });
+
+  test("returns updated false when link does not exist", () => {
+    const result = updateLinkStatusCode(999_999, 200);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.updated).toBe(false);
+    }
+  });
+});
+
+describe("links.service updateLinkContentText", () => {
+  test("validates linkId", () => {
+    const invalidId = updateLinkContentText(0, "content");
+    expect(invalidId.ok).toBe(false);
+    if (!invalidId.ok) {
+      expect(invalidId.error.code).toBe("VALIDATION_ERROR");
+    }
+  });
+
+  test("persists extracted content and allows null", () => {
+    const created = createLink({ userId: 1 }, {
+      url: "https://reader.example.com",
+      title: "reader",
+      shortCode: "rdr111",
+    });
+    if (!created.ok) throw new Error("seed failed");
+
+    const withContent = updateLinkContentText(created.data.id, "Readable content text");
+    expect(withContent.ok).toBe(true);
+    if (withContent.ok) {
+      expect(withContent.data.updated).toBe(true);
+    }
+
+    const rowWithContent = testDb
+      .query("SELECT content_text FROM links WHERE id = ?")
+      .get(created.data.id) as { content_text: string | null } | null;
+    expect(rowWithContent?.content_text).toBe("Readable content text");
+
+    const withNull = updateLinkContentText(created.data.id, null);
+    expect(withNull.ok).toBe(true);
+    if (withNull.ok) {
+      expect(withNull.data.updated).toBe(true);
+    }
+
+    const rowWithNull = testDb
+      .query("SELECT content_text FROM links WHERE id = ?")
+      .get(created.data.id) as { content_text: string | null } | null;
+    expect(rowWithNull?.content_text).toBeNull();
+  });
+
+  test("returns updated false when link does not exist", () => {
+    const result = updateLinkContentText(999_999, "anything");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.updated).toBe(false);
+    }
+  });
+});
+
+describe("links.service updateLinkArchiveUrl", () => {
+  test("validates linkId", () => {
+    const invalidId = updateLinkArchiveUrl(0, "https://web.archive.org/web/*/https%3A%2F%2Fexample.com");
+    expect(invalidId.ok).toBe(false);
+    if (!invalidId.ok) {
+      expect(invalidId.error.code).toBe("VALIDATION_ERROR");
+    }
+  });
+
+  test("persists archive URL and allows null", () => {
+    const created = createLink({ userId: 1 }, {
+      url: "https://archive.example.com",
+      title: "archive",
+      shortCode: "arc111",
+    });
+    if (!created.ok) throw new Error("seed failed");
+
+    const archive = "https://web.archive.org/web/20260326030303/https://archive.example.com";
+    const withArchive = updateLinkArchiveUrl(created.data.id, archive);
+    expect(withArchive.ok).toBe(true);
+    if (withArchive.ok) {
+      expect(withArchive.data.updated).toBe(true);
+    }
+
+    const rowWithArchive = testDb
+      .query("SELECT archive_url FROM links WHERE id = ?")
+      .get(created.data.id) as { archive_url: string | null } | null;
+    expect(rowWithArchive?.archive_url).toBe(archive);
+
+    const withNull = updateLinkArchiveUrl(created.data.id, null);
+    expect(withNull.ok).toBe(true);
+    if (withNull.ok) {
+      expect(withNull.data.updated).toBe(true);
+    }
+
+    const rowWithNull = testDb
+      .query("SELECT archive_url FROM links WHERE id = ?")
+      .get(created.data.id) as { archive_url: string | null } | null;
+    expect(rowWithNull?.archive_url).toBeNull();
+  });
+
+  test("returns updated false when link does not exist", () => {
+    const result = updateLinkArchiveUrl(999_999, "https://web.archive.org/web/*/https%3A%2F%2Fmissing.example.com");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.updated).toBe(false);
+    }
   });
 });

@@ -248,6 +248,24 @@ const incrementViewsStmt = () => getDb().prepare(`
   UPDATE links SET views = views + 1 WHERE id = ?
 `);
 
+const updateLinkStatusCodeByIdStmt = () => getDb().prepare(`
+  UPDATE links
+  SET status_code = ?
+  WHERE id = ?
+`);
+
+const updateLinkContentTextByIdStmt = () => getDb().prepare(`
+  UPDATE links
+  SET content_text = ?
+  WHERE id = ?
+`);
+
+const updateLinkArchiveUrlByIdStmt = () => getDb().prepare(`
+  UPDATE links
+  SET archive_url = ?
+  WHERE id = ?
+`);
+
 // ============================================================================
 // LINK QUERIES
 // ============================================================================
@@ -557,6 +575,24 @@ export function updateLinkByOwner(
 export function deleteLinkByOwner(linkId: number, ownerUserId: number): LinkMutationResult {
   const stmt = deleteLinkByOwnerStmt();
   const result = stmt.run(linkId, ownerUserId);
+  return { changes: result.changes };
+}
+
+export function updateLinkStatusCodeById(linkId: number, statusCode: number): LinkMutationResult {
+  const stmt = updateLinkStatusCodeByIdStmt();
+  const result = stmt.run(statusCode, linkId);
+  return { changes: result.changes };
+}
+
+export function updateLinkContentTextById(linkId: number, contentText: string | null): LinkMutationResult {
+  const stmt = updateLinkContentTextByIdStmt();
+  const result = stmt.run(contentText, linkId);
+  return { changes: result.changes };
+}
+
+export function updateLinkArchiveUrlById(linkId: number, archiveUrl: string | null): LinkMutationResult {
+  const stmt = updateLinkArchiveUrlByIdStmt();
+  const result = stmt.run(archiveUrl, linkId);
   return { changes: result.changes };
 }
 

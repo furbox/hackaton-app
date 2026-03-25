@@ -1,6 +1,6 @@
 # Tasks: URLoft - Complete Implementation
 
-> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`, `tasks/Phase04.md`.
+> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`, `tasks/Phase04.md`, `tasks/Phase05.md`.
 > Status below is synchronized with those phase files.
 
 ## Architecture Guardrails
@@ -53,14 +53,14 @@
 - [x] 4.9 Create `backend/routes/api/keys.ts` with API key CRUD and hashing logic
 - [x] 4.10 Create short link redirect handler in `backend/routes/api/short.ts` (`GET /api/s/:code`)
 
-## Phase 5: Background Workers (6 tasks)
+## Phase 5: Background Workers (6 tasks) ✅
 
-- [ ] 5.0 Architecture checkpoint: workers coordinan con servicios sin saltar la capa de negocio
-- [ ] 5.1 Create `backend/workers/health-checker.worker.ts` with periodic link status verification
-- [ ] 5.2 Create `backend/workers/reader-mode.worker.ts` with text extraction using Readability
-- [ ] 5.3 Create `backend/workers/wayback.worker.ts` with Internet Archive API integration
-- [ ] 5.4 Create `backend/workers/pool.ts` to manage worker lifecycle and message passing
-- [ ] 5.5 Integrate worker pool with link creation (fire-and-forget pattern with DB updates)
+- [x] 5.0 Architecture checkpoint: workers coordinan con servicios sin saltar la capa de negocio
+- [x] 5.1 Create `backend/workers/health-checker.worker.ts` with periodic link status verification
+- [x] 5.2 Create `backend/workers/reader-mode.worker.ts` with text extraction using Readability
+- [x] 5.3 Create `backend/workers/wayback.worker.ts` with Internet Archive API integration
+- [x] 5.4 Create `backend/workers/pool.ts` to manage worker lifecycle and message passing
+- [x] 5.5 Integrate worker pool with link creation (fire-and-forget pattern with DB updates)
 
 ## Phase 6: MCP Server & Web Skill (4 tasks)
 

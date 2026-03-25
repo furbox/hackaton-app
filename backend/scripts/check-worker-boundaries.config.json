@@ -1,0 +1,38 @@
+{
+  "routeGlobs": [
+    "backend/workers/**/*.ts"
+  ],
+  "indexFiles": [],
+  "ignoreGlobs": [
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/types.ts"
+  ],
+  "forbiddenRoutePatterns": [
+    {
+      "id": "worker-no-bun-sqlite",
+      "pattern": "from\\s+[\"']bun:sqlite[\"']",
+      "flags": "g",
+      "message": "Workers must not import bun:sqlite directly. All DB writes go via backend/services/ called from main thread pool."
+    },
+    {
+      "id": "worker-no-db-queries",
+      "pattern": "from\\s+[\"'][^\"']*db/queries(?:/[^\"']*)?(?:\\.ts|\\.js)?[\"']",
+      "flags": "g",
+      "message": "Workers must not import from db/queries/*. All DB writes go via backend/services/ called from main thread pool."
+    },
+    {
+      "id": "worker-no-db-connection",
+      "pattern": "from\\s+[\"'][^\"']*db/connection(?:\\.ts|\\.js)?[\"']",
+      "flags": "g",
+      "message": "Workers must not import db/connection. All DB writes go via backend/services/ called from main thread pool."
+    },
+    {
+      "id": "worker-no-get-database",
+      "pattern": "\\bgetDatabase\\s*\\(",
+      "flags": "g",
+      "message": "Workers must not call getDatabase(). All DB writes go via backend/services/ called from main thread pool."
+    }
+  ],
+  "forbiddenIndexPatterns": []
+}

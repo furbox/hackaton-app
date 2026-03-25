@@ -6,6 +6,9 @@ import {
   getLinksVisibleToActor,
   toggleFavoriteAndGetSnapshot,
   toggleLikeAndGetSnapshot,
+  updateLinkContentTextById,
+  updateLinkArchiveUrlById,
+  updateLinkStatusCodeById,
   updateLinkByOwner,
   type CreateLinkScopedParams,
   type Link,
@@ -13,16 +16,24 @@ import {
   type LinkSort,
   type LinkWithCounts,
   type UpdateLinkByOwnerPatch,
-} from "../db/queries/index.js";
+} from "../db/queries/index.ts";
 import type {
   Phase4ServiceError,
   Phase4ServiceResult,
-} from "../contracts/service-error.js";
+} from "../contracts/service-error.ts";
 import {
   extractLinkPreviewMetadata,
   type PreviewMetadata,
   type PreviewMetadataResult,
-} from "./link-preview-metadata.js";
+} from "./link-preview-metadata.ts";
+import { getInitializedWorkerPool } from "../workers/pool.ts";
+import {
+  WorkerMessageType,
+  type WorkerMessage,
+  type HealthCheckPayload,
+  type ReaderModePayload,
+  type WaybackPayload,
+} from "../workers/types.ts";
 
 export type ServiceActor = { userId: number } | null;
 export type ServiceLinkSort = LinkSort;
@@ -195,6 +206,40 @@ function mapPreviewFailure(result: Extract<PreviewMetadataResult, { ok: false }>
   return fail("INTERNAL", "Failed to fetch metadata", { reason: "FETCH_FAILED" });
 }
 
+function createWorkerMessage<T>(
+  type: WorkerMessageType,
+  payload: T,
+  linkId: number
+): WorkerMessage<T> {
+  return {
+    type,
+    correlationId: `${type.toLowerCase()}-${linkId}-${Date.now()}`,
+    payload,
+  };
+}
+
+function dispatchCreateLinkWorkers(linkId: number, url: string): void {
+  const pool = getInitializedWorkerPool();
+  if (!pool) {
+    return;
+  }
+
+  const basePayload = { linkId, url };
+  const jobs: WorkerMessage<unknown>[] = [
+    createWorkerMessage<HealthCheckPayload>(WorkerMessageType.HEALTH_CHECK, basePayload, linkId),
+    createWorkerMessage<ReaderModePayload>(WorkerMessageType.READER_MODE, basePayload, linkId),
+    createWorkerMessage<WaybackPayload>(WorkerMessageType.WAYBACK, basePayload, linkId),
+  ];
+
+  for (const job of jobs) {
+    try {
+      pool.dispatch(job);
+    } catch {
+      // Fire-and-forget workers must never block createLink response flow.
+    }
+  }
+}
+
 export function createLink(
   actor: ServiceActor,
   input: CreateLinkInput
@@ -231,6 +276,7 @@ export function createLink(
 
   try {
     const row = createLinkScoped(params);
+    dispatchCreateLinkWorkers(row.id, row.url);
     return ok(toLinkDTO(row));
   } catch (error) {
     const classified = classifySqliteError(error);
@@ -452,6 +498,70 @@ export function toggleFavorite(
     return ok(snapshot);
   } catch {
     return fail("INTERNAL", "Failed to toggle favorite");
+  }
+}
+
+export function updateLinkStatusCode(
+  linkId: number,
+  statusCode: number
+): Phase4ServiceResult<{ updated: boolean }> {
+  if (!isPositiveInt(linkId)) {
+    return fail("VALIDATION_ERROR", "linkId must be a positive integer");
+  }
+
+  const isValidStatusCode =
+    Number.isInteger(statusCode)
+    && (statusCode === -1 || statusCode === 0 || (statusCode >= 100 && statusCode <= 599));
+
+  if (!isValidStatusCode) {
+    return fail("VALIDATION_ERROR", "statusCode must be -1, 0, or an HTTP status code (100-599)");
+  }
+
+  try {
+    const mutation = updateLinkStatusCodeById(linkId, statusCode);
+    return ok({ updated: mutation.changes > 0 });
+  } catch {
+    return fail("INTERNAL", "Failed to update link status code");
+  }
+}
+
+export function updateLinkContentText(
+  linkId: number,
+  contentText: string | null
+): Phase4ServiceResult<{ updated: boolean }> {
+  if (!isPositiveInt(linkId)) {
+    return fail("VALIDATION_ERROR", "linkId must be a positive integer");
+  }
+
+  if (contentText !== null && typeof contentText !== "string") {
+    return fail("VALIDATION_ERROR", "contentText must be a string or null");
+  }
+
+  try {
+    const mutation = updateLinkContentTextById(linkId, contentText);
+    return ok({ updated: mutation.changes > 0 });
+  } catch {
+    return fail("INTERNAL", "Failed to update link content text");
+  }
+}
+
+export function updateLinkArchiveUrl(
+  linkId: number,
+  archiveUrl: string | null
+): Phase4ServiceResult<{ updated: boolean }> {
+  if (!isPositiveInt(linkId)) {
+    return fail("VALIDATION_ERROR", "linkId must be a positive integer");
+  }
+
+  if (archiveUrl !== null && typeof archiveUrl !== "string") {
+    return fail("VALIDATION_ERROR", "archiveUrl must be a string or null");
+  }
+
+  try {
+    const mutation = updateLinkArchiveUrlById(linkId, archiveUrl);
+    return ok({ updated: mutation.changes > 0 });
+  } catch {
+    return fail("INTERNAL", "Failed to update link archive URL");
   }
 }
 

@@ -51,7 +51,13 @@ function globToRegExp(globPattern: string): RegExp {
 
 async function walkFiles(startDir: string): Promise<string[]> {
   const output: string[] = [];
-  const entries = await readdir(startDir, { withFileTypes: true });
+  let entries;
+  try {
+    entries = await readdir(startDir, { withFileTypes: true });
+  } catch {
+    // Skip directories that cannot be read (e.g. Windows reserved names like "nul")
+    return output;
+  }
 
   for (const entry of entries) {
     const fullPath = resolve(startDir, entry.name);
