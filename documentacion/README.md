@@ -8,6 +8,7 @@
 |---------|-------------|-----------|
 | [`db-layer.md`](./db-layer.md) | **Phase 2: Database Layer** | Arquitectura, esquema, queries, testing, troubleshooting |
 | [`phase03-authentication-layer.md`](./phase03-authentication-layer.md) | **Phase 3: Authentication Layer** | Objetivo, decisiones de arquitectura auth, estado 3.1-3.8, testing, pendientes |
+| [`phase4-architecture-checkpoint-4-0.md`](./phase4-architecture-checkpoint-4-0.md) | **Phase 4.0: Architecture Checkpoint** | Reglas de capas, contrato de errores, comandos de verificacion, rollback |
 
 ---
 
@@ -45,6 +46,19 @@
 - Onboarding rapido de auth y seguridad
 - Entender decisiones de Better Auth + sesiones stateful
 - Identificar rapido que falta para cerrar la Fase 3
+
+### `phase4-architecture-checkpoint-4-0.md` - Architecture Checkpoint (Phase 4.0)
+
+**Que incluye:**
+- Reglas de frontera `routes -> services -> db` para la superficie API de Phase 4
+- Restricciones wiring-only para `backend/index.ts`
+- Contrato deterministico de mapeo de errores de servicio a HTTP
+- Comandos exactos para ejecutar el guard de arquitectura y tests de contrato
+
+**Ideal para:**
+- Revisar PRs de APIs nuevas sin ambiguedad de capas
+- Detectar acoplamiento route-to-db antes de merge
+- Arrancar 4.1+ con contratos y gates ya definidos
 
 ---
 
