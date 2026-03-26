@@ -1,6 +1,6 @@
 # Tasks: URLoft - Complete Implementation
 
-> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`, `tasks/Phase04.md`, `tasks/Phase05.md`.
+> Parent roadmap only. Detailed execution/progress lives in `tasks/Phase01.md`, `tasks/Phase02.md`, `tasks/Phase03.md`, `tasks/Phase04.md`, `tasks/Phase05.md`, `tasks/Phase06.md`.
 > Status below is synchronized with those phase files.
 
 ## Architecture Guardrails
@@ -62,12 +62,12 @@
 - [x] 5.4 Create `backend/workers/pool.ts` to manage worker lifecycle and message passing
 - [x] 5.5 Integrate worker pool with link creation (fire-and-forget pattern with DB updates)
 
-## Phase 6: MCP Server & Web Skill (4 tasks)
+## Phase 6: MCP Server & Web Skill (4 tasks) ✅
 
-- [ ] 6.1 Create `backend/mcp/server.ts` with MCP protocol implementation and API key auth
-- [ ] 6.2 Implement MCP tools: create_link, get_links, get_link, update_link, delete_link, search_links, get_categories
-- [ ] 6.3 Create `backend/skill/search.ts` with full-text search using FTS5
-- [ ] 6.4 Create `backend/skill/extract.ts` with link metadata extraction endpoint
+- [x] 6.1 Create `backend/mcp/server.ts` with MCP protocol implementation and API key auth
+- [x] 6.2 Implement MCP tools: create_link, get_links, get_link, update_link, delete_link, search_links, get_categories
+- [x] 6.3 Create `backend/skill/search.ts` with full-text search using FTS5
+- [x] 6.4 Create `backend/skill/extract.ts` with link metadata extraction endpoint
 
 ## Phase 7: Frontend - SvelteKit Setup (6 tasks)
 
