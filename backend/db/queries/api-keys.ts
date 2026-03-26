@@ -48,6 +48,17 @@ export interface ApiKeyOwnerRecord {
 }
 
 /**
+ * Active API key record used for bearer-key authentication.
+ */
+export interface ActiveApiKeyRecord {
+  id: number;
+  user_id: number;
+  permissions: "read" | "read+write";
+  key_prefix: string;
+  expires_at: string | null;
+}
+
+/**
  * Result of an API key mutation operation.
  */
 export interface ApiKeyMutationResult {
@@ -87,6 +98,13 @@ const getApiKeyOwnerByIdStmt = () => getDb().prepare(`
 
 const revokeApiKeyStmt = () => getDb().prepare(`
   UPDATE api_keys SET is_active = 0 WHERE id = ? AND user_id = ?
+`);
+
+const getActiveApiKeyByHashStmt = () => getDb().prepare(`
+  SELECT id, user_id, permissions, key_prefix, expires_at
+  FROM api_keys
+  WHERE key_hash = ? AND is_active = 1
+  LIMIT 1
 `);
 
 // ============================================================================
@@ -188,4 +206,18 @@ export function revokeApiKey(keyId: number, ownerUserId: number): ApiKeyMutation
   const result = stmt.run(keyId, ownerUserId);
 
   return { changes: result.changes };
+}
+
+/**
+ * Retrieves an active API key by its SHA-256 hash.
+ *
+ * Used by bearer-key auth flows (MCP/Web Skill) to resolve the actor context
+ * without exposing raw keys in persistence.
+ *
+ * @param keyHash - Hex-encoded SHA-256 hash of the raw API key
+ * @returns Active API key auth record or null when not found
+ */
+export function getActiveApiKeyByHash(keyHash: string): ActiveApiKeyRecord | null {
+  const stmt = getActiveApiKeyByHashStmt();
+  return stmt.get(keyHash) as ActiveApiKeyRecord | null;
 }

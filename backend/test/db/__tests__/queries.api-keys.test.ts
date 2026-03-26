@@ -5,6 +5,7 @@ import {
   insertApiKey,
   getApiKeysByUser,
   getApiKeyOwnerById,
+  getActiveApiKeyByHash,
   revokeApiKey,
   type ApiKey,
 } from "../queries.js";
@@ -245,5 +246,44 @@ describe("revokeApiKey", () => {
     // Row should still exist, just inactive
     const row = testDb.query("SELECT * FROM api_keys WHERE id = ?").get(keyId);
     expect(row).toBeDefined();
+  });
+});
+
+describe("getActiveApiKeyByHash", () => {
+  test("returns active key auth record when hash exists", () => {
+    insertApiKey({
+      key_hash: "hash_active",
+      key_prefix: "urlk_live1",
+      name: "Live Key",
+      permissions: "read+write",
+      user_id: 1,
+    });
+
+    const record = getActiveApiKeyByHash("hash_active");
+
+    expect(record).toBeDefined();
+    expect(record!.user_id).toBe(1);
+    expect(record!.permissions).toBe("read+write");
+    expect(record!.key_prefix).toBe("urlk_live1");
+  });
+
+  test("returns null for revoked key", () => {
+    const keyId = insertApiKey({
+      key_hash: "hash_revoked",
+      key_prefix: "urlk_dead1",
+      name: "Dead Key",
+      permissions: "read",
+      user_id: 1,
+    });
+
+    revokeApiKey(keyId, 1);
+
+    const record = getActiveApiKeyByHash("hash_revoked");
+    expect(record).toBeNull();
+  });
+
+  test("returns null when hash does not exist", () => {
+    const record = getActiveApiKeyByHash("missing_hash");
+    expect(record).toBeNull();
   });
 });

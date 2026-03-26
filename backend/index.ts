@@ -2,7 +2,6 @@
 // Ultra-fast JavaScript runtime with native SQLite support
 
 import { verifyDatabaseConnection } from "./db/verify";
-import { handleShortRoute } from "./routes/api/short.js";
 import { handleAuthRoute } from "./routes/api/auth/index.js";
 import { handleAuditLogRoute } from "./routes/api/audit-log/index.js";
 import { handleAdminAuditLogRoute } from "./routes/api/admin/audit-log.js";
@@ -11,6 +10,9 @@ import { handleCategoriesRoute } from "./routes/api/categories.js";
 import { handleKeysRoute } from "./routes/api/keys.js";
 import { handleStatsRoute } from "./routes/api/stats.js";
 import { handleUsersRoute } from "./routes/api/users.js";
+import { handleMcpRoute } from "./mcp/server.ts";
+import { handleSkillSearchRoute } from "./skill/search.ts";
+import { handleSkillExtractRoute } from "./skill/extract.ts";
 import {
   setRoleHandler,
   banUserHandler,
@@ -31,12 +33,6 @@ const server = Bun.serve({
 	async fetch(req) {
 		const url = new URL(req.url);
 		const path = url.pathname;
-
-		// Route: /api/s/:code → short-link redirect (must be before other /api/* routes)
-		if (path.startsWith("/api/s/")) {
-			const r = await handleShortRoute(req, path);
-			if (r !== null) return r;
-		}
 
 		// Route: /api/auth/* → auth router
 		if (path.startsWith("/api/auth/")) {
@@ -77,6 +73,21 @@ const server = Bun.serve({
 		if (path.startsWith("/api/users")) {
 			const usersResponse = await handleUsersRoute(req, path);
 			if (usersResponse !== null) return usersResponse;
+		}
+
+		if (path === "/mcp") {
+			const mcpResponse = await handleMcpRoute(req, path);
+			if (mcpResponse !== null) return mcpResponse;
+		}
+
+		if (path === "/api/skill/search") {
+			const skillSearchResponse = await handleSkillSearchRoute(req, path);
+			if (skillSearchResponse !== null) return skillSearchResponse;
+		}
+
+		if (path === "/api/skill/lookup" || path.startsWith("/api/skill/extract/")) {
+			const skillExtractResponse = await handleSkillExtractRoute(req, path);
+			if (skillExtractResponse !== null) return skillExtractResponse;
 		}
 
 		// Admin routes: /api/admin/users/:id/...

@@ -7,8 +7,9 @@ import {
   listApiKeys,
   createApiKey,
   revokeApiKey,
-} from "../api-keys.service.js";
-import { insertApiKey, getApiKeysByUser } from "../../db/queries/index.js";
+  verifyApiKey,
+} from "../../../services/api-keys.service.ts";
+import { insertApiKey, getApiKeysByUser } from "../../../db/queries/index.ts";
 
 let testDb: Database;
 
@@ -323,6 +324,68 @@ describe("revokeApiKey", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.error.code).toBe("UNAUTHORIZED");
+    }
+  });
+});
+
+describe("verifyApiKey", () => {
+  test("returns auth context for valid active key", async () => {
+    const created = await createApiKey(
+      { userId: 1 },
+      { name: "MCP Key", permissions: "read+write" },
+      "127.0.0.1",
+      "test-agent"
+    );
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    const verified = await verifyApiKey(created.data.raw_key);
+    expect(verified.ok).toBe(true);
+
+    if (verified.ok) {
+      expect(verified.data.user_id).toBe(1);
+      expect(verified.data.permissions).toBe("read+write");
+      expect(verified.data.key_prefix).toBe(created.data.key_prefix);
+      expect(verified.data.key_id).toBeGreaterThan(0);
+    }
+  });
+
+  test("returns UNAUTHORIZED for unknown key", async () => {
+    const verified = await verifyApiKey("urlk_deadbeef");
+
+    expect(verified.ok).toBe(false);
+    if (!verified.ok) {
+      expect(verified.error.code).toBe("UNAUTHORIZED");
+    }
+  });
+
+  test("returns UNAUTHORIZED for expired key", async () => {
+    const created = await createApiKey(
+      { userId: 1 },
+      { name: "Expired MCP Key", permissions: "read" },
+      "127.0.0.1",
+      "test-agent"
+    );
+
+    expect(created.ok).toBe(true);
+    if (!created.ok) {
+      return;
+    }
+
+    testDb.run("UPDATE api_keys SET expires_at = ? WHERE id = ?", [
+      "2000-01-01T00:00:00.000Z",
+      created.data.id,
+    ]);
+
+    const verified = await verifyApiKey(created.data.raw_key);
+
+    expect(verified.ok).toBe(false);
+    if (!verified.ok) {
+      expect(verified.error.code).toBe("UNAUTHORIZED");
+      expect(verified.error.message).toContain("expired");
     }
   });
 });

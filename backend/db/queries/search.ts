@@ -47,6 +47,50 @@ const searchLinksWithCategoryStmt = () => getDb().prepare(`
   ORDER BY l.created_at DESC
 `);
 
+const searchLinksScopedStmt = () => getDb().prepare(`
+  SELECT
+    l.id,
+    l.title,
+    l.url,
+    l.description,
+    l.created_at,
+    l.user_id,
+    l.category_id,
+    c.name AS category_name
+  FROM links l
+  LEFT JOIN categories c ON c.id = l.category_id
+  WHERE l.id IN (
+    SELECT rowid FROM links_fts WHERE links_fts MATCH ?
+  )
+  AND (
+    (? IS NOT NULL AND l.user_id = ?)
+    OR
+    (? IS NULL AND l.is_public = 1 AND (? IS NULL OR l.user_id = ?))
+  )
+  AND (? IS NULL OR l.category_id = ?)
+  ORDER BY l.created_at DESC
+  LIMIT ? OFFSET ?
+`);
+
+export interface SearchLinksScopedFilters {
+  actor_user_id?: number;
+  owner_user_id?: number;
+  category_id?: number;
+  limit: number;
+  offset: number;
+}
+
+export interface SearchLinkScopedResult {
+  id: number;
+  title: string;
+  url: string;
+  description: string | null;
+  created_at: string;
+  user_id: number;
+  category_id: number | null;
+  category_name: string | null;
+}
+
 // ============================================================================
 // SEARCH QUERIES
 // ============================================================================
@@ -87,4 +131,23 @@ export function searchLinks(
 
   const stmt = searchLinksStmt();
   return stmt.all(query) as (Link & { likes_count: number; favorites_count: number })[];
+}
+
+export function searchLinksScoped(
+  query: string,
+  filters: SearchLinksScopedFilters
+): SearchLinkScopedResult[] {
+  const stmt = searchLinksScopedStmt();
+  return stmt.all(
+    query,
+    filters.actor_user_id ?? null,
+    filters.actor_user_id ?? null,
+    filters.actor_user_id ?? null,
+    filters.owner_user_id ?? null,
+    filters.owner_user_id ?? null,
+    filters.category_id ?? null,
+    filters.category_id ?? null,
+    filters.limit,
+    filters.offset
+  ) as SearchLinkScopedResult[];
 }

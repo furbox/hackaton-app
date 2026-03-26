@@ -10,6 +10,7 @@
 import type {
   ApiKeyDTO,
   ApiKeyCreationDTO,
+  ApiKeyAuthContext,
   CreateApiKeyInput,
   RevokeApiKeyInput,
   ListApiKeysOutput,
@@ -23,6 +24,7 @@ import type {
 import {
   getApiKeysByUser as dbGetApiKeysByUser,
   getApiKeyOwnerById,
+  getActiveApiKeyByHash,
   insertApiKey,
   revokeApiKey as dbRevokeApiKey,
   type ApiKey as DbApiKey,
@@ -363,5 +365,45 @@ export async function revokeApiKey(
     return ok({ revoked: true });
   } catch {
     return fail("INTERNAL", "Failed to revoke API key");
+  }
+}
+
+/**
+ * Verifies a bearer API key and resolves the authenticated actor context.
+ *
+ * This centralizes key verification so HTTP routes (e.g. `/mcp`) can reuse
+ * one service path and avoid duplicate auth logic.
+ *
+ * @param rawKey - Raw bearer API key
+ * @returns Service result with API key auth context
+ */
+export async function verifyApiKey(rawKey: string): Promise<Phase4ServiceResult<ApiKeyAuthContext>> {
+  const candidate = rawKey.trim();
+
+  if (!candidate) {
+    return fail("UNAUTHORIZED", "Missing API key");
+  }
+
+  try {
+    const keyHash = await hashApiKey(candidate);
+    const keyRecord = getActiveApiKeyByHash(keyHash);
+
+    if (!keyRecord) {
+      return fail("UNAUTHORIZED", "Invalid API key");
+    }
+
+    if (keyRecord.expires_at !== null && Date.parse(keyRecord.expires_at) <= Date.now()) {
+      return fail("UNAUTHORIZED", "API key expired");
+    }
+
+    return ok({
+      key_id: keyRecord.id,
+      user_id: keyRecord.user_id,
+      permissions: keyRecord.permissions,
+      key_prefix: keyRecord.key_prefix,
+      expires_at: keyRecord.expires_at,
+    });
+  } catch {
+    return fail("INTERNAL", "Failed to verify API key");
   }
 }

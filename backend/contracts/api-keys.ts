@@ -44,6 +44,17 @@ export interface RevokeApiKeyInput {
 }
 
 /**
+ * Authentication context resolved from a valid API key.
+ */
+export interface ApiKeyAuthContext {
+  key_id: number;
+  user_id: number;
+  permissions: "read" | "read+write";
+  key_prefix: string;
+  expires_at: string | null;
+}
+
+/**
  * Output for listing API keys.
  */
 export type ListApiKeysOutput = ApiKeyDTO[];
