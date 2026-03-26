@@ -1,3 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+@theme {
+  --color-primary: var(--color-indigo-600);
+  --color-primary-foreground: var(--color-white);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
