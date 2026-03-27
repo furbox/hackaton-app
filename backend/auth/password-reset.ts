@@ -25,7 +25,7 @@ import { loadTemplate } from "../emails/load-template.js";
 
 const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
 const DEFAULT_EMAIL_FROM = "URLoft <noreply@urloft.site>";
-const DEFAULT_BASE_URL = "http://localhost:3000";
+const DEFAULT_FRONTEND_URL = "http://localhost:5173";
 const RESET_EMAIL_SUBJECT = "Reset your URLoft password";
 
 // ---------------------------------------------------------------------------
@@ -89,16 +89,29 @@ export async function sendPasswordResetEmail(
   email: string,
   token: string
 ): Promise<boolean> {
-  const baseUrl = Bun.env.BASE_URL ?? DEFAULT_BASE_URL;
+  const rawFrontendUrl = Bun.env.FRONTEND_URL?.trim();
+  const frontendUrl =
+    rawFrontendUrl && rawFrontendUrl !== "undefined" && rawFrontendUrl !== "null"
+      ? rawFrontendUrl.replace(/\/+$/, "")
+      : DEFAULT_FRONTEND_URL;
+  const normalizedToken = token.trim();
   const from = Bun.env.EMAIL_FROM ?? DEFAULT_EMAIL_FROM;
-  const resetUrl = `${baseUrl}/api/auth/reset-password/${token}`;
+
+  if (!normalizedToken || normalizedToken.includes("/")) {
+    console.error(
+      `[password-reset] Refusing to send email with invalid token format: "${token}"`
+    );
+    return false;
+  }
+
+  const resetUrl = `${frontendUrl}/auth/reset-password/${encodeURIComponent(normalizedToken)}`;
 
   let html: string;
 
   try {
     html = await loadTemplate("password-reset", {
       reset_url: resetUrl,
-      base_url: baseUrl,
+      base_url: frontendUrl,
     });
   } catch (err) {
     console.error("[password-reset] Failed to load email template:", err);

@@ -16,6 +16,11 @@
       "sourceType": "github",
       "computedHash": "88edc0446783b83d8c4462494ad3cb58ec0fff1eb6ba26f709c5e74313f1c9f2"
     },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
     "mcp-builder": {
       "source": "anthropics/skills",
       "sourceType": "github",

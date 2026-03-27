@@ -93,7 +93,7 @@ beforeEach(() => {
 
 afterEach(() => {
   _resetResendClient();
-  delete process.env.BASE_URL;
+  delete process.env.FRONTEND_URL;
   delete process.env.EMAIL_FROM;
 });
 
@@ -210,7 +210,7 @@ describe("sendPasswordResetEmail", () => {
       },
     } as unknown as Resend;
     _setResendClient(stubResend);
-    process.env.BASE_URL = "https://test.local";
+    process.env.FRONTEND_URL = "https://test.local";
     process.env.EMAIL_FROM = "URLoft Test <test@urloft.local>";
 
     const result = await sendPasswordResetEmail("user@example.com", "token-123");
@@ -230,7 +230,7 @@ describe("sendPasswordResetEmail", () => {
       },
     } as unknown as Resend;
     _setResendClient(stubResend);
-    process.env.BASE_URL = "https://test.local";
+    process.env.FRONTEND_URL = "https://test.local";
     process.env.EMAIL_FROM = "URLoft Test <test@urloft.local>";
 
     const result = await sendPasswordResetEmail("user@example.com", "token-123");
@@ -239,7 +239,7 @@ describe("sendPasswordResetEmail", () => {
 
   test("returns false when template loading fails", async () => {
     // Test D2 requirement: sender-level guards prevent send on template failure
-    process.env.BASE_URL = "https://test.local";
+    process.env.FRONTEND_URL = "https://test.local";
     process.env.EMAIL_FROM = "URLoft Test <test@urloft.local>";
 
     // The template loader has fallback HTML, so this tests that path
@@ -254,12 +254,12 @@ describe("sendPasswordResetEmail", () => {
 
 describe("sendPasswordResetEmail() — Phase C2/E2: Template Integration", () => {
   const originalApiKey = Bun.env.RESEND_API_KEY;
-  const originalBaseUrl = Bun.env.BASE_URL;
+  const originalFrontendUrl = Bun.env.FRONTEND_URL;
   const originalEmailFrom = Bun.env.EMAIL_FROM;
 
   beforeEach(async () => {
     process.env.RESEND_API_KEY = "test-key-12345";
-    process.env.BASE_URL = "https://urloft.test";
+    process.env.FRONTEND_URL = "https://urloft.test";
     process.env.EMAIL_FROM = "URLoft <test@urloft.test>";
     _resetResendClient();
   });
@@ -270,10 +270,10 @@ describe("sendPasswordResetEmail() — Phase C2/E2: Template Integration", () =>
     } else {
       delete process.env.RESEND_API_KEY;
     }
-    if (originalBaseUrl !== undefined) {
-      process.env.BASE_URL = originalBaseUrl;
+    if (originalFrontendUrl !== undefined) {
+      process.env.FRONTEND_URL = originalFrontendUrl;
     } else {
-      delete process.env.BASE_URL;
+      delete process.env.FRONTEND_URL;
     }
     if (originalEmailFrom !== undefined) {
       process.env.EMAIL_FROM = originalEmailFrom;
@@ -306,7 +306,7 @@ describe("sendPasswordResetEmail() — Phase C2/E2: Template Integration", () =>
     expect(call.subject).toBe("Reset your URLoft password");
 
     // Verify the HTML contains the reset URL
-    expect(call.html).toContain("https://urloft.test/api/auth/reset-password/reset-token-xyz789");
+    expect(call.html).toContain("https://urloft.test/auth/reset-password/reset-token-xyz789");
 
     // Verify template content
     expect(call.html).toContain("Reset your password");
@@ -335,7 +335,46 @@ describe("sendPasswordResetEmail() — Phase C2/E2: Template Integration", () =>
     expect(captured.length).toBe(1);
 
     // Should have the URL visible as text for accessibility
-    expect(captured[0].html).toContain("https://urloft.test/api/auth/reset-password/token-abc");
+    expect(captured[0].html).toContain("https://urloft.test/auth/reset-password/token-abc");
+  });
+
+  test("trims trailing slashes from FRONTEND_URL", async () => {
+    const captured: Record<string, string>[] = [];
+
+    _setResendClient({
+      emails: {
+        send: async (payload: Record<string, string>) => {
+          captured.push(payload);
+          return { id: "test-id" };
+        },
+      },
+    } as unknown as Resend);
+
+    process.env.FRONTEND_URL = "https://urloft.test///";
+    await sendPasswordResetEmail("user@example.com", "token-trim");
+
+    expect(captured.length).toBe(1);
+    expect(captured[0].html).toContain("https://urloft.test/auth/reset-password/token-trim");
+    expect(captured[0].html).not.toContain("https://urloft.test///auth/reset-password/token-trim");
+  });
+
+  test("falls back to localhost frontend URL when FRONTEND_URL is missing", async () => {
+    const captured: Record<string, string>[] = [];
+
+    _setResendClient({
+      emails: {
+        send: async (payload: Record<string, string>) => {
+          captured.push(payload);
+          return { id: "test-id" };
+        },
+      },
+    } as unknown as Resend);
+
+    delete process.env.FRONTEND_URL;
+    await sendPasswordResetEmail("user@example.com", "token-fallback");
+
+    expect(captured.length).toBe(1);
+    expect(captured[0].html).toContain("http://localhost:5173/auth/reset-password/token-fallback");
   });
 
   test("template includes security notice about password sharing", async () => {

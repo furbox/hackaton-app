@@ -40,12 +40,12 @@ describe("loadTemplate — Phase A1-A3: Basic Functionality", () => {
 
   test("A2: loads password-reset template successfully", async () => {
     const html = await loadTemplate("password-reset", {
-      reset_url: "https://urloft.site/api/auth/reset-password/test-token",
+      reset_url: "https://urloft.site/auth/reset-password/test-token",
       base_url: "https://urloft.site",
     });
 
     expect(html).toContain("Reset your password");
-    expect(html).toContain("https://urloft.site/api/auth/reset-password/test-token");
+    expect(html).toContain("https://urloft.site/auth/reset-password/test-token");
     expect(html).toContain("1 hour");
   });
 });

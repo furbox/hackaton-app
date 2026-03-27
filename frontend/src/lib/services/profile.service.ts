@@ -1,13 +1,35 @@
-import { http, type ApiResponse } from './http';
+import type { ApiResult, ServiceContext } from './contracts';
+import { PROXY_ROUTES } from './contracts';
+import { http } from './http';
+import type { LinkListItemDTO } from './links.service';
+
+type RequestContext = ServiceContext | string | undefined;
+
+function resolveContext(ctx: RequestContext): ServiceContext | undefined {
+	if (!ctx) {
+		return undefined;
+	}
+
+	if (typeof ctx === 'string') {
+		return { cookies: ctx };
+	}
+
+	return ctx;
+}
 
 export interface PublicProfileResponse {
+	id: number;
 	username: string;
+	name: string | null;
 	avatarUrl: string | null;
 	bio: string | null;
-	rankId: number;
-	totalLinks: number;
-	totalViews: number;
-	totalLikes: number;
+	rank: string;
+	stats: {
+		totalLinks: number;
+		totalLikes: number;
+		totalViews: number;
+	};
+	links: LinkListItemDTO[];
 }
 
 export interface UpdateProfileInput {
@@ -28,16 +50,16 @@ export interface ChangePasswordInput {
 }
 
 export class ProfileService {
-	async getPublicProfile(username: string): Promise<ApiResponse<PublicProfileResponse>> {
-		return http.get<PublicProfileResponse>(`/api/users/${username}`);
+	async getPublicProfile(username: string, ctx?: RequestContext): Promise<ApiResult<PublicProfileResponse>> {
+		return http.get<PublicProfileResponse>(PROXY_ROUTES.users.byUsername(username), resolveContext(ctx));
 	}
 
-	async updateProfile(input: UpdateProfileInput, cookies?: string): Promise<ApiResponse<UpdateProfileResponse>> {
-		return http.put<UpdateProfileResponse>('/api/users/me', input, { cookies });
+	async updateProfile(input: UpdateProfileInput, ctx?: RequestContext): Promise<ApiResult<UpdateProfileResponse>> {
+		return http.put<UpdateProfileResponse>(PROXY_ROUTES.users.me, input, resolveContext(ctx));
 	}
 
-	async changePassword(input: ChangePasswordInput, cookies?: string): Promise<ApiResponse<{ success: true }>> {
-		return http.put<{ success: true }>('/api/users/me/password', input, { cookies });
+	async changePassword(input: ChangePasswordInput, ctx?: RequestContext): Promise<ApiResult<{ success: true }>> {
+		return http.put<{ success: true }>(PROXY_ROUTES.users.changePassword, input, resolveContext(ctx));
 	}
 }
 

@@ -2,8 +2,28 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import MainNav from '$lib/components/navigation/MainNav.svelte';
+	import { session } from '$lib/stores/session';
+	import { onMount } from 'svelte';
 
-	let { children } = $props();
+	let { data, children } = $props<{
+		data: {
+			session: {
+				user: {
+					id: number;
+					username: string;
+					email: string;
+					avatarUrl: string | null;
+					rank: string;
+				} | null;
+				token: string | null;
+			} | null;
+		} | null;
+	}>();
+
+	// Hydrate session store from server data on mount
+	onMount(() => {
+		session.hydrate(data?.session || null);
+	});
 </script>
 
 <svelte:head>

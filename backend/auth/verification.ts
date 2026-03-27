@@ -151,16 +151,29 @@ export async function sendVerificationEmail(
   email: string,
   token: string
 ): Promise<boolean> {
-  const baseUrl = Bun.env.BASE_URL ?? "http://localhost:3000";
+  const rawFrontendUrl = Bun.env.FRONTEND_URL?.trim();
+  const frontendUrl =
+    rawFrontendUrl && rawFrontendUrl !== "undefined" && rawFrontendUrl !== "null"
+      ? rawFrontendUrl.replace(/\/+$/, "")
+      : "http://localhost:5173";
+  const normalizedToken = token.trim();
   const from = Bun.env.EMAIL_FROM ?? "URLoft <noreply@urloft.site>";
-  const verificationUrl = `${baseUrl}/api/auth/verify/${token}`;
+
+  if (!normalizedToken || normalizedToken.includes("/")) {
+    console.error(
+      `[verification] Refusing to send email with invalid token format: "${token}"`
+    );
+    return false;
+  }
+
+  const verificationUrl = `${frontendUrl}/auth/verify/${encodeURIComponent(normalizedToken)}`;
 
   let html: string;
 
   try {
     html = await loadTemplate("verification", {
       verification_url: verificationUrl,
-      base_url: baseUrl,
+      base_url: frontendUrl,
     });
   } catch (err) {
     console.error(

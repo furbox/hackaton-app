@@ -13,6 +13,25 @@ All API requests are made to:
 `http://localhost:3000` (Development)
 `https://api.urloft.site` (Production - TBD)
 
+### Frontend API Boundary (Strategy in Production)
+
+For web pages/actions, frontend uses a single boundary:
+
+`views/actions (+page/+page.server/+server) -> lib/services/* -> /api/proxy/* -> backend /api/*`
+
+This means:
+- UI never calls backend `/api/*` directly.
+- Cookie/session forwarding is centralized in proxy handlers.
+- Error normalization is centralized in `frontend/src/lib/server/proxy-forward.ts` and `frontend/src/lib/services/response.ts`.
+
+#### Where to implement a new endpoint (frontend side)
+1. Add backend contract (`backend/routes/*` + service layer).
+2. Add mapping in `frontend/src/lib/server/proxy-map.ts`.
+3. Add proxy route file in `frontend/src/routes/api/proxy/**/+server.ts`.
+4. Expose route constant in `frontend/src/lib/services/contracts.ts`.
+5. Add/extend domain service in `frontend/src/lib/services/*.service.ts`.
+6. Consume from page load/action (`+page.server.ts`) or endpoint (`+server.ts`).
+
 ### Authentication
 URLoft supports two authentication methods:
 
@@ -67,6 +86,11 @@ All API errors follow a standardized format to ensure consistency across clients
 `POST /api/auth/register`
 Creates a new user account. Sends a verification email via Resend.
 
+**Email verification link behavior (current):**
+- Email link points to frontend route: `${FRONTEND_URL}/auth/verify/:token`.
+- User lands on `frontend/src/routes/auth/verify/[token]/+page.server.ts`.
+- That page calls `GET /api/proxy/auth/verify/:token`, which forwards to backend `GET /api/auth/verify/:token`.
+
 **Request Body:**
 ```json
 {
@@ -81,6 +105,8 @@ Creates a new user account. Sends a verification email via Resend.
 `POST /api/auth/login`
 Authenticates a user and starts a session.
 
+In frontend flow, login is executed via server action in `frontend/src/routes/auth/login/+page.server.ts`, using `authService.login()` against `/api/proxy/auth/login`.
+
 **Request Body:**
 ```json
 {
@@ -92,6 +118,23 @@ Authenticates a user and starts a session.
 ### Logout
 `POST /api/auth/logout`
 Terminates the current session.
+
+### Forgot Password
+`POST /api/auth/forgot-password`
+Requests reset email delivery for the provided account.
+
+**Reset link behavior (current):**
+- Email link points to frontend route: `${FRONTEND_URL}/auth/reset-password/:token`.
+- User lands on `frontend/src/routes/auth/reset-password/[token]/+page.server.ts`.
+- Reset action calls `POST /api/proxy/auth/reset-password`, which forwards to backend `POST /api/auth/reset-password`.
+
+### Verify Email
+`GET /api/auth/verify/:token`
+Consumes verification token and marks user email as verified.
+
+### Reset Password
+`POST /api/auth/reset-password`
+Consumes reset token and updates password.
 
 ---
 

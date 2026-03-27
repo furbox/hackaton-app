@@ -21,6 +21,7 @@ Implementar una capa de autenticacion completa y segura sobre Better Auth, con s
 - **Seguridad de sesion por fingerprint:** Hash SHA-256 de `IP + User-Agent`, comparacion timing-safe y control de `TRUST_PROXY` para evitar spoofing.
 - **Backend en capas (feature-first + layered):** Flujo consistente `routes -> services -> db`, evitando logica de negocio en handlers HTTP.
 - **Auditoria y admin-by-design:** Eventos de auth, seguridad y operaciones admin se registran en `audit_logs`, con enforcement de ban en login y revocacion de sesiones.
+- **Links de email orientados al frontend:** Los correos de verificacion y reset construyen URLs de UI (`/auth/verify/:token`, `/auth/reset-password/:token`) usando `FRONTEND_URL`; el backend mantiene los endpoints `/api/auth/*` para consumo por proxy/server actions.
 
 ---
 
@@ -52,11 +53,15 @@ Implementar una capa de autenticacion completa y segura sobre Better Auth, con s
 
 - Token de verificacion, endpoint de verificacion y reenvio implementados.
 - Register/login adaptados para exigir email verificado.
+- Link de email actualizado a frontend: `${FRONTEND_URL}/auth/verify/:token` (fallback `http://localhost:5173`).
+- Sanitizacion aplicada: trim de `FRONTEND_URL`, remocion de slash final y rechazo de tokens invalidos (`""` o con `/`).
 
 ### 3.6 Password reset
 
 - Flujo completo `forgot-password` + `reset-password` implementado.
 - Consumo seguro de token, invalidacion de sesiones y auditoria de eventos.
+- Link de reset actualizado a frontend: `${FRONTEND_URL}/auth/reset-password/:token` (fallback `http://localhost:5173`).
+- Misma estrategia de hardening de URL/token para evitar links malformados.
 
 ### 3.7 Templates de email
 
@@ -113,6 +118,7 @@ Implementar una capa de autenticacion completa y segura sobre Better Auth, con s
 - `TRUST_PROXY` debe gobernar lectura de `x-forwarded-for` para evitar spoofing.
 - Fire-and-forget en auditoria reduce acoplamiento y no bloquea auth flow.
 - Orden de implementacion corregido: migracion 3.11 antes de integracion admin 3.10 para evitar errores por columnas faltantes.
+- El link del email NO debe apuntar directo a `/api/auth/*`; el entrypoint correcto es la ruta frontend para preservar UX y flujo de server actions/proxy.
 
 ---
 
@@ -140,6 +146,8 @@ Implementar una capa de autenticacion completa y segura sobre Better Auth, con s
 
 - `backend/auth/verification.ts`
 - `backend/auth/password-reset.ts`
+- `frontend/src/routes/auth/verify/[token]/+page.server.ts`
+- `frontend/src/routes/auth/reset-password/[token]/+page.server.ts`
 - `backend/auth/__tests__/auth.test.ts`
 - `backend/auth/__tests__/audit-e2e.test.ts`
 

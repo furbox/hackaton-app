@@ -1,4 +1,20 @@
-import { http, type ApiResponse } from './http';
+import type { ApiResult, ServiceContext } from './contracts';
+import { PROXY_ROUTES } from './contracts';
+import { http } from './http';
+
+type RequestContext = ServiceContext | string | undefined;
+
+function resolveContext(ctx: RequestContext): ServiceContext | undefined {
+	if (!ctx) {
+		return undefined;
+	}
+
+	if (typeof ctx === 'string') {
+		return { cookies: ctx };
+	}
+
+	return ctx;
+}
 
 export interface CategoryDTO {
 	id: number;
@@ -22,20 +38,20 @@ export interface UpdateCategoryInput {
 }
 
 export class CategoriesService {
-	async getCategories(cookies?: string): Promise<ApiResponse<CategoryWithLinksCountDTO[]>> {
-		return http.get<CategoryWithLinksCountDTO[]>('/api/categories', { cookies });
+	async getCategories(ctx?: RequestContext): Promise<ApiResult<CategoryWithLinksCountDTO[]>> {
+		return http.get<CategoryWithLinksCountDTO[]>(PROXY_ROUTES.categories.list, resolveContext(ctx));
 	}
 
-	async createCategory(input: CreateCategoryInput, cookies?: string): Promise<ApiResponse<CategoryDTO>> {
-		return http.post<CategoryDTO>('/api/categories', input, { cookies });
+	async createCategory(input: CreateCategoryInput, ctx?: RequestContext): Promise<ApiResult<CategoryDTO>> {
+		return http.post<CategoryDTO>(PROXY_ROUTES.categories.list, input, resolveContext(ctx));
 	}
 
-	async updateCategory(id: number, input: UpdateCategoryInput, cookies?: string): Promise<ApiResponse<CategoryDTO>> {
-		return http.put<CategoryDTO>(`/api/categories/${id}`, input, { cookies });
+	async updateCategory(id: number, input: UpdateCategoryInput, ctx?: RequestContext): Promise<ApiResult<CategoryDTO>> {
+		return http.put<CategoryDTO>(PROXY_ROUTES.categories.byId(id), input, resolveContext(ctx));
 	}
 
-	async deleteCategory(id: number, cookies?: string): Promise<ApiResponse<{ deleted: true }>> {
-		return http.delete<{ deleted: true }>(`/api/categories/${id}`, { cookies });
+	async deleteCategory(id: number, ctx?: RequestContext): Promise<ApiResult<{ deleted: true }>> {
+		return http.delete<{ deleted: true }>(PROXY_ROUTES.categories.byId(id), resolveContext(ctx));
 	}
 }
 

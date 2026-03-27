@@ -9,6 +9,12 @@
 | [`db-layer.md`](./db-layer.md) | **Phase 2: Database Layer** | Arquitectura, esquema, queries, testing, troubleshooting |
 | [`phase03-authentication-layer.md`](./phase03-authentication-layer.md) | **Phase 3: Authentication Layer** | Objetivo, decisiones de arquitectura auth, estado 3.1-3.8, testing, pendientes |
 | [`phase4-architecture-checkpoint-4-0.md`](./phase4-architecture-checkpoint-4-0.md) | **Phase 4.0: Architecture Checkpoint** | Reglas de capas, contrato de errores, comandos de verificacion, rollback |
+| [`phase05-background-workers.md`](./phase05-background-workers.md) | **Phase 5: Background Workers** | Worker pool, jobs async, resiliencia y observabilidad |
+| [`phase06-mcp-server.md`](./phase06-mcp-server.md) | **Phase 6: MCP Server** | Arquitectura MCP, auth con API keys, herramientas expuestas |
+| [`phase06-web-skill.md`](./phase06-web-skill.md) | **Phase 6: Web Skill** | Endpoints de skill, contratos y casos de uso para agentes |
+| [`phase07-frontend-sveltekit-setup.md`](./phase07-frontend-sveltekit-setup.md) | **Phase 7: Frontend Setup** | Base SvelteKit, layouts, estado y actions iniciales |
+| [`phase08-frontend-public-pages.md`](./phase08-frontend-public-pages.md) | **Phase 8: Frontend Public Pages** | Rutas publicas, auth flows, SSR/SEO y estado actual |
+| [`api-doc.md`](./api-doc.md) | **API Contracts** | Endpoints, errores, auth y frontera frontend `services + /api/proxy` |
 
 ---
 
@@ -60,6 +66,32 @@
 - Detectar acoplamiento route-to-db antes de merge
 - Arrancar 4.1+ con contratos y gates ya definidos
 
+### `phase08-frontend-public-pages.md` - Frontend Public Pages (Phase 8)
+
+**Que incluye:**
+- Alcance implementado para Home, Explore, perfiles publicos y auth publico
+- Estado real de flujos login/register/forgot/reset/verify via server actions
+- Estrategia API unica en frontend (`views/actions -> services -> /api/proxy/* -> backend`)
+- Notas SSR/SEO y desvíos actuales respecto a la planificacion original
+
+**Ideal para:**
+- Onboarding rapido del frontend publico actual
+- Saber que partes de Phase 8 estan cerradas y cuales quedaron como deuda
+- Implementar nuevas vistas publicas sin romper la frontera de proxy
+
+### `api-doc.md` - API Contracts y estrategia de consumo frontend
+
+**Que incluye:**
+- Catalogo de endpoints REST, MCP y Web Skill
+- Contrato de errores de Phase 4
+- Comportamiento actual de links de email (verificacion/reset apuntando al frontend)
+- Guia corta para agregar nuevos endpoints en la frontera `services + /api/proxy/*`
+
+**Ideal para:**
+- Integrar frontend/backend manteniendo una sola estrategia de acceso a API
+- Entender el flujo completo desde email link hasta endpoint backend real
+- Extender la API sin acoplar componentes UI al backend directamente
+
 ---
 
 ## 🚀 Cómo Navegar
@@ -67,8 +99,10 @@
 ### Para desarrolladores nuevos:
 1. Empieza con [`db-layer.md`](./db-layer.md) para entender la base de datos
 2. Continua con [`phase03-authentication-layer.md`](./phase03-authentication-layer.md) para entender la capa de auth
-3. Revisa las secciones de "Componentes del Sistema" para ver el código
-4. Consulta "Troubleshooting" si encuentras errores
+3. Lee [`phase07-frontend-sveltekit-setup.md`](./phase07-frontend-sveltekit-setup.md) para la base del frontend
+4. Lee [`phase08-frontend-public-pages.md`](./phase08-frontend-public-pages.md) para el estado real de paginas publicas
+5. Revisa [`api-doc.md`](./api-doc.md) antes de tocar contratos o integraciones
+6. Consulta "Troubleshooting" si encuentras errores
 
 ### Para contribuidores:
 1. Lee "Patrones y Best Practices" antes de hacer cambios
@@ -102,5 +136,5 @@
 
 ---
 
-**Última actualización**: 2026-03-24  
-**Versión**: 1.1.0
+**Última actualización**: 2026-03-26  
+**Versión**: 1.2.0

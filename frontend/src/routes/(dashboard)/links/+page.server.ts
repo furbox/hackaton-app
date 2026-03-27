@@ -1,8 +1,8 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import { linksService } from '$lib/services/links.service';
+import { linksService } from '$lib/services';
 
 export const actions: Actions = {
-	createLink: async ({ request }) => {
+	createLink: async ({ request, fetch }) => {
 		const formData = await request.formData();
 		const url = formData.get('url')?.toString();
 		const title = formData.get('title')?.toString();
@@ -28,11 +28,15 @@ export const actions: Actions = {
 				isPublic,
 				categoryId: categoryId ? parseInt(categoryId) : null
 			},
-			request.headers.get('cookie') ?? undefined
+			{
+				fetch,
+				cookies: request.headers.get('cookie') ?? undefined,
+				signal: AbortSignal.timeout(5000)
+			}
 		);
 
 		if (!response.ok) {
-			return fail(response.status, {
+			return fail(response.error.status, {
 				success: false,
 				formError: response.error.message,
 				fieldErrors: response.error.details,

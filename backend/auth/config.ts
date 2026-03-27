@@ -58,23 +58,72 @@ export const authConfig = betterAuth({
   database: getDatabase(),
 
   /**
-   * Secret for signing and encryption.
-   *
-   * MUST be set in production. Generated with `openssl rand -base64 32`.
-   * Currently set in backend/.env as:
-   * BETTER_AUTH_SECRET=qpbzSwXxeQKZAz3EQLmzcF5V7jUXnILsfA52i2vr1xc=
+   * Database type - required for Better Auth to work with bun:sqlite.
    */
-  secret: process.env.BETTER_AUTH_SECRET,
+  databaseType: "sqlite",
 
   /**
-   * Session configuration.
+   * Custom table names and field mappings to match existing schema.
    *
-   * - expiresIn: 7 days - sessions expire after a week of inactivity
-   * - updateAge: 1 day - refresh session if it's been more than a day since last refresh
-   * - cookieCache: disabled - we use database-backed sessions, not cookie cache
-   * - storeSessionInDatabase: true - persist sessions to SQLite for audit trail
+   * The project uses plural table names (users, sessions) and different
+   * field names than the default Better Auth schema.
    */
+  user: {
+    modelName: "users",
+    fields: {
+      email: "email",
+      name: "username",
+      emailVerified: "email_verified",
+      image: "avatar_url",
+      password: "password_hash", // Better Auth hashes 'password' and stores in 'password_hash'
+      createdAt: "created_at",
+      updatedAt: "created_at",
+    },
+    additionalFields: {
+      bio: {
+        type: "string",
+        required: false,
+      },
+      rank_id: {
+        type: "number",
+        required: false,
+        defaultValue: 1,
+        input: false,
+      },
+      verification_token: {
+        type: "string",
+        required: false,
+      },
+      verification_expires: {
+        type: "date",
+        required: false,
+      },
+    },
+  },
   session: {
+    // Table name and field mapping to match existing schema
+    modelName: "sessions",
+    fields: {
+      userId: "user_id",
+      token: "token_jti",
+      expiresAt: "expires_at",
+      ipAddress: "ip_address",
+      userAgent: "user_agent",
+      createdAt: "created_at",
+      updatedAt: "created_at",
+    },
+    additionalFields: {
+      fingerprint: {
+        type: "string",
+        required: true,
+      },
+      is_active: {
+        type: "boolean",
+        required: false,
+        defaultValue: true,
+      },
+    },
+    // Session behavior configuration
     expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
     updateAge: 60 * 60 * 24, // 1 day - refresh session daily
     cookieCache: {
@@ -83,6 +132,15 @@ export const authConfig = betterAuth({
     },
     storeSessionInDatabase: true, // Required for audit trail and revocation
   },
+
+  /**
+   * Secret for signing and encryption.
+   *
+   * MUST be set in production. Generated with `openssl rand -base64 32`.
+   * Currently set in backend/.env as:
+   * BETTER_AUTH_SECRET=qpbzSwXxeQKZAz3EQLmzcF5V7jUXnILsfA52i2vr1xc=
+   */
+  secret: process.env.BETTER_AUTH_SECRET,
 
   /**
    * Advanced security options.
@@ -110,6 +168,17 @@ export const authConfig = betterAuth({
       sessionToken: {
         name: "urlft_session", // Cookie name for session token
       },
+    },
+
+    /**
+     * ID generation strategy.
+     *
+     * Use "serial" for database auto-increment IDs (INTEGER PRIMARY KEY).
+     * Better Auth defaults to generating cuid/uuid strings, which would cause
+     * a datatype mismatch with INTEGER columns.
+     */
+    database: {
+      generateId: "serial", // Use database auto-increment instead of cuid/uuid
     },
   },
 
@@ -180,6 +249,28 @@ export const authConfig = betterAuth({
    */
   databaseHooks: {
     /**
+     * User creation hook.
+     *
+     * This hook runs before a new user is inserted into the database.
+     * We use it to ensure the password hash is included in the INSERT.
+     *
+     * Better Auth's kysely adapter sometimes doesn't include password fields
+     * when using direct database connections, so we add it explicitly here.
+     */
+    user: {
+      create: {
+        before: async (user, context) => {
+          // Ensure password_hash is included if password is provided
+          if ((user as any).password && !(user as any).password_hash) {
+            const password = (user as any).password;
+            const hash = await Bun.password.hash(password);
+            (user as any).password_hash = hash;
+          }
+          return { data: user };
+        },
+      },
+    },
+    /**
      * Session creation hook.
      *
      * This hook runs before a new session is inserted into the database.
@@ -200,24 +291,16 @@ export const authConfig = betterAuth({
             ((context as any)?.request as Request | undefined) ??
             ((context as any)?.context?.request as Request | undefined);
 
-          if (request) {
-            // Extract IP and User-Agent
-            const ip = extractIP(request);
-            const userAgent = extractUserAgent(request);
+          const ip = request ? extractIP(request) : "unknown";
+          const userAgent = request ? extractUserAgent(request) : "unknown";
+          const fingerprint = await generateFingerprint(ip, userAgent);
 
-            // Generate fingerprint
-            const fingerprint = await generateFingerprint(ip, userAgent);
-
-            // Add fingerprint to session data
-            return {
-              data: {
-                ...session,
-                fingerprint,
-              },
-            };
-          }
-
-          return { data: session };
+          return {
+            data: {
+              ...session,
+              fingerprint,
+            },
+          };
         },
       },
     },

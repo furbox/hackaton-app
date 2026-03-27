@@ -152,7 +152,7 @@ beforeEach(() => {
 
 afterEach(() => {
   _resetResendClient();
-  delete process.env.BASE_URL;
+  delete process.env.FRONTEND_URL;
   delete process.env.EMAIL_FROM;
 });
 
@@ -168,7 +168,7 @@ describe("POST /api/auth/forgot-password", () => {
         },
       },
     } as unknown as Resend);
-    process.env.BASE_URL = "https://test.local";
+    process.env.FRONTEND_URL = "https://test.local/";
     process.env.EMAIL_FROM = "URLoft Test <test@urloft.local>";
 
     const req = makePost("/api/auth/forgot-password", { email: "reset-1@example.com" });
@@ -182,6 +182,8 @@ describe("POST /api/auth/forgot-password", () => {
     await new Promise(resolve => setTimeout(resolve, 50));
 
     expect(captured.length).toBe(1);
+    expect(captured[0].html).toContain("https://test.local/auth/reset-password/");
+    expect(captured[0].html).not.toContain("/api/auth/reset-password/");
 
     const row = testDb.query("SELECT * FROM password_resets WHERE user_id = ?").get(userId) as { used: number } | null;
     expect(row).toBeTruthy();

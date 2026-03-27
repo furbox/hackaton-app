@@ -1,8 +1,8 @@
 import { fail, type Actions } from '@sveltejs/kit';
-import { categoriesService } from '$lib/services/categories.service';
+import { categoriesService } from '$lib/services';
 
 export const actions: Actions = {
-	createCategory: async ({ request }) => {
+	createCategory: async ({ request, fetch }) => {
 		const formData = await request.formData();
 		const name = formData.get('name')?.toString();
 		const color = formData.get('color')?.toString() ?? '#6366f1';
@@ -17,11 +17,15 @@ export const actions: Actions = {
 
 		const response = await categoriesService.createCategory(
 			{ name, color },
-			request.headers.get('cookie') ?? undefined
+			{
+				fetch,
+				cookies: request.headers.get('cookie') ?? undefined,
+				signal: AbortSignal.timeout(5000)
+			}
 		);
 
 		if (!response.ok) {
-			return fail(response.status, {
+			return fail(response.error.status, {
 				success: false,
 				formError: response.error.message,
 				fieldErrors: response.error.details,

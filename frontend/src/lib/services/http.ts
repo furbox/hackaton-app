@@ -1,49 +1,34 @@
-import { PUBLIC_BACKEND_URL } from '$env/static/public';
+import type { ApiResult, ServiceContext } from './contracts';
+import { errorResult, successResult } from './response';
 
-/**
- * Standardized API error structure.
- */
-export interface ApiError {
-	code: string;
-	message: string;
-	details?: Record<string, any>;
+type HttpRequestOptions = RequestInit & ServiceContext;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return Boolean(value && typeof value === 'object');
 }
 
 /**
- * Standardized API response structure.
- */
-export type ApiResponse<T> =
-	| {
-			ok: true;
-			data: T;
-	  }
-	| {
-			ok: false;
-			error: ApiError;
-			status: number;
-	  };
-
-/**
- * Base HTTP client for backend calls.
+ * Base HTTP client for proxy calls.
  * Handles cookie forwarding and standardized error handling.
  */
 export class HttpClient {
 	private baseUrl: string;
 
-	constructor(baseUrl: string = PUBLIC_BACKEND_URL) {
+	constructor(baseUrl: string = '/api/proxy') {
 		this.baseUrl = baseUrl;
 	}
 
 	/**
 	 * Makes an HTTP request to the backend.
 	 *
-	 * @param path - The endpoint path (e.g., '/api/links').
+	 * @param path - The endpoint path (e.g., '/links').
 	 * @param options - Standard RequestInit with optional `cookies` field.
-	 * @returns A standardized ApiResponse.
+	 * @returns A standardized ApiResult.
 	 */
-	async request<T>(path: string, options: RequestInit & { cookies?: string } = {}): Promise<ApiResponse<T>> {
-		const { cookies, ...fetchOptions } = options;
+	async request<T>(path: string, options: HttpRequestOptions = {}): Promise<ApiResult<T>> {
+		const { cookies, fetch: requestFetch, ...fetchOptions } = options;
 		const url = `${this.baseUrl}${path}`;
+		const executeFetch = requestFetch ?? fetch;
 
 		const headers = new Headers(fetchOptions.headers);
 		if (cookies) {
@@ -54,43 +39,47 @@ export class HttpClient {
 		}
 
 		try {
-			const response = await fetch(url, { ...fetchOptions, headers });
-
-			// Check for non-JSON response (e.g., server crash)
-			const contentType = response.headers.get('content-type');
-			if (!contentType || !contentType.includes('application/json')) {
-				return {
-					ok: false,
-					error: { code: 'NOT_JSON', message: 'The server did not return JSON' },
-					status: response.status
-				};
+			const response = await executeFetch(url, { ...fetchOptions, headers });
+			if (response.status === 204) {
+				return successResult(null as T);
 			}
 
-			const result = await response.json();
+			const bodyText = await response.text();
+			let payload: unknown = null;
+
+			if (bodyText) {
+				try {
+					payload = JSON.parse(bodyText);
+				} catch {
+					if (response.ok) {
+						return errorResult(response.status, null, 'Invalid JSON response from proxy');
+					}
+				}
+			}
 
 			if (response.ok) {
-				return { ok: true, data: result.data };
-			} else {
-				return {
-					ok: false,
-					error: result.error || { code: 'UNKNOWN_ERROR', message: 'Something went wrong' },
-					status: response.status
-				};
+				if (isRecord(payload) && 'data' in payload) {
+					return successResult(payload.data as T);
+				}
+
+				return successResult(payload as T);
 			}
+
+			return errorResult(response.status, payload, 'Request failed');
 		} catch (error) {
-			return {
-				ok: false,
-				error: { code: 'FETCH_ERROR', message: (error as Error).message },
-				status: 500
-			};
+			return errorResult(
+				503,
+				{ error: { code: 'FETCH_ERROR', message: (error as Error).message } },
+				'Network request failed'
+			);
 		}
 	}
 
-	get<T>(path: string, options: RequestInit & { cookies?: string } = {}) {
+	get<T>(path: string, options: HttpRequestOptions = {}) {
 		return this.request<T>(path, { ...options, method: 'GET' });
 	}
 
-	post<T>(path: string, body?: any, options: RequestInit & { cookies?: string } = {}) {
+	post<T>(path: string, body?: unknown, options: HttpRequestOptions = {}) {
 		return this.request<T>(path, {
 			...options,
 			method: 'POST',
@@ -98,7 +87,7 @@ export class HttpClient {
 		});
 	}
 
-	put<T>(path: string, body?: any, options: RequestInit & { cookies?: string } = {}) {
+	put<T>(path: string, body?: unknown, options: HttpRequestOptions = {}) {
 		return this.request<T>(path, {
 			...options,
 			method: 'PUT',
@@ -106,7 +95,7 @@ export class HttpClient {
 		});
 	}
 
-	delete<T>(path: string, options: RequestInit & { cookies?: string } = {}) {
+	delete<T>(path: string, options: HttpRequestOptions = {}) {
 		return this.request<T>(path, { ...options, method: 'DELETE' });
 	}
 }
