@@ -9,6 +9,7 @@ import {
 
 const WAYBACK_SAVE_BASE_URL = "https://web.archive.org/save/";
 const WAYBACK_FALLBACK_BASE_URL = "https://web.archive.org/web/*/";
+const DEFAULT_WAYBACK_TIMEOUT_MS = 30_000;
 const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_BASE_DELAY_MS = 2_000;
 
@@ -21,6 +22,7 @@ type WaybackDeps = {
   sleepImpl?: SleepLike;
   maxAttempts?: number;
   baseDelayMs?: number;
+  timeoutMs?: number;
   postMessage?: WorkerPostMessage;
 };
 
@@ -32,12 +34,64 @@ function toPositiveIntOrDefault(value: number | undefined, fallback: number): nu
   return value;
 }
 
+function parseTimeoutMs(rawValue: string | undefined): number {
+  if (!rawValue) return DEFAULT_WAYBACK_TIMEOUT_MS;
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return DEFAULT_WAYBACK_TIMEOUT_MS;
+  return parsed;
+}
+
+export function getWaybackTimeoutMs(env: Record<string, string | undefined> = process.env): number {
+  return parseTimeoutMs(env.WAYBACK_TIMEOUT_MS);
+}
+
 export function getRetryDelayMs(attempt: number, baseDelayMs = RETRY_BASE_DELAY_MS): number {
   if (attempt <= 1) {
     return 0;
   }
 
   return baseDelayMs * (2 ** (attempt - 2));
+}
+
+async function fetchWithTimeout(
+  fetchImpl: FetchLike,
+  url: string,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetchImpl(url, {
+      method: "POST",
+      redirect: "follow",
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function isRetryableNetworkError(error: unknown): boolean {
+  // Retry on timeout errors
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return true;
+  }
+
+  // Retry on generic network errors (but not on TypeError for invalid URLs)
+  if (error instanceof Error) {
+    if (error.name === "AbortError") {
+      return true;
+    }
+
+    // ECONNREFUSED, ENOTFOUND, ETIMEDOUT, etc. typically inherit from Error
+    // We retry if it's a network error, but not if it's a TypeError (e.g., invalid URL)
+    if (error.name === "TypeError" && error.message.includes("fetch failed")) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -93,25 +147,34 @@ export async function archiveLinkInWayback(
     sleepImpl?: SleepLike;
     maxAttempts?: number;
     baseDelayMs?: number;
+    timeoutMs?: number;
   } = {}
 ): Promise<WaybackResult> {
   const fetchImpl = deps.fetchImpl ?? fetch;
   const sleepImpl = deps.sleepImpl ?? sleep;
   const maxAttempts = toPositiveIntOrDefault(deps.maxAttempts, MAX_RETRY_ATTEMPTS);
   const baseDelayMs = toPositiveIntOrDefault(deps.baseDelayMs, RETRY_BASE_DELAY_MS);
+  const timeoutMs = deps.timeoutMs ?? getWaybackTimeoutMs();
 
   const archivedAt = new Date().toISOString();
+  let lastError: unknown = null;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     if (attempt > 1) {
-      await sleepImpl(getRetryDelayMs(attempt, baseDelayMs));
+      const delayMs = getRetryDelayMs(attempt, baseDelayMs);
+      console.warn(`[wayback-worker] Retry attempt ${attempt}/${maxAttempts} for link ${payload.linkId} after ${delayMs}ms`, {
+        linkId: payload.linkId,
+        url: payload.url,
+        attempt,
+        maxAttempts,
+        delayMs,
+        lastError: lastError instanceof Error ? lastError.message : String(lastError),
+      });
+      await sleepImpl(delayMs);
     }
 
     try {
-      const response = await fetchImpl(buildSaveRequestUrl(payload.url), {
-        method: "POST",
-        redirect: "follow",
-      });
+      const response = await fetchWithTimeout(fetchImpl, buildSaveRequestUrl(payload.url), timeoutMs);
 
       if (response.ok) {
         return {
@@ -122,6 +185,7 @@ export async function archiveLinkInWayback(
       }
 
       if (isRetryableStatus(response.status) && attempt < maxAttempts) {
+        lastError = new Error(`HTTP ${response.status}`);
         continue;
       }
 
@@ -130,7 +194,14 @@ export async function archiveLinkInWayback(
         archiveUrl: null,
         archivedAt,
       };
-    } catch {
+    } catch (error) {
+      lastError = error;
+
+      // Retry on network errors (timeouts, connection failures, etc.)
+      if (isRetryableNetworkError(error) && attempt < maxAttempts) {
+        continue;
+      }
+
       return {
         linkId: payload.linkId,
         archiveUrl: null,
@@ -167,6 +238,7 @@ export async function handleWaybackMessage(
   const sleepImpl = deps.sleepImpl ?? sleep;
   const maxAttempts = deps.maxAttempts;
   const baseDelayMs = deps.baseDelayMs;
+  const timeoutMs = deps.timeoutMs ?? getWaybackTimeoutMs();
 
   if (message.type === WorkerMessageType.WAYBACK) {
     const data = await archiveLinkInWayback(message.payload as WaybackPayload, {
@@ -174,6 +246,7 @@ export async function handleWaybackMessage(
       sleepImpl,
       maxAttempts,
       baseDelayMs,
+      timeoutMs,
     });
 
     emitResult(postMessage, {
@@ -203,6 +276,7 @@ export async function handleWaybackMessage(
         sleepImpl,
         maxAttempts,
         baseDelayMs,
+        timeoutMs,
       });
 
       emitResult(postMessage, {

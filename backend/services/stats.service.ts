@@ -8,6 +8,7 @@
 import {
   getGlobalStats as getGlobalStatsFromDb,
   getUserStatsById,
+  getUserRankWithCounts,
   type GlobalStatsRow,
   type UserStatsRow,
 } from "../db/queries/index.js";
@@ -26,6 +27,22 @@ export interface UserStatsResponse {
   totalLinks: number;
   totalViews: number;
   totalLikes: number;
+  rankProgression: {
+    currentRank: {
+      id: number;
+      name: string;
+      displayName: string;
+      color: string;
+      description: string | null;
+    };
+    nextRank: {
+      id: number;
+      name: string;
+      displayName: string;
+      minLinks: number;
+      linksNeeded: number;
+    } | null;
+  };
 }
 
 export interface GlobalStatsResponse {
@@ -80,6 +97,13 @@ export function getUserStats(
       return fail("NOT_FOUND", "User not found");
     }
 
+    // Get detailed rank progression information
+    const rankWithProgression = getUserRankWithCounts(actor.userId);
+
+    if (!rankWithProgression) {
+      return fail("NOT_FOUND", "User rank information not found");
+    }
+
     return ok({
       username: row.username,
       avatarUrl: row.avatar_url,
@@ -88,6 +112,10 @@ export function getUserStats(
       totalLinks: row.total_links,
       totalViews: row.total_views,
       totalLikes: row.total_likes,
+      rankProgression: {
+        currentRank: rankWithProgression.currentRank,
+        nextRank: rankWithProgression.nextRank,
+      },
     });
   } catch {
     return fail("INTERNAL", "Failed to retrieve user stats");

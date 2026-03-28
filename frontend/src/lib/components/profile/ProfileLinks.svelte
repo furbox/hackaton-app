@@ -8,7 +8,7 @@
 
 	let activeTab = $state<TabType>('all');
 
-	const tabs = $derived(() => [
+	const tabs = $derived.by(() => [
 		{ id: 'all' as TabType, label: 'Todos', count: links.length },
 		{
 			id: 'public' as TabType,
@@ -22,7 +22,7 @@
 		}
 	]);
 
-	const filteredLinks = $derived(() => {
+	const filteredLinks = $derived.by(() => {
 		switch (activeTab) {
 			case 'public':
 				return links.filter((l: LinkListItemDTO) => l.isPublic);
@@ -38,7 +38,7 @@
 	<!-- Tabs -->
 	<div class="border-b border-gray-200 dark:border-gray-700 mb-6">
 		<nav class="flex -mb-px space-x-8" aria-label="Tabs">
-			{#each tabs() as tab}
+			{#each tabs as tab (tab.id)}
 				<button
 					onclick={() => (activeTab = tab.id)}
 					class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors {activeTab === tab.id
@@ -57,7 +57,7 @@
 	</div>
 
 	<!-- Links Grid -->
-	{#if filteredLinks().length === 0}
+	{#if filteredLinks.length === 0}
 		<div class="text-center py-12">
 			<svg
 				class="mx-auto h-12 w-12 text-gray-400"
@@ -79,7 +79,7 @@
 		</div>
 	{:else}
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			{#each filteredLinks() as link (link.id)}
+			{#each filteredLinks as link (link.id)}
 				<LinkCard {link} />
 			{/each}
 		</div>

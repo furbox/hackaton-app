@@ -168,11 +168,11 @@ describe("getGlobalStats", () => {
     const stats = getGlobalStats();
 
     expect(stats.total_users).toBe(3);
-    expect(stats.total_links).toBe(2); // 2 public links out of 3 (link3 is private)
+    expect(stats.total_links).toBe(3); // All links (2 public + 1 private)
     expect(stats.total_categories).toBe(1);
   });
 
-  test("counts only public links", () => {
+  test("counts all links including private", () => {
     // Add a private link
     testDb.run(`
       INSERT INTO links (user_id, url, title, short_code, is_public, views)
@@ -180,7 +180,7 @@ describe("getGlobalStats", () => {
     `);
 
     const stats = getGlobalStats();
-    expect(stats.total_links).toBe(2); // Still 2, new private link not counted
+    expect(stats.total_links).toBe(4); // Now 4 total (2 public + 2 private)
   });
 
   test("handles empty database", () => {

@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach, mock } from "bun:test";
-import { handleKeysRoute, type KeysRouteDeps } from "../keys.js";
+import { handleKeysRoute, type KeysRouteDeps } from "../../../../routes/api/keys.ts";
 import type { Phase4ServiceResult } from "../../../../contracts/service-error.ts";
 
 // Local type definitions (matching service layer)

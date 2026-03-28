@@ -9,7 +9,8 @@
 
 import {
   getLinkByShortCode,
-  incrementViews,
+  getLinkByShortCodeVisibleToActor,
+  recordLinkVisitAndIncrementViews,
 } from "../db/queries/index.js";
 import type { Phase4ServiceResult } from "../contracts/service-error.js";
 
@@ -19,6 +20,9 @@ import type { Phase4ServiceResult } from "../contracts/service-error.js";
 
 export interface ResolveShortCodeInput {
   code: string;
+  ipAddress: string;
+  userAgent: string;
+  actorUserId?: number;
 }
 
 export type ResolvedLinkDTO = {
@@ -60,9 +64,23 @@ export function resolveShortCode(
   }
 
   // Lookup
-  const link = getLinkByShortCode(input.code);
+  const link = getLinkByShortCodeVisibleToActor(input.code, input.actorUserId);
 
   if (!link) {
+    const hiddenLink = getLinkByShortCode(input.code);
+
+    if (hiddenLink && hiddenLink.is_public !== 1) {
+      return {
+        ok: false,
+        error: {
+          code: input.actorUserId ? "FORBIDDEN" : "UNAUTHORIZED",
+          message: input.actorUserId
+            ? "You are not allowed to access this short link"
+            : "Authentication required to access this short link",
+        },
+      };
+    }
+
     return {
       ok: false,
       error: {
@@ -72,8 +90,13 @@ export function resolveShortCode(
     };
   }
 
-  // Side effect: increment view count (bun:sqlite is sync — no await needed)
-  incrementViews(link.id);
+  // Side effects: persist visit telemetry + increment aggregate views counter.
+  recordLinkVisitAndIncrementViews({
+    linkId: link.id,
+    userId: input.actorUserId,
+    ipAddress: input.ipAddress,
+    userAgent: input.userAgent,
+  });
 
   return {
     ok: true,

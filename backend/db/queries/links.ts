@@ -83,6 +83,7 @@ export interface CreateLinkScopedParams {
 }
 
 export interface GetLinksVisibleToActorArgs {
+  q?: string;
   owner_user_id?: number;
   actor_user_id?: number;
   category_id?: number;
@@ -114,10 +115,47 @@ export interface LinkMutationResult {
   changes: number;
 }
 
+export interface LinkViewInsertParams {
+  linkId: number;
+  userId?: number;
+  ipAddress: string;
+  userAgent: string;
+}
+
 export type LinkWithCounts = Link & {
   likes_count: number;
   favorites_count: number;
+  liked_by_me: number;
+  favorited_by_me: number;
+  owner_username: string;
+  owner_avatar_url: string | null;
 };
+
+export type FavoriteLinkWithCounts = LinkWithCounts & {
+  liked_by_me: number;
+  favorited_by_me: number;
+  category_name: string | null;
+  category_color: string | null;
+};
+
+export interface ImportLinkItem {
+  url: string;
+  title: string;
+  description: string | null;
+  category_name: string | null;
+}
+
+export interface ImportLinksResult {
+  imported: number;
+  duplicates: number;
+  categories_created: number;
+  imported_links: Array<{
+    id: number;
+    url: string;
+    title: string;
+    category_name: string | null;
+  }>;
+}
 
 // ============================================================================
 // PREPARED STATEMENT FACTORIES
@@ -135,6 +173,31 @@ const createLinkStmt = () => getDb().prepare(`
 
 const getLinksByUserStmt = () => getDb().prepare(`
   SELECT * FROM links WHERE user_id = ? ORDER BY created_at DESC
+`);
+
+const getAllLinksByUserStmt = () => getDb().prepare(`
+  SELECT
+    l.*,
+    u.username AS owner_username,
+    u.avatar_url AS owner_avatar_url,
+    COUNT(DISTINCT lk.user_id) as likes_count,
+    COUNT(DISTINCT f.user_id) as favorites_count,
+    EXISTS(
+      SELECT 1 FROM likes lk_me
+      WHERE lk_me.link_id = l.id AND lk_me.user_id = ?
+    ) AS liked_by_me,
+    EXISTS(
+      SELECT 1 FROM favorites f_me
+      WHERE f_me.link_id = l.id AND f_me.user_id = ?
+    ) AS favorited_by_me
+  FROM links l
+  INNER JOIN users u ON u.id = l.user_id
+  LEFT JOIN likes lk ON l.id = lk.link_id
+  LEFT JOIN favorites f ON l.id = f.link_id
+  WHERE l.user_id = ?
+  GROUP BY l.id
+  ORDER BY l.created_at DESC
+  LIMIT ?
 `);
 
 const getPublicLinksStmt = () => getDb().prepare(`
@@ -217,12 +280,27 @@ const getLinkByIdVisibleToActorStmt = () => getDb().prepare(`
 const getLinksVisibleToActorStmt = () => getDb().prepare(`
   SELECT
     l.*,
+    u.username AS owner_username,
+    u.avatar_url AS owner_avatar_url,
     COUNT(DISTINCT lk.user_id) as likes_count,
-    COUNT(DISTINCT f.user_id) as favorites_count
+    COUNT(DISTINCT f.user_id) as favorites_count,
+    EXISTS(
+      SELECT 1 FROM likes lk_me
+      WHERE lk_me.link_id = l.id AND lk_me.user_id = ?
+    ) AS liked_by_me,
+    EXISTS(
+      SELECT 1 FROM favorites f_me
+      WHERE f_me.link_id = l.id AND f_me.user_id = ?
+    ) AS favorited_by_me
   FROM links l
+  INNER JOIN users u ON u.id = l.user_id
   LEFT JOIN likes lk ON l.id = lk.link_id
   LEFT JOIN favorites f ON l.id = f.link_id
   WHERE
+    (? IS NULL OR l.id IN (
+      SELECT rowid FROM links_fts WHERE links_fts MATCH ?
+    ))
+    AND
     (? IS NULL OR l.user_id = ?)
     AND (? IS NULL OR l.category_id = ?)
     AND (
@@ -239,6 +317,32 @@ const getLinksVisibleToActorStmt = () => getDb().prepare(`
   LIMIT ? OFFSET ?
 `);
 
+const getFavoriteLinksByUserStmt = () => getDb().prepare(`
+  SELECT
+    l.*,
+    u.username AS owner_username,
+    u.avatar_url AS owner_avatar_url,
+    COUNT(DISTINCT lk.user_id) as likes_count,
+    COUNT(DISTINCT f_all.user_id) as favorites_count,
+    EXISTS(
+      SELECT 1 FROM likes lk_me
+      WHERE lk_me.link_id = l.id AND lk_me.user_id = ?
+    ) AS liked_by_me,
+    1 AS favorited_by_me,
+    c.name AS category_name,
+    c.color AS category_color
+  FROM favorites f_me
+  INNER JOIN links l ON l.id = f_me.link_id
+  INNER JOIN users u ON u.id = l.user_id
+  LEFT JOIN likes lk ON l.id = lk.link_id
+  LEFT JOIN favorites f_all ON l.id = f_all.link_id
+  LEFT JOIN categories c ON c.id = l.category_id
+  WHERE f_me.user_id = ?
+    AND (l.is_public = 1 OR l.user_id = ?)
+  GROUP BY l.id
+  ORDER BY l.created_at DESC
+ `);
+
 const deleteLinkByOwnerStmt = () => getDb().prepare(`
   DELETE FROM links
   WHERE id = ? AND user_id = ?
@@ -246,6 +350,11 @@ const deleteLinkByOwnerStmt = () => getDb().prepare(`
 
 const incrementViewsStmt = () => getDb().prepare(`
   UPDATE links SET views = views + 1 WHERE id = ?
+`);
+
+const insertLinkViewStmt = () => getDb().prepare(`
+  INSERT INTO link_views (link_id, user_id, ip_address, user_agent)
+  VALUES (?, ?, ?, ?)
 `);
 
 const updateLinkStatusCodeByIdStmt = () => getDb().prepare(`
@@ -264,6 +373,41 @@ const updateLinkArchiveUrlByIdStmt = () => getDb().prepare(`
   UPDATE links
   SET archive_url = ?
   WHERE id = ?
+`);
+
+const findCategoryByUserAndNameStmt = () => getDb().prepare(`
+  SELECT id
+  FROM categories
+  WHERE user_id = ?
+    AND LOWER(name) = LOWER(?)
+  LIMIT 1
+`);
+
+const createCategoryForImportStmt = () => getDb().prepare(`
+  INSERT INTO categories (user_id, name, color)
+  VALUES (?, ?, ?)
+`);
+
+const findLinkByUserAndUrlStmt = () => getDb().prepare(`
+  SELECT id
+  FROM links
+  WHERE user_id = ?
+    AND url = ?
+  LIMIT 1
+`);
+
+const insertImportedLinkStmt = () => getDb().prepare(`
+  INSERT INTO links (
+    user_id,
+    url,
+    title,
+    description,
+    short_code,
+    is_public,
+    category_id,
+    status_code
+  )
+  VALUES (?, ?, ?, ?, ?, 1, ?, 200)
 `);
 
 // ============================================================================
@@ -327,6 +471,28 @@ export function createLink(params: CreateLinkParams): Link {
 export function getLinksByUser(userId: number): Link[] {
   const stmt = getLinksByUserStmt();
   return stmt.all(userId) as Link[];
+}
+
+/**
+ * Retrieves ALL links (public + private) for a specific user.
+ *
+ * Unlike getLinksVisibleToActor, this does NOT filter by visibility.
+ * Used for the user's own dashboard where they should see all their links.
+ *
+ * @param userId - User's primary key ID
+ * @param actorUserId - The user viewing the links (should be the same as userId)
+ * @param limit - Maximum number of links to return
+ * @returns Array of user's links with engagement metrics, ordered by creation date (newest first)
+ *
+ * @example
+ * ```typescript
+ * // Get all my links (public and private)
+ * const myLinks = getAllLinksByUser(123, 123, 100);
+ * ```
+ */
+export function getAllLinksByUser(userId: number, actorUserId: number, limit: number): LinkWithCounts[] {
+  const stmt = getAllLinksByUserStmt();
+  return stmt.all(actorUserId, actorUserId, userId, limit) as LinkWithCounts[];
 }
 
 /**
@@ -478,6 +644,10 @@ export function getLinkByIdVisibleToActor(id: number, actorUserId?: number): Lin
 export function getLinksVisibleToActor(args: GetLinksVisibleToActorArgs): LinkWithCounts[] {
   const stmt = getLinksVisibleToActorStmt();
   return stmt.all(
+    args.actor_user_id ?? null,  // liked_by_me EXISTS subquery
+    args.actor_user_id ?? null,  // favorited_by_me EXISTS subquery
+    args.q ?? null,
+    args.q ?? null,
     args.owner_user_id ?? null,
     args.owner_user_id ?? null,
     args.category_id ?? null,
@@ -491,6 +661,11 @@ export function getLinksVisibleToActor(args: GetLinksVisibleToActorArgs): LinkWi
     args.limit,
     args.offset
   ) as LinkWithCounts[];
+}
+
+export function getFavoriteLinksByUser(userId: number): FavoriteLinkWithCounts[] {
+  const stmt = getFavoriteLinksByUserStmt();
+  return stmt.all(userId, userId, userId) as FavoriteLinkWithCounts[];
 }
 
 export function updateLinkByOwner(
@@ -596,6 +771,51 @@ export function updateLinkArchiveUrlById(linkId: number, archiveUrl: string | nu
   return { changes: result.changes };
 }
 
+function normalizeIpAddress(value: string): string {
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : "unknown";
+}
+
+function normalizeUserAgent(value: string): string {
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return "unknown";
+  }
+
+  const MAX_UA_LENGTH = 512;
+  return normalized.length > MAX_UA_LENGTH ? normalized.slice(0, MAX_UA_LENGTH) : normalized;
+}
+
+export function insertLinkView(params: LinkViewInsertParams): boolean {
+  const stmt = insertLinkViewStmt();
+  const result = stmt.run(
+    params.linkId,
+    params.userId ?? null,
+    normalizeIpAddress(params.ipAddress),
+    normalizeUserAgent(params.userAgent)
+  );
+
+  return result.changes > 0;
+}
+
+export function recordLinkVisitAndIncrementViews(params: LinkViewInsertParams): void {
+  const db = getDb();
+
+  const tx = db.transaction((input: LinkViewInsertParams) => {
+    const inserted = insertLinkView(input);
+    if (!inserted) {
+      throw new Error("Failed to insert link view row");
+    }
+
+    const incremented = incrementViews(input.linkId);
+    if (!incremented) {
+      throw new Error("Failed to increment link views");
+    }
+  });
+
+  tx(params);
+}
+
 /**
  * Increments the view count for a link.
  *
@@ -623,6 +843,18 @@ export function incrementViews(id: number): boolean {
 const getLinkByShortCodeStmt = () =>
   getDb().prepare(`SELECT * FROM links WHERE short_code = ? LIMIT 1`);
 
+const getLinkByShortCodeVisibleToActorStmt = () =>
+  getDb().prepare(`
+    SELECT *
+    FROM links
+    WHERE short_code = ?
+      AND (
+        is_public = 1
+        OR (? IS NOT NULL AND user_id = ?)
+      )
+    LIMIT 1
+  `);
+
 /**
  * Retrieves a link by its short code.
  *
@@ -641,4 +873,161 @@ const getLinkByShortCodeStmt = () =>
  */
 export function getLinkByShortCode(code: string): Link | null {
   return getLinkByShortCodeStmt().get(code) as Link | null;
+}
+
+function randomShortCode(length = 8): string {
+  const alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let output = "";
+
+  for (let i = 0; i < length; i += 1) {
+    output += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+
+  return output;
+}
+
+function normalizeCategoryKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+function isUniqueShortCodeError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes("UNIQUE constraint failed: links.short_code");
+}
+
+function resolveCategoryIdForImport(
+  userId: number,
+  categoryName: string,
+  cache: Map<string, number>
+): { id: number; created: boolean } {
+  const key = normalizeCategoryKey(categoryName);
+  const cached = cache.get(key);
+  if (cached) {
+    return { id: cached, created: false };
+  }
+
+  const found = findCategoryByUserAndNameStmt().get(userId, categoryName) as { id: number } | null;
+  if (found) {
+    cache.set(key, found.id);
+    return { id: found.id, created: false };
+  }
+
+  const insert = createCategoryForImportStmt().run(userId, categoryName, "#6366f1");
+  const createdId = Number(insert.lastInsertRowid);
+  cache.set(key, createdId);
+  return { id: createdId, created: true };
+}
+
+function insertImportedLinkWithRetry(
+  userId: number,
+  item: ImportLinkItem,
+  categoryId: number | null
+): number {
+  const MAX_SHORT_CODE_RETRIES = 10;
+
+  for (let attempt = 0; attempt < MAX_SHORT_CODE_RETRIES; attempt += 1) {
+    const shortCode = randomShortCode(8);
+
+    try {
+      const result = insertImportedLinkStmt().run(
+        userId,
+        item.url,
+        item.title,
+        item.description,
+        shortCode,
+        categoryId
+      );
+      return Number(result.lastInsertRowid);
+    } catch (error) {
+      if (isUniqueShortCodeError(error)) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  throw new Error("Could not generate unique short code for imported link");
+}
+
+export function importLinksForUser(userId: number, items: ImportLinkItem[]): ImportLinksResult {
+  const db = getDb();
+
+  const tx = db.transaction((inputItems: ImportLinkItem[]) => {
+    let imported = 0;
+    let duplicates = 0;
+    let categoriesCreated = 0;
+    const importedLinks: ImportLinksResult["imported_links"] = [];
+    const seenUrls = new Set<string>();
+    const categoryCache = new Map<string, number>();
+
+    for (const item of inputItems) {
+      const normalizedUrl = item.url.trim();
+      if (!normalizedUrl) {
+        continue;
+      }
+
+      if (seenUrls.has(normalizedUrl)) {
+        duplicates += 1;
+        continue;
+      }
+      seenUrls.add(normalizedUrl);
+
+      const existing = findLinkByUserAndUrlStmt().get(userId, normalizedUrl) as { id: number } | null;
+      if (existing) {
+        duplicates += 1;
+        continue;
+      }
+
+      let categoryId: number | null = null;
+      let resolvedCategoryName: string | null = null;
+
+      if (item.category_name) {
+        const categoryName = item.category_name.trim();
+        if (categoryName.length > 0) {
+          const categoryResolution = resolveCategoryIdForImport(userId, categoryName, categoryCache);
+          categoryId = categoryResolution.id;
+          resolvedCategoryName = categoryName;
+          if (categoryResolution.created) {
+            categoriesCreated += 1;
+          }
+        }
+      }
+
+      const insertedId = insertImportedLinkWithRetry(
+        userId,
+        {
+          ...item,
+          url: normalizedUrl,
+          category_name: resolvedCategoryName,
+        },
+        categoryId
+      );
+
+      imported += 1;
+      if (importedLinks.length < 50) {
+        importedLinks.push({
+          id: insertedId,
+          url: normalizedUrl,
+          title: item.title,
+          category_name: resolvedCategoryName,
+        });
+      }
+    }
+
+    return {
+      imported,
+      duplicates,
+      categories_created: categoriesCreated,
+      imported_links: importedLinks,
+    };
+  });
+
+  return tx(items);
+}
+
+export function getLinkByShortCodeVisibleToActor(code: string, actorUserId?: number): Link | null {
+  return getLinkByShortCodeVisibleToActorStmt().get(
+    code,
+    actorUserId ?? null,
+    actorUserId ?? null
+  ) as Link | null;
 }

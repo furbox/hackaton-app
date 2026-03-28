@@ -13,12 +13,14 @@ function successDeps(): LinksRouteDeps {
   return {
     getSession: async () => ({ user: { id: "1" } } as any),
     getLinks: () => ({ ok: true, data: { items: [], page: 1, limit: 20, sort: "recent" } }),
+    getFavoriteLinks: () => ({ ok: true, data: { links: [] } }),
     createLink: () => ({ ok: true, data: { id: 1 } }),
     updateLink: () => ({ ok: true, data: { id: 1 } }),
     deleteLink: () => ({ ok: true, data: { deleted: true } }),
     toggleLike: () => ({ ok: true, data: { link_id: 1 } }),
     toggleFavorite: () => ({ ok: true, data: { link_id: 1 } }),
     previewLink: async () => ({ ok: true, data: { title: null, description: null, image: null } }),
+    importLinks: () => ({ ok: true, data: { imported: 0, duplicates: 0, categoriesCreated: 0, importedLinks: [] } }),
   };
 }
 
@@ -40,6 +42,11 @@ describe("handleLinksRoute boundaries", () => {
       "/api/links",
       deps
     );
+    const favoritesRes = await handleLinksRoute(
+      makeRequest("/api/links/me/favorites", { method: "GET" }),
+      "/api/links/me/favorites",
+      deps
+    );
     const putRes = await handleLinksRoute(
       makeRequest("/api/links/1", {
         method: "PUT",
@@ -54,11 +61,22 @@ describe("handleLinksRoute boundaries", () => {
       "/api/links/1",
       deps
     );
+    const importRes = await handleLinksRoute(
+      makeRequest("/api/links/import", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ items: [{ url: "https://example.com", title: "Example" }] }),
+      }),
+      "/api/links/import",
+      deps
+    );
 
     expect(getRes).toBeInstanceOf(Response);
     expect(postRes).toBeInstanceOf(Response);
+    expect(favoritesRes).toBeInstanceOf(Response);
     expect(putRes).toBeInstanceOf(Response);
     expect(deleteRes).toBeInstanceOf(Response);
+    expect(importRes).toBeInstanceOf(Response);
   });
 
   test("returns null for phase 4.3+ paths", async () => {
@@ -67,8 +85,6 @@ describe("handleLinksRoute boundaries", () => {
     const samples = [
       { method: "GET", path: "/api/links/1" },
       { method: "GET", path: "/api/links/me" },
-      { method: "GET", path: "/api/links/me/favorites" },
-      { method: "POST", path: "/api/links/import" },
     ];
 
     for (const sample of samples) {
@@ -179,6 +195,54 @@ describe("handleLinksRoute auth and validation", () => {
 
     expect(response?.status).toBe(400);
     expect(getCalls).toBe(0);
+  });
+
+  test("passes q, sort, page and limit query params to service", async () => {
+    let receivedInput: Record<string, unknown> | null = null;
+
+    const deps: LinksRouteDeps = {
+      ...successDeps(),
+      getLinks: (_actor, input) => {
+        receivedInput = input as Record<string, unknown>;
+        return { ok: true, data: { items: [], page: 2, limit: 5, sort: "likes" } };
+      },
+    };
+
+    const response = await handleLinksRoute(
+      makeRequest("/api/links?q=google&sort=likes&page=2&limit=5", { method: "GET" }),
+      "/api/links",
+      deps
+    );
+
+    expect(response?.status).toBe(200);
+    expect(receivedInput).not.toBeNull();
+    expect(receivedInput).toMatchObject({
+      q: "google",
+      sort: "likes",
+      page: 2,
+      limit: 5,
+    });
+  });
+
+  test("rejects unauthenticated favorites listing with 401", async () => {
+    let favoriteCalls = 0;
+    const deps: LinksRouteDeps = {
+      ...successDeps(),
+      getSession: async () => null,
+      getFavoriteLinks: () => {
+        favoriteCalls += 1;
+        return { ok: true, data: { links: [] } };
+      },
+    };
+
+    const response = await handleLinksRoute(
+      makeRequest("/api/links/me/favorites", { method: "GET" }),
+      "/api/links/me/favorites",
+      deps
+    );
+
+    expect(response?.status).toBe(401);
+    expect(favoriteCalls).toBe(0);
   });
 
   test("rejects invalid ids before service invocation", async () => {
@@ -368,6 +432,47 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
 
     expect(response?.status).toBe(201);
     expect(calls).toBe(1);
+  });
+
+  test("GET favorites delegates once and returns data envelope", async () => {
+    let calls = 0;
+    const deps: LinksRouteDeps = {
+      ...successDeps(),
+      getFavoriteLinks: () => {
+        calls += 1;
+        return {
+          ok: true,
+          data: {
+            links: [
+              {
+                id: 7,
+                title: "example",
+                url: "https://example.com",
+                shortCode: "abc123",
+                views: 3,
+                likesCount: 2,
+                favoritesCount: 1,
+                likedByMe: false,
+                favoritedByMe: true,
+              },
+            ],
+          },
+        };
+      },
+    };
+
+    const response = await handleLinksRoute(
+      makeRequest("/api/links/me/favorites", { method: "GET" }),
+      "/api/links/me/favorites",
+      deps
+    );
+
+    expect(response?.status).toBe(200);
+    expect(calls).toBe(1);
+
+    const body = await response?.json();
+    expect(Array.isArray(body?.data?.links)).toBe(true);
+    expect(body?.data?.links?.[0]?.shortCode).toBe("abc123");
   });
 
   test("PUT and DELETE delegate to correct service exactly once", async () => {
@@ -617,6 +722,10 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
       code: "NOT_FOUND",
       message: "missing",
     });
+    const favoritesGetMapped = mapPhase4ServiceError({
+      code: "INTERNAL",
+      message: "favorites-failed",
+    });
     const postMapped = mapPhase4ServiceError({
       code: "CONFLICT",
       message: "dup",
@@ -646,6 +755,7 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
     const deps: LinksRouteDeps = {
       ...successDeps(),
       getLinks: () => ({ ok: false, error: { code: "NOT_FOUND", message: "missing" } }),
+      getFavoriteLinks: () => ({ ok: false, error: { code: "INTERNAL", message: "favorites-failed" } }),
       createLink: () => ({ ok: false, error: { code: "CONFLICT", message: "dup" } }),
       updateLink: () => ({ ok: false, error: { code: "FORBIDDEN", message: "nope" } }),
       deleteLink: () => ({ ok: false, error: { code: "INTERNAL", message: "boom" } }),
@@ -669,6 +779,11 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
         body: JSON.stringify({ url: "https://example.com", title: "x", shortCode: "x1" }),
       }),
       "/api/links",
+      deps
+    );
+    const favoritesGetResponse = await handleLinksRoute(
+      makeRequest("/api/links/me/favorites", { method: "GET" }),
+      "/api/links/me/favorites",
       deps
     );
     const putResponse = await handleLinksRoute(
@@ -707,6 +822,9 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
 
     expect(getResponse?.status).toBe(getMapped.status);
     expect(await getResponse?.json()).toEqual(getMapped.body);
+
+    expect(favoritesGetResponse?.status).toBe(favoritesGetMapped.status);
+    expect(await favoritesGetResponse?.json()).toEqual(favoritesGetMapped.body);
 
     expect(postResponse?.status).toBe(postMapped.status);
     expect(await postResponse?.json()).toEqual(postMapped.body);

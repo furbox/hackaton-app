@@ -2,7 +2,11 @@ import { getSession, type Session } from "../../middleware/auth/index.ts";
 import {
   createLink,
   deleteLink,
+  getFavoriteLinks,
   getLinks,
+  getLinksMe,
+  getLinkDetailsById,
+  importLinks,
   previewLink,
   toggleFavorite,
   toggleLike,
@@ -10,6 +14,8 @@ import {
   type CreateLinkInput,
   type DeleteLinkInput,
   type GetLinksInput,
+  type ImportLinksInput,
+  type ImportLinksOutput,
   type ServiceActor,
   type UpdateLinkInput,
 } from "../../services/links.service.ts";
@@ -23,6 +29,9 @@ const SORT_VALUES = ["recent", "likes", "views", "favorites"] as const;
 export interface LinksRouteDeps {
   getSession: (request: Request) => Promise<Session | null>;
   getLinks: (actor: ServiceActor, input?: GetLinksInput) => Phase4ServiceResult<unknown>;
+  getLinksMe: (actor: ServiceActor, input?: { limit?: number }) => Phase4ServiceResult<unknown>;
+  getFavoriteLinks: (actor: ServiceActor) => Phase4ServiceResult<unknown>;
+  getLinkDetailsById: (actor: ServiceActor, linkId: number) => Phase4ServiceResult<unknown>;
   createLink: (actor: ServiceActor, input: CreateLinkInput) => Phase4ServiceResult<unknown>;
   updateLink: (actor: ServiceActor, input: UpdateLinkInput) => Phase4ServiceResult<unknown>;
   deleteLink: (actor: ServiceActor, input: DeleteLinkInput) => Phase4ServiceResult<unknown>;
@@ -35,18 +44,23 @@ export interface LinksRouteDeps {
       image: string | null;
     }>
   >;
+  importLinks: (actor: ServiceActor, input: ImportLinksInput) => Phase4ServiceResult<ImportLinksOutput>;
 }
 
 function defaultDeps(): LinksRouteDeps {
   return {
     getSession,
     getLinks,
+    getLinksMe,
+    getFavoriteLinks,
+    getLinkDetailsById,
     createLink,
     updateLink,
     deleteLink,
     toggleLike,
     toggleFavorite,
     previewLink,
+    importLinks,
   };
 }
 
@@ -232,6 +246,7 @@ function parseUpdateLinkPatch(body: Record<string, unknown>): UpdateLinkInput["p
 }
 
 function parseGetLinksQuery(url: URL): GetLinksInput | Response {
+  const qRaw = url.searchParams.get("q");
   const ownerUserIdRaw = url.searchParams.get("ownerUserId");
   const categoryIdRaw = url.searchParams.get("categoryId");
   const sortRaw = url.searchParams.get("sort");
@@ -239,6 +254,10 @@ function parseGetLinksQuery(url: URL): GetLinksInput | Response {
   const limitRaw = url.searchParams.get("limit");
 
   const input: GetLinksInput = {};
+
+  if (qRaw !== null) {
+    input.q = qRaw;
+  }
 
   if (ownerUserIdRaw !== null) {
     const parsed = parsePositiveInt(ownerUserIdRaw, "ownerUserId");
@@ -282,6 +301,38 @@ function parseGetLinksQuery(url: URL): GetLinksInput | Response {
   return input;
 }
 
+function parseImportLinksInput(body: Record<string, unknown>): ImportLinksInput | Response {
+  const items = body.items;
+  if (!Array.isArray(items) || items.length === 0) {
+    return validationError("items must be a non-empty array");
+  }
+
+  for (let i = 0; i < items.length; i += 1) {
+    const item = items[i];
+    if (!isRecord(item)) {
+      return validationError(`items[${i}] must be an object`);
+    }
+
+    if (typeof item.url !== "string") {
+      return validationError(`items[${i}].url must be a string`);
+    }
+
+    if (item.title !== undefined && typeof item.title !== "string") {
+      return validationError(`items[${i}].title must be a string when provided`);
+    }
+
+    if (item.description !== undefined && item.description !== null && typeof item.description !== "string") {
+      return validationError(`items[${i}].description must be a string or null`);
+    }
+
+    if (item.category !== undefined && item.category !== null && typeof item.category !== "string") {
+      return validationError(`items[${i}].category must be a string or null`);
+    }
+  }
+
+  return { items: items as ImportLinksInput["items"] };
+}
+
 function responseFromService<T>(result: Phase4ServiceResult<T>, successStatus = 200): Response {
   if (!result.ok) {
     const mapped = mapPhase4ServiceError(result.error);
@@ -292,18 +343,6 @@ function responseFromService<T>(result: Phase4ServiceResult<T>, successStatus = 
 }
 
 function isPhase43PassThrough(method: string, path: string): boolean {
-  if (method === "GET" && path === "/api/links/me") {
-    return true;
-  }
-
-  if (method === "GET" && path === "/api/links/me/favorites") {
-    return true;
-  }
-
-  if (method === "POST" && path === "/api/links/import") {
-    return true;
-  }
-
   if (method === "GET" && /^\/api\/links\/[^/]+$/.test(path)) {
     return true;
   }
@@ -325,9 +364,39 @@ export async function handleLinksRoute(
       return query;
     }
 
-    const session = await resolvedDeps.getSession(request);
-    const actor = parseActorOptional(session);
-    return responseFromService(resolvedDeps.getLinks(actor, query));
+    // Public explore page - always show only public links, even for authenticated users.
+    // This ensures /explore only displays publicly shared content from all users.
+    return responseFromService(resolvedDeps.getLinks(null, query));
+  }
+
+  if (path === "/api/links/me" && method === "GET") {
+    const actorResult = await parseActorRequired(request, resolvedDeps);
+    if (!actorResult.ok) {
+      return actorResult.response;
+    }
+
+    const url = new URL(request.url);
+    const limitRaw = url.searchParams.get("limit");
+    const input: { limit?: number } = {};
+
+    if (limitRaw !== null) {
+      const parsed = parsePositiveInt(limitRaw, "limit");
+      if (parsed instanceof Response) {
+        return parsed;
+      }
+      input.limit = parsed;
+    }
+
+    return responseFromService(resolvedDeps.getLinksMe(actorResult.actor, input));
+  }
+
+  if (path === "/api/links/me/favorites" && method === "GET") {
+    const actorResult = await parseActorRequired(request, resolvedDeps);
+    if (!actorResult.ok) {
+      return actorResult.response;
+    }
+
+    return responseFromService(resolvedDeps.getFavoriteLinks(actorResult.actor));
   }
 
   if (path === "/api/links" && method === "POST") {
@@ -363,6 +432,25 @@ export async function handleLinksRoute(
     return responseFromService(result);
   }
 
+  if (path === "/api/links/import" && method === "POST") {
+    const actorResult = await parseActorRequired(request, resolvedDeps);
+    if (!actorResult.ok) {
+      return actorResult.response;
+    }
+
+    const body = await parseJsonObjectBody(request);
+    if (body instanceof Response) {
+      return body;
+    }
+
+    const input = parseImportLinksInput(body);
+    if (input instanceof Response) {
+      return input;
+    }
+
+    return responseFromService(resolvedDeps.importLinks(actorResult.actor, input));
+  }
+
   if (method === "POST") {
     const interactionMatch = path.match(/^\/api\/links\/([^/]+)\/(like|favorite)$/);
     if (interactionMatch) {
@@ -381,6 +469,24 @@ export async function handleLinksRoute(
       }
 
       return responseFromService(resolvedDeps.toggleFavorite(actorResult.actor, id));
+    }
+  }
+
+  // GET /api/links/:id/details - Link details with engagement stats
+  if (method === "GET") {
+    const detailsMatch = path.match(/^\/api\/links\/([^/]+)\/details$/);
+    if (detailsMatch) {
+      const id = parsePositiveInt(detailsMatch[1], "id");
+      if (id instanceof Response) {
+        return id;
+      }
+
+      const actorResult = await parseActorRequired(request, resolvedDeps);
+      if (!actorResult.ok) {
+        return actorResult.response;
+      }
+
+      return responseFromService(resolvedDeps.getLinkDetailsById(actorResult.actor, id));
     }
   }
 
@@ -410,10 +516,20 @@ export async function handleLinksRoute(
         return patch;
       }
 
+      // Parse forceRefresh option
+      let forceRefresh: boolean | undefined = undefined;
+      if (hasOwn(body, "forceRefresh")) {
+        if (typeof body.forceRefresh !== "boolean") {
+          return validationError("forceRefresh must be a boolean");
+        }
+        forceRefresh = body.forceRefresh;
+      }
+
       return responseFromService(
         resolvedDeps.updateLink(actorResult.actor, {
           id,
           patch,
+          forceRefresh,
         })
       );
     }

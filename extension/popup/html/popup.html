@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URLoft - Guarda tus links</title>
+  <link rel="stylesheet" href="../css/popup.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Loading view ─────────────────────────────────── -->
+    <div id="loading-view" class="view">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Cargando...</p>
+    </div>
+
+    <!-- ── Auth view ─────────────────────────────────────── -->
+    <div id="auth-view" class="view hidden">
+      <div class="auth-container">
+        <div class="auth__header">
+          <div class="auth__logo">🔗</div>
+          <h1 class="auth__title">URLoft</h1>
+          <p class="auth__subtitle">Iniciá sesión para continuar</p>
+        </div>
+
+        <form id="auth-form" class="auth__form" novalidate>
+          <div class="form-group">
+            <label for="email-input" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email-input"
+              class="form-input"
+              placeholder="tu@email.com"
+              required
+              autocomplete="email"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="password-input" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              id="password-input"
+              class="form-input"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            >
+          </div>
+
+          <button type="submit" id="auth-submit-btn" class="btn btn--primary btn--full">
+            Iniciar sesión
+          </button>
+
+          <div id="auth-error" class="error-message" hidden></div>
+        </form>
+
+        <p class="auth__footer">
+          ¿No tenés cuenta?
+          <a href="https://urloft.site/auth/register" target="_blank" rel="noopener">Registrate</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- ── App view ──────────────────────────────────────── -->
+    <div id="app-view" class="view hidden">
+
+      <!-- Header -->
+      <header class="app-header">
+        <div class="app-header__brand">
+          <span class="app-header__logo">🔗</span>
+          <span class="app-header__name">URLoft</span>
+        </div>
+        <div class="app-header__actions">
+          <span id="user-email" class="app-header__email"></span>
+          <button id="logout-btn" class="btn btn--icon" title="Cerrar sesión" aria-label="Cerrar sesión">🚪</button>
+        </div>
+      </header>
+
+      <section class="settings-panel" aria-label="Settings">
+        <label for="api-base-url-input" class="form-label">Backend URL</label>
+        <div class="settings-panel__controls">
+          <input
+            type="url"
+            id="api-base-url-input"
+            class="form-input"
+            placeholder="http://localhost:3000"
+            inputmode="url"
+            autocomplete="off"
+          >
+          <button type="button" id="save-api-url-btn" class="btn btn--secondary btn--sm">Guardar</button>
+          <button type="button" id="reset-api-url-btn" class="btn btn--ghost btn--sm">Reset</button>
+        </div>
+        <p id="api-url-status" class="settings-status" hidden></p>
+      </section>
+
+      <!-- Tab Navigation -->
+      <nav class="app-nav" role="tablist">
+        <button class="nav-tab nav-tab--active" data-tab="save" role="tab" aria-selected="true">
+          💾 Guardar
+        </button>
+        <button class="nav-tab" data-tab="search" role="tab" aria-selected="false">
+          🔍 Mis Links
+        </button>
+      </nav>
+
+      <!-- Tab Contents -->
+      <main class="app-content">
+
+        <!-- Save Tab -->
+        <div id="save-tab" class="tab-content" role="tabpanel">
+
+          <!-- Duplicate Warning (oculto por defecto) -->
+          <div id="duplicate-warning" class="duplicate-warning hidden">
+            <div class="duplicate-warning__icon">⚠️</div>
+            <p class="duplicate-warning__title">Ya tenés este link guardado</p>
+            <p class="duplicate-warning__link-title" id="dup-link-title"></p>
+            <p class="duplicate-warning__category">
+              Categoría: <span id="dup-link-category"></span>
+            </p>
+            <div class="duplicate-warning__actions">
+              <a id="dup-view-btn" href="#" target="_blank" rel="noopener" class="btn btn--secondary">
+                Ver link existente
+              </a>
+              <button id="dup-cancel-btn" class="btn btn--ghost">Cancelar</button>
+            </div>
+          </div>
+
+          <!-- Save Form -->
+          <form id="save-link-form" class="save-form" novalidate>
+            <div class="form-group">
+              <label for="link-url" class="form-label">URL</label>
+              <input
+                type="url"
+                id="link-url"
+                class="form-input form-input--readonly"
+                readonly
+                placeholder="https://..."
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="link-title" class="form-label">Título <span class="required">*</span></label>
+              <input
+                type="text"
+                id="link-title"
+                class="form-input"
+                placeholder="Título del link"
+                required
+                maxlength="200"
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="link-description" class="form-label">Descripción</label>
+              <textarea
+                id="link-description"
+                class="form-textarea"
+                placeholder="Descripción opcional..."
+                rows="2"
+                maxlength="500"
+              ></textarea>
+            </div>
+
+            <div class="form-group form-group--row">
+              <div class="form-group__expand">
+                <label for="link-category" class="form-label">Categoría</label>
+                <select id="link-category" class="form-select">
+                  <option value="">Sin categoría</option>
+                </select>
+              </div>
+              <button type="button" id="new-category-btn" class="btn btn--ghost btn--sm">
+                + Nueva
+              </button>
+            </div>
+
+            <div class="form-group form-group--inline">
+              <label class="form-checkbox">
+                <input type="checkbox" id="link-public" checked>
+                <span>Hacer público</span>
+              </label>
+            </div>
+
+            <div id="save-error" class="error-message" hidden></div>
+
+            <button type="submit" id="save-submit-btn" class="btn btn--primary btn--full">
+              Guardar Link
+            </button>
+          </form>
+
+          <!-- New Category Inline Form (oculto por defecto) -->
+          <div id="new-category-form" class="new-category-form hidden">
+            <h3 class="new-category-form__title">Nueva categoría</h3>
+            <div class="form-group">
+              <label for="cat-name" class="form-label">Nombre</label>
+              <input
+                type="text"
+                id="cat-name"
+                class="form-input"
+                placeholder="Ej: Trabajo, Recetas..."
+                maxlength="100"
+              >
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <div class="color-swatches" id="color-swatches">
+                <button type="button" class="color-swatch color-swatch--selected" data-color="#ef4444" style="background:#ef4444" aria-label="Rojo"></button>
+                <button type="button" class="color-swatch" data-color="#f97316" style="background:#f97316" aria-label="Naranja"></button>
+                <button type="button" class="color-swatch" data-color="#eab308" style="background:#eab308" aria-label="Amarillo"></button>
+                <button type="button" class="color-swatch" data-color="#22c55e" style="background:#22c55e" aria-label="Verde"></button>
+                <button type="button" class="color-swatch" data-color="#3b82f6" style="background:#3b82f6" aria-label="Azul"></button>
+                <button type="button" class="color-swatch" data-color="#a855f7" style="background:#a855f7" aria-label="Púrpura"></button>
+              </div>
+            </div>
+            <div id="cat-error" class="error-message" hidden></div>
+            <div class="new-category-form__actions">
+              <button type="button" id="cat-create-btn" class="btn btn--primary btn--sm">Crear</button>
+              <button type="button" id="cat-cancel-btn" class="btn btn--ghost btn--sm">Cancelar</button>
+            </div>
+          </div>
+
+        </div><!-- /save-tab -->
+
+        <!-- Search Tab -->
+        <div id="search-tab" class="tab-content hidden" role="tabpanel">
+
+          <div class="search-header">
+            <input
+              type="search"
+              id="search-input"
+              class="form-input search-input"
+              placeholder="Buscar links..."
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="search-filters">
+            <select id="search-sort" class="form-select form-select--sm">
+              <option value="recent">Recientes</option>
+              <option value="views">Más vistos</option>
+              <option value="likes">Más likes</option>
+              <option value="favorites">Más favoritos</option>
+            </select>
+            <select id="search-category" class="form-select form-select--sm">
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <div id="search-results" class="search-results">
+            <div class="search-empty hidden" id="search-empty">
+              <p>No encontraste nada. ¡Empezá a guardar links!</p>
+            </div>
+            <div class="search-list" id="search-list"></div>
+          </div>
+
+          <div id="search-loading" class="search-loading hidden">
+            <div class="loading-spinner loading-spinner--sm"></div>
+          </div>
+
+          <div id="load-more-container" class="load-more hidden">
+            <button id="load-more-btn" class="btn btn--ghost btn--full">Cargar más</button>
+          </div>
+
+          <div id="search-end" class="search-end hidden">
+            <p>No hay más links.</p>
+          </div>
+
+        </div><!-- /search-tab -->
+
+      </main>
+    </div><!-- /app-view -->
+
+  </div><!-- /app -->
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+  <script type="module" src="../js/app.js"></script>
+</body>
+</html>

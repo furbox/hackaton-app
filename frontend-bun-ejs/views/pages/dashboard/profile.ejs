@@ -1,0 +1,185 @@
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary">Mi Perfil</h1>
+    <p class="mt-1 text-text-secondary">Editá tu información pública y tu contraseña</p>
+  </div>
+
+  <!-- Section 1: Edit Profile -->
+  <div class="ui-card p-6 mb-6">
+    <h2 class="mb-5 text-lg font-semibold text-text-primary">Editar Perfil</h2>
+
+    <form method="POST" action="/dashboard/profile" enctype="multipart/form-data" class="space-y-4" id="profile-form">
+
+      <!-- Avatar preview -->
+      <div class="flex items-center gap-4 mb-2">
+        <div class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-accent-primary/15 text-2xl" id="avatar-preview-wrapper">
+          <% if (user.avatar_url) { %>
+            <img src="<%= user.avatar_url %>" alt="Avatar" class="w-full h-full object-cover" id="avatar-preview-image" />
+          <% } else { %>
+            <img src="" alt="Avatar" class="w-full h-full object-cover hidden" id="avatar-preview-image" />
+            <span class="text-2xl" id="avatar-preview-fallback">👤</span>
+          <% } %>
+        </div>
+        <div>
+          <p class="font-medium text-text-primary"><%= user.username %></p>
+          <p class="text-sm text-text-secondary"><%= user.email %></p>
+          <% if (rankProgression) { %>
+            <div class="mt-2">
+              <span 
+                class="inline-block rounded-full px-2 py-0.5 text-xs font-medium"
+                style="background-color: <%= rankProgression.currentRank.color %>20; color: <%= rankProgression.currentRank.color %>"
+              >
+                <%= rankProgression.currentRank.displayName %>
+              </span>
+              <% if (rankProgression.nextRank) { %>
+                <div class="mt-2 text-xs text-text-secondary">
+                  <p><%= rankProgression.linksNeeded %> links para <%= rankProgression.nextRank.displayName %></p>
+                  <div class="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-bg-tertiary">
+                    <div 
+                      class="h-full rounded-full transition-all duration-300"
+                      style="width: <%= rankProgression.progressPercent %>%; background-color: <%= rankProgression.currentRank.color %>"
+                    ></div>
+                  </div>
+                </div>
+              <% } else { %>
+                <p class="mt-1 text-xs text-text-secondary">🎉 ¡Modo Dios alcanzado!</p>
+              <% } %>
+            </div>
+          <% } else { %>
+            <% if (user.rank) { %>
+              <span class="mt-1 inline-block rounded-full bg-accent-secondary/15 px-2 py-0.5 text-xs text-accent-secondary">
+                🏆 <%= user.rank %>
+              </span>
+            <% } %>
+          <% } %>
+        </div>
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Nombre de usuario</label>
+        <input type="text" name="username" value="<%= user.username %>" required
+               class="ui-input" />
+      </div>
+
+      <div>
+        <label for="avatar" class="mb-1 block text-sm font-medium text-text-secondary">Avatar</label>
+        <input
+          id="avatar"
+          name="avatar"
+          type="file"
+          accept="image/*"
+          class="ui-input"
+        />
+        <p class="mt-1 text-xs text-text-secondary">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB.</p>
+        <p id="avatar-error" class="mt-1 hidden text-xs text-error"></p>
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Biografía</label>
+        <textarea name="bio" rows="3"
+                  placeholder="Contá algo sobre vos..."
+                  class="ui-textarea resize-none"><%= user.bio || '' %></textarea>
+      </div>
+
+      <div class="pt-2">
+        <button type="submit"
+                class="ui-btn-primary px-5 py-2 text-sm font-medium">
+          Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Section 2: Change Password -->
+  <div class="ui-card p-6">
+    <h2 class="mb-5 text-lg font-semibold text-text-primary">Cambiar Contraseña</h2>
+
+    <form method="POST" action="/dashboard/profile/password" class="space-y-4">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Contraseña actual</label>
+        <input type="password" name="currentPassword" required autocomplete="current-password"
+               class="ui-input" />
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Nueva contraseña</label>
+        <input type="password" name="newPassword" required autocomplete="new-password"
+               class="ui-input" />
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Confirmar nueva contraseña</label>
+        <input type="password" name="confirmPassword" required autocomplete="new-password"
+               class="ui-input" />
+      </div>
+
+      <div class="pt-2">
+        <button type="submit"
+                class="ui-btn-secondary px-5 py-2 text-sm font-medium">
+          Cambiar contraseña
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<script>
+  (() => {
+    const avatarInput = document.getElementById("avatar");
+    const avatarError = document.getElementById("avatar-error");
+    const avatarImage = document.getElementById("avatar-preview-image");
+    const avatarFallback = document.getElementById("avatar-preview-fallback");
+    const MAX_SIZE_BYTES = 2 * 1024 * 1024;
+    const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
+
+    if (!avatarInput || !avatarError || !avatarImage) {
+      return;
+    }
+
+    const showError = (message) => {
+      avatarError.textContent = message;
+      avatarError.classList.remove("hidden");
+    };
+
+    const clearError = () => {
+      avatarError.textContent = "";
+      avatarError.classList.add("hidden");
+    };
+
+    avatarInput.addEventListener("change", () => {
+      const file = avatarInput.files && avatarInput.files[0] ? avatarInput.files[0] : null;
+      if (!file) {
+        clearError();
+        return;
+      }
+
+      if (!ALLOWED_MIME_TYPES.has(file.type)) {
+        showError("Formato inválido. Usá JPG, PNG o GIF.");
+        avatarInput.value = "";
+        return;
+      }
+
+      if (file.size > MAX_SIZE_BYTES) {
+        showError("El archivo supera el límite de 2MB.");
+        avatarInput.value = "";
+        return;
+      }
+
+      clearError();
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          avatarImage.src = reader.result;
+          avatarImage.classList.remove("hidden");
+          if (avatarFallback) {
+            avatarFallback.classList.add("hidden");
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  })();
+</script>

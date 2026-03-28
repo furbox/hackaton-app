@@ -52,6 +52,20 @@ beforeEach(() => {
 			expires_at DATETIME NOT NULL
 		);
 
+		CREATE TABLE links (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			url TEXT NOT NULL,
+			title TEXT NOT NULL,
+			description TEXT,
+			short_code TEXT UNIQUE NOT NULL,
+			is_public INTEGER DEFAULT 1,
+			views INTEGER DEFAULT 0,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+			UNIQUE(user_id, url)
+		);
+
 		CREATE TABLE ranks (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT UNIQUE NOT NULL,
@@ -275,4 +289,55 @@ test("all admin columns are present after migration", async () => {
 	expect(columnNames).toContain("banned");
 	expect(columnNames).toContain("banReason");
 	expect(columnNames).toContain("banExpires");
+});
+
+test("link_views table is created with required columns", async () => {
+	await runMigrations(db);
+
+	const columns = db
+		.query("PRAGMA table_info(link_views)")
+		.all() as Array<{ name: string; type: string; notnull: number }>;
+
+	const names = columns.map((column) => column.name);
+	expect(names).toContain("id");
+	expect(names).toContain("link_id");
+	expect(names).toContain("user_id");
+	expect(names).toContain("ip_address");
+	expect(names).toContain("user_agent");
+	expect(names).toContain("visited_at");
+
+	const linkIdColumn = columns.find((column) => column.name === "link_id");
+	const userIdColumn = columns.find((column) => column.name === "user_id");
+	const ipColumn = columns.find((column) => column.name === "ip_address");
+	const userAgentColumn = columns.find((column) => column.name === "user_agent");
+
+	expect(linkIdColumn?.notnull).toBe(1);
+	expect(userIdColumn?.notnull).toBe(0);
+	expect(ipColumn?.notnull).toBe(1);
+	expect(userAgentColumn?.notnull).toBe(1);
+});
+
+test("link_views foreign keys and indexes are created", async () => {
+	await runMigrations(db);
+
+	const foreignKeys = db
+		.query("PRAGMA foreign_key_list(link_views)")
+		.all() as Array<{ table: string; from: string; on_delete: string }>;
+
+	const linkFk = foreignKeys.find((fk) => fk.from === "link_id");
+	const userFk = foreignKeys.find((fk) => fk.from === "user_id");
+
+	expect(linkFk?.table).toBe("links");
+	expect(linkFk?.on_delete).toBe("CASCADE");
+	expect(userFk?.table).toBe("users");
+	expect(userFk?.on_delete).toBe("SET NULL");
+
+	const indexes = db
+		.query("SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='link_views'")
+		.all() as Array<{ name: string }>;
+
+	const indexNames = indexes.map((index) => index.name);
+	expect(indexNames).toContain("idx_link_views_link_id_visited_at");
+	expect(indexNames).toContain("idx_link_views_visited_at");
+	expect(indexNames).toContain("idx_link_views_user_id_visited_at");
 });

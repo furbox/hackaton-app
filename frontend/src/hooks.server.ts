@@ -6,16 +6,15 @@ import { authService } from '$lib/services/auth.service';
  * Fetches session data from backend and populates event.locals.session.
  */
 export const handle: Handle = async ({ event, resolve }) => {
-	// Get session cookie from request
-	const sessionCookie = event.cookies.get('session');
+	const cookieHeader = event.request.headers.get('cookie');
 
-	// Fetch session from backend if cookie exists
+	// Fetch session from backend if cookies exist
 	let session = null;
-	if (sessionCookie) {
+	if (cookieHeader) {
 		try {
 			const response = await authService.getSession({
 				fetch: event.fetch,
-				cookies: `session=${sessionCookie}`,
+				cookies: cookieHeader,
 				signal: AbortSignal.timeout(3000)
 			});
 

@@ -1,0 +1,53 @@
+<%
+  const errorStatus = typeof status !== "undefined" ? Number(status) : 500;
+  const errorMessage = typeof message !== "undefined" ? message : "Ocurrio un error inesperado.";
+%>
+
+<section class="flex flex-col items-center justify-center min-h-[60vh] py-20 px-4 text-center">
+  <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-accent-primary/15 text-2xl font-bold text-accent-primary" aria-hidden="true">
+    !
+  </div>
+
+  <div class="mb-4 text-8xl font-extrabold tabular-nums text-accent-primary"><%= errorStatus %></div>
+
+  <div class="mb-6 h-1 w-16 rounded-full bg-accent-primary/45"></div>
+
+  <h1 class="mb-3 text-2xl font-bold text-text-primary sm:text-3xl">
+    <% if (errorStatus === 404) { %>
+      Pagina no encontrada
+    <% } else if (errorStatus === 403) { %>
+      Acceso denegado
+    <% } else if (errorStatus === 500) { %>
+      Error interno del servidor
+    <% } else { %>
+      Ocurrio un error
+    <% } %>
+  </h1>
+
+  <p class="mb-10 max-w-md leading-relaxed text-text-secondary"><%= errorMessage %></p>
+
+  <div class="flex flex-col sm:flex-row items-center gap-3 mb-8">
+    <a href="/" class="ui-btn-primary inline-flex items-center gap-2 px-6 py-3 font-semibold transition-all duration-200">
+      Ir al inicio
+    </a>
+
+    <button
+      type="button"
+      onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '/'; }"
+      class="ui-btn-secondary inline-flex items-center gap-2 px-6 py-3 font-semibold transition-all duration-200"
+    >
+      Volver atras
+    </button>
+  </div>
+
+  <% if (errorStatus === 500) { %>
+    <div class="max-w-md rounded-xl border border-warning/35 bg-warning/12 px-4 py-3 text-left">
+      <p class="text-sm text-warning">
+        Si el problema persiste, podes pedir ayuda en
+        <a href="mailto:soporte@urloft.site?subject=URLoft%20Error%20500" class="font-semibold underline decoration-warning/70 hover:decoration-warning">
+          soporte@urloft.site
+        </a>.
+      </p>
+    </div>
+  <% } %>
+</section>

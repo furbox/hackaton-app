@@ -5,6 +5,8 @@ import { verifyDatabaseConnection } from "./db/verify.ts";
 import { router } from "./router.ts";
 import { cors, withCors } from "./middleware/cors.ts";
 import { logger } from "./middleware/logger.ts";
+import { initializeWorkerPool, shutdownWorkerPool } from "./workers/pool.ts";
+import { startScheduler, stopScheduler } from "./workers/scheduler.ts";
 
 const SPLASH_HTML = `
 <!DOCTYPE html>
@@ -112,6 +114,27 @@ if (!verifyDatabaseConnection()) {
   process.exit(1);
 }
 
+// Initialize worker pool for background jobs
+const workerPool = initializeWorkerPool();
+console.log("✅ Worker pool initialized");
+
+// Start scheduler for periodic health sweeps
+startScheduler();
+
+// Graceful shutdown handler
+const shutdown = async () => {
+  console.log("🔄 Shutting down scheduler...");
+  await stopScheduler();
+  console.log("🔄 Shutting down worker pool...");
+  await shutdownWorkerPool();
+  console.log("✅ Worker pool shut down");
+  server.stop();
+  process.exit(0);
+};
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+
 // Database is ready, start HTTP server
 const server = Bun.serve({
   port: Number(process.env.PORT) || 3000,
@@ -133,10 +156,10 @@ const server = Bun.serve({
       });
 
       // 4. Global CORS Headers (on all responses)
-      return withCors(finalResponse);
+      return withCors(req, finalResponse);
     } catch (error) {
       console.error("❌ Request error:", error);
-      return withCors(new Response(JSON.stringify({
+      return withCors(req, new Response(JSON.stringify({
         success: false,
         error: "Internal Server Error"
       }), {

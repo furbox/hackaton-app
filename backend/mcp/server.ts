@@ -3,16 +3,33 @@ import type { Phase4ServiceResult } from "../contracts/service-error.ts";
 import {
   JSONRPC_ERROR_CODES,
   MCP_ERROR_CODES,
+  type MCPInitializeResult,
   type MCPRequest,
   type MCPRequestId,
   type MCPResponse,
   type MCPTool,
+  type MCPToolCallResult,
   type MCPToolDefinition,
 } from "./types.ts";
 import { verifyApiKey as serviceVerifyApiKey } from "../services/api-keys.service.ts";
+import { extractRequestInfo } from "../services/audit-log.service.ts";
 import { createMcpToolsRegistry } from "./tools/index.ts";
 
 type JsonObject = Record<string, unknown>;
+const MCP_PROTOCOL_VERSION = "2024-11-05";
+const MCP_SERVER_NAME = "URLoft MCP Server";
+const MCP_SERVER_VERSION = "0.4.0";
+const DEFAULT_RATE_LIMIT_WINDOW_MS = 60_000;
+const DEFAULT_RATE_LIMIT_PER_KEY = 100;
+const DEFAULT_RATE_LIMIT_PER_IP = 60;
+
+type RateLimitBucket = {
+  count: number;
+  resetAt: number;
+};
+
+const mcpKeyBuckets = new Map<string, RateLimitBucket>();
+const mcpIpBuckets = new Map<string, RateLimitBucket>();
 
 export interface MCPServerDeps {
   verifyApiKey: (key: string) => Promise<Phase4ServiceResult<ApiKeyAuthContext>>;
@@ -35,20 +52,23 @@ function errorResponse(
   code: number,
   message: string,
   status: number,
-  data?: Record<string, unknown>
+  data?: Record<string, unknown>,
+  headers?: HeadersInit
 ): Response {
-  return jsonResponse(
-    {
-      jsonrpc: "2.0",
-      id,
-      error: {
-        code,
-        message,
-        ...(data ? { data } : {}),
-      },
+  const body: MCPResponse = {
+    jsonrpc: "2.0",
+    id,
+    error: {
+      code,
+      message,
+      ...(data ? { data } : {}),
     },
-    status
-  );
+  };
+
+  return Response.json(body, {
+    status,
+    ...(headers ? { headers } : {}),
+  });
 }
 
 function successResponse<TResult>(id: MCPRequestId, result: TResult): Response {
@@ -57,6 +77,10 @@ function successResponse<TResult>(id: MCPRequestId, result: TResult): Response {
     id,
     result,
   });
+}
+
+function notificationResponse(): Response {
+  return new Response(null, { status: 204 });
 }
 
 function isRecord(value: unknown): value is JsonObject {
@@ -83,6 +107,67 @@ function parseBearerApiKey(request: Request): string | null {
   return candidate.length > 0 ? candidate : null;
 }
 
+function parsePositiveIntEnv(value: string | undefined, fallback: number): number {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return fallback;
+  }
+
+  return parsed;
+}
+
+function checkFixedWindowRateLimit(
+  buckets: Map<string, RateLimitBucket>,
+  key: string,
+  maxRequests: number,
+  windowMs: number
+): { allowed: true } | { allowed: false; retryAfterSeconds: number } {
+  const now = Date.now();
+  let bucket = buckets.get(key);
+
+  if (!bucket || now >= bucket.resetAt) {
+    bucket = {
+      count: 0,
+      resetAt: now + windowMs,
+    };
+    buckets.set(key, bucket);
+  }
+
+  bucket.count += 1;
+
+  if (bucket.count > maxRequests) {
+    return {
+      allowed: false,
+      retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
+    };
+  }
+
+  return { allowed: true };
+}
+
+function checkMcpIpRateLimit(request: Request): { allowed: true } | { allowed: false; retryAfterSeconds: number } {
+  const ipAddress = extractRequestInfo(request).ipAddress;
+
+  if (ipAddress === "unknown") {
+    return { allowed: true };
+  }
+
+  const windowMs = parsePositiveIntEnv(process.env.MCP_RATE_LIMIT_WINDOW_MS, DEFAULT_RATE_LIMIT_WINDOW_MS);
+  const maxRequests = parsePositiveIntEnv(process.env.MCP_RATE_LIMIT_PER_IP, DEFAULT_RATE_LIMIT_PER_IP);
+
+  return checkFixedWindowRateLimit(mcpIpBuckets, ipAddress, maxRequests, windowMs);
+}
+
+function checkMcpApiKeyRateLimit(apiKeyId: number): { allowed: true } | { allowed: false; retryAfterSeconds: number } {
+  const windowMs = parsePositiveIntEnv(process.env.MCP_RATE_LIMIT_WINDOW_MS, DEFAULT_RATE_LIMIT_WINDOW_MS);
+  const maxRequests = parsePositiveIntEnv(process.env.MCP_RATE_LIMIT_PER_KEY, DEFAULT_RATE_LIMIT_PER_KEY);
+  return checkFixedWindowRateLimit(mcpKeyBuckets, String(apiKeyId), maxRequests, windowMs);
+}
+
 function toToolMetadataList(tools: Record<string, MCPToolDefinition>): MCPTool[] {
   return Object.values(tools)
     .map((tool) => ({
@@ -96,7 +181,12 @@ function toToolMetadataList(tools: Record<string, MCPToolDefinition>): MCPTool[]
 async function parseJsonRpcRequest(
   request: Request
 ): Promise<
-  | { ok: true; value: MCPRequest<JsonObject>; id: MCPRequestId }
+  | {
+      ok: true;
+      value: MCPRequest<JsonObject>;
+      id: MCPRequestId;
+      isNotification: boolean;
+    }
   | { ok: false; response: Response }
 > {
   let payload: unknown;
@@ -127,14 +217,14 @@ async function parseJsonRpcRequest(
     };
   }
 
+  const hasId = Object.prototype.hasOwnProperty.call(payload, "id");
   const candidateId = isValidRequestId(payload.id) ? payload.id : null;
 
   if (
     payload.jsonrpc !== "2.0" ||
     typeof payload.method !== "string" ||
     payload.method.trim().length === 0 ||
-    !Object.prototype.hasOwnProperty.call(payload, "id") ||
-    !isValidRequestId(payload.id)
+    (hasId && !isValidRequestId(payload.id))
   ) {
     return {
       ok: false,
@@ -154,13 +244,69 @@ async function parseJsonRpcRequest(
     jsonrpc: "2.0",
     method: payload.method,
     params,
-    id: payload.id,
+    ...(hasId ? { id: payload.id } : {}),
   };
 
   return {
     ok: true,
     value: normalized,
-    id: payload.id,
+    id: hasId ? (payload.id as MCPRequestId) : null,
+    isNotification: !hasId,
+  };
+}
+
+function stringifyToolResult(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value === undefined) {
+    return "null";
+  }
+
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
+}
+
+function isMcpToolCallResult(value: unknown): value is MCPToolCallResult {
+  if (!isRecord(value) || !Array.isArray(value.content)) {
+    return false;
+  }
+
+  return value.content.every(
+    (piece) => isRecord(piece) && piece.type === "text" && typeof piece.text === "string"
+  );
+}
+
+function toMcpToolCallResult(result: unknown): MCPToolCallResult {
+  if (isMcpToolCallResult(result)) {
+    return result;
+  }
+
+  return {
+    content: [
+      {
+        type: "text",
+        text: stringifyToolResult(result),
+      },
+    ],
+    ...(result === undefined ? {} : { structuredContent: result }),
+  };
+}
+
+function buildInitializeResult(): MCPInitializeResult {
+  return {
+    protocolVersion: MCP_PROTOCOL_VERSION,
+    capabilities: {
+      tools: {},
+    },
+    serverInfo: {
+      name: MCP_SERVER_NAME,
+      version: MCP_SERVER_VERSION,
+    },
   };
 }
 
@@ -208,10 +354,10 @@ export async function handleMcpRoute(
 
   if (request.method.toUpperCase() === "GET") {
     return Response.json({
-      name: "URLoft MCP Server",
+      name: MCP_SERVER_NAME,
       endpoint: "/mcp",
       protocol: "JSON-RPC 2.0",
-      methods: ["tools/list", "tools/call"],
+      methods: ["initialize", "notifications/initialized", "tools/list", "tools/call"],
     });
   }
 
@@ -231,42 +377,88 @@ export async function handleMcpRoute(
     return parsed.response;
   }
 
-  const apiKey = parseBearerApiKey(request);
-  if (!apiKey) {
-    return errorResponse(
-      parsed.id,
-      MCP_ERROR_CODES.AUTHENTICATION_ERROR,
-      "Unauthorized: missing or invalid bearer API key",
-      401
-    );
+  if (parsed.value.method === "initialize") {
+    if (parsed.isNotification) {
+      return notificationResponse();
+    }
+
+    return successResponse(parsed.id, buildInitializeResult());
   }
 
-  const authResult = await resolvedDeps.verifyApiKey(apiKey);
-  if (!authResult.ok) {
-    if (authResult.error.code === "UNAUTHORIZED") {
+  if (parsed.value.method === "notifications/initialized") {
+    return notificationResponse();
+  }
+
+  const requiresAuth = parsed.value.method === "tools/list" || parsed.value.method === "tools/call";
+
+  if (requiresAuth) {
+    const ipRateLimit = checkMcpIpRateLimit(request);
+    if (!ipRateLimit.allowed) {
+      return errorResponse(
+        parsed.id,
+        MCP_ERROR_CODES.FORBIDDEN,
+        "Rate limit exceeded",
+        429,
+        {
+          retryAfterSeconds: ipRateLimit.retryAfterSeconds,
+        },
+        { "Retry-After": String(ipRateLimit.retryAfterSeconds) }
+      );
+    }
+
+    const apiKey = parseBearerApiKey(request);
+    if (!apiKey) {
       return errorResponse(
         parsed.id,
         MCP_ERROR_CODES.AUTHENTICATION_ERROR,
-        "Unauthorized",
+        "Unauthorized: missing or invalid bearer API key",
         401
       );
     }
 
-    return errorResponse(
-      parsed.id,
-      JSONRPC_ERROR_CODES.INTERNAL_ERROR,
-      "Internal error",
-      500
-    );
-  }
+    const authResult = await resolvedDeps.verifyApiKey(apiKey);
+    if (!authResult.ok) {
+      if (authResult.error.code === "UNAUTHORIZED") {
+        return errorResponse(
+          parsed.id,
+          MCP_ERROR_CODES.AUTHENTICATION_ERROR,
+          "Unauthorized",
+          401
+        );
+      }
 
-  if (parsed.value.method === "tools/list") {
-    return successResponse(parsed.id, {
-      tools: toToolMetadataList(resolvedDeps.tools),
-    });
-  }
+      return errorResponse(
+        parsed.id,
+        JSONRPC_ERROR_CODES.INTERNAL_ERROR,
+        "Internal error",
+        500
+      );
+    }
 
-  if (parsed.value.method === "tools/call") {
+    const keyRateLimit = checkMcpApiKeyRateLimit(authResult.data.key_id);
+    if (!keyRateLimit.allowed) {
+      return errorResponse(
+        parsed.id,
+        MCP_ERROR_CODES.FORBIDDEN,
+        "Rate limit exceeded",
+        429,
+        {
+          retryAfterSeconds: keyRateLimit.retryAfterSeconds,
+        },
+        { "Retry-After": String(keyRateLimit.retryAfterSeconds) }
+      );
+    }
+
+    if (parsed.value.method === "tools/list") {
+      if (parsed.isNotification) {
+        return notificationResponse();
+      }
+
+      return successResponse(parsed.id, {
+        tools: toToolMetadataList(resolvedDeps.tools),
+      });
+    }
+
     const params = parsed.value.params ?? {};
     const parsedParams = parseToolCallParams(params);
 
@@ -299,7 +491,11 @@ export async function handleMcpRoute(
         request,
       });
 
-      return successResponse(parsed.id, result);
+      if (parsed.isNotification) {
+        return notificationResponse();
+      }
+
+      return successResponse(parsed.id, toMcpToolCallResult(result));
     } catch (error) {
       if (isToolError(error) && error.code === JSONRPC_ERROR_CODES.INVALID_PARAMS) {
         return errorResponse(
@@ -328,6 +524,10 @@ export async function handleMcpRoute(
         500
       );
     }
+  }
+
+  if (parsed.isNotification) {
+    return notificationResponse();
   }
 
   return errorResponse(

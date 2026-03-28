@@ -108,43 +108,59 @@ describe("MCP links tools", () => {
 });
 
 describe("MCP search tool", () => {
-  test("search_links validates query and filters results by owner", () => {
+  test("search_links validates query and uses owner-scoped service query", () => {
+    let receivedActor: unknown = null;
+    let receivedInput: unknown = null;
+
     const tools = createSearchTools({
-      searchLinks: () => [
-        {
-          id: 1,
-          user_id: 7,
-          url: "https://a.test",
-          title: "A",
-          description: null,
-          short_code: "a1",
-          is_public: 1,
-          category_id: null,
-          views: 1,
-          created_at: "2026-03-25T10:00:00.000Z",
-          likes_count: 1,
-          favorites_count: 1,
-        },
-        {
-          id: 2,
-          user_id: 99,
-          url: "https://b.test",
-          title: "B",
-          description: null,
-          short_code: "b1",
-          is_public: 1,
-          category_id: null,
-          views: 2,
-          created_at: "2026-03-25T10:01:00.000Z",
-          likes_count: 2,
-          favorites_count: 2,
-        },
-      ],
+      getLinks: (actor, input) => {
+        receivedActor = actor;
+        receivedInput = input;
+
+        return {
+          ok: true,
+          data: {
+            items: [
+              {
+                id: 1,
+                userId: 7,
+                url: "https://a.test",
+                title: "A",
+                description: null,
+                shortCode: "a1",
+                isPublic: true,
+                categoryId: null,
+                views: 1,
+                createdAt: "2026-03-25T10:00:00.000Z",
+                likesCount: 1,
+                favoritesCount: 1,
+                likedByMe: false,
+                favoritedByMe: false,
+                ownerUsername: "furbox",
+                ownerAvatarUrl: null,
+              },
+            ],
+            page: 1,
+            limit: 5,
+            sort: "recent",
+          },
+        };
+      },
     });
 
     expect(() => tools.search_links.handler({ query: "" }, context)).toThrow(MCPInvalidParamsError);
 
     const result = tools.search_links.handler({ query: "test", limit: 5 }, context);
+    expect(receivedActor).toEqual({ userId: 7 });
+    expect(receivedInput).toEqual({
+      q: "test",
+      ownerUserId: 7,
+      categoryId: undefined,
+      page: 1,
+      limit: 5,
+      sort: "recent",
+    });
+
     expect(result).toEqual({
       items: [
         {
@@ -160,6 +176,10 @@ describe("MCP search tool", () => {
           createdAt: "2026-03-25T10:00:00.000Z",
           likesCount: 1,
           favoritesCount: 1,
+          likedByMe: false,
+          favoritedByMe: false,
+          ownerUsername: "furbox",
+          ownerAvatarUrl: null,
         },
       ],
       limit: 5,

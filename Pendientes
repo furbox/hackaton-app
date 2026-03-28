@@ -3,5 +3,11 @@
 3.-Reutilizar Codigo, Refactorizar, Codigo Limpio
 4.-Mejorar el index.ts del backend
 5.-Revision completa de el backend con skill bun/better-auth
-6.-Revisar Recordarme que funcione bien
-7.-Validando tus credenciales... en auth login
+6.-Revisar Recordarme que funcione bien login
+7.-Revisar... en auth login etc
+8.-Revisar los links privados no se muestren en explorer ni en el perfil del usuario pero que si se cuenten
+urlk_1f925534ac9c942bff0bb0c8ab1602888738f1a5c7b9f365bf963bdf279c788c
+9.-Paginaciones
+10.-revisar og_title descr etc etc del link
+ok hoy vamos a dar una revisada a los pendientes
+primero revisaremos un error al hacer commit

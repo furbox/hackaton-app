@@ -13,6 +13,13 @@ let testDb: Database;
 function createSchema(db: Database): void {
   db.run("PRAGMA foreign_keys = ON;");
   db.run(`
+    CREATE TABLE ranks (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULL,
+      display_name TEXT NOT NULL
+    )
+  `);
+  db.run(`
     CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT NOT NULL UNIQUE,
@@ -28,6 +35,15 @@ function createSchema(db: Database): void {
       banReason TEXT,
       banExpires TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  db.run(`
+    CREATE TABLE categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      color TEXT DEFAULT '#6366f1',
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `);
   db.run(`
@@ -50,6 +66,16 @@ function createSchema(db: Database): void {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       UNIQUE(user_id, url)
+    )
+  `);
+  db.run(`
+    CREATE TABLE favorites (
+      user_id INTEGER NOT NULL,
+      link_id INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, link_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (link_id) REFERENCES links(id) ON DELETE CASCADE
     )
   `);
   db.run(`
@@ -79,6 +105,16 @@ function createSchema(db: Database): void {
 }
 
 function seedBaseData(): void {
+  testDb.run(`
+    INSERT INTO ranks (id, name, display_name)
+    VALUES
+      (1, 'newbie', 'Newbie'),
+      (2, 'active', 'Active'),
+      (3, 'power_user', 'Power User'),
+      (4, 'legend', 'Legend'),
+      (5, 'god_mode', 'GOD Mode')
+  `);
+
   // User 1: Active user with links and likes
   testDb.run(`
     INSERT INTO users (id, username, email, password_hash, avatar_url, bio, rank_id)
@@ -113,6 +149,10 @@ function seedBaseData(): void {
     // Add likes from user 2
     testDb.run("INSERT INTO likes (user_id, link_id) VALUES (2, ?)", [links[0].id]);
     testDb.run("INSERT INTO likes (user_id, link_id) VALUES (2, ?)", [links[1].id]);
+
+    // User 1 favorites both links
+    testDb.run("INSERT INTO favorites (user_id, link_id) VALUES (1, ?)", [links[0].id]);
+    testDb.run("INSERT INTO favorites (user_id, link_id) VALUES (1, ?)", [links[1].id]);
   }
 }
 
@@ -122,15 +162,18 @@ beforeAll(() => {
   setTestDatabase(testDb);
 });
 
-beforeEach(() => {
-  // Clear all tables before each test
-  testDb.run("DELETE FROM likes");
-  testDb.run("DELETE FROM links");
-  testDb.run("DELETE FROM sessions");
-  testDb.run("DELETE FROM users");
-  // Reseed base data
-  seedBaseData();
-});
+  beforeEach(() => {
+    // Clear all tables before each test
+    testDb.run("DELETE FROM favorites");
+    testDb.run("DELETE FROM likes");
+    testDb.run("DELETE FROM links");
+    testDb.run("DELETE FROM categories");
+    testDb.run("DELETE FROM sessions");
+    testDb.run("DELETE FROM users");
+    testDb.run("DELETE FROM ranks");
+    // Reseed base data
+    seedBaseData();
+  });
 
 afterAll(() => {
   testDb.close();
@@ -150,9 +193,12 @@ describe("users.service", () => {
         expect(result.data.avatarUrl).toBe("https://avatar1.png");
         expect(result.data.bio).toBe("Link collector");
         expect(result.data.rankId).toBe(5);
+        expect(result.data.rank).toBe("GOD Mode");
         expect(result.data.totalLinks).toBe(2);
         expect(result.data.totalViews).toBe(150); // 100 + 50
         expect(result.data.totalLikes).toBe(2); // Both liked by bob
+        expect(result.data.links).toHaveLength(2);
+        expect(result.data.favorites).toHaveLength(2);
       }
     });
 

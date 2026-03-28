@@ -25,7 +25,9 @@
 
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins/admin";
+import { bearer } from "better-auth/plugins/bearer";
 import { getDatabase } from "../db/connection.js";
+import { extractIP, extractUserAgent } from "../middleware/auth/fingerprint.js";
 
 /**
  * Better Auth configuration instance.
@@ -239,6 +241,18 @@ export const authConfig = betterAuth({
       bannedUserMessage:
         "You have been banned from this application. Please contact support if you believe this is an error.",
     }),
+
+    /**
+     * Bearer plugin for token-based authentication.
+     *
+     * Enables the Chrome extension (and any API client) to authenticate
+     * using a session token via the Authorization header:
+     *   Authorization: Bearer <session_token>
+     *
+     * This works alongside cookie-based auth — existing web sessions
+     * using cookies are NOT affected.
+     */
+    bearer(),
   ],
 
   /**
@@ -310,9 +324,9 @@ export const authConfig = betterAuth({
 /**
  * Generates a fingerprint from IP address and User-Agent.
  *
- * This is a duplicate of the function in middleware.ts to avoid circular
- * dependencies. The auth config needs this for the beforeSessionCreate hook,
- * but the config file is imported by middleware.ts.
+ * This is a local duplicate of the function in middleware/auth/fingerprint.ts
+ * to avoid circular dependencies. The auth config needs this for the
+ * beforeSessionCreate hook, but the config file is imported by middleware.ts.
  *
  * @param ip - Client IP address
  * @param userAgent - Client User-Agent string
@@ -329,39 +343,6 @@ async function generateFingerprint(
 	const hashArray = Array.from(new Uint8Array(hashBuffer));
 	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 	return hashHex;
-}
-
-/**
- * Extracts client IP from request headers.
- *
- * Respects TRUST_PROXY environment variable for security.
- */
-function extractIP(request: Request): string {
-	const trustProxy = process.env.TRUST_PROXY === "true";
-
-	if (trustProxy) {
-		const forwardedFor = request.headers.get("x-forwarded-for");
-		if (forwardedFor) {
-			return forwardedFor.split(",")[0].trim();
-		}
-		const realIP = request.headers.get("x-real-ip");
-		if (realIP) {
-			return realIP.trim();
-		}
-	}
-
-	return "unknown";
-}
-
-/**
- * Extracts and sanitizes User-Agent from request headers.
- */
-function extractUserAgent(request: Request): string {
-	const ua = request.headers.get("user-agent");
-	if (!ua) return "unknown";
-
-	const MAX_UA_LENGTH = 512;
-	return ua.length > MAX_UA_LENGTH ? ua.slice(0, MAX_UA_LENGTH) : ua;
 }
 
 /**

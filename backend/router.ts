@@ -9,9 +9,11 @@ import { handleCategoriesRoute } from "./routes/api/categories.js";
 import { handleKeysRoute } from "./routes/api/keys.js";
 import { handleStatsRoute } from "./routes/api/stats.js";
 import { handleUsersRoute } from "./routes/api/users.js";
+import { handleShortRoute } from "./routes/api/short.js";
 import { handleMcpRoute } from "./mcp/server.ts";
 import { handleSkillSearchRoute } from "./skill/search.ts";
 import { handleSkillExtractRoute } from "./skill/extract.ts";
+import { GET as testIPRoute } from "./routes/api/test-ip.js";
 import {
   setRoleHandler,
   banUserHandler,
@@ -76,6 +78,12 @@ export async function router(req: Request): Promise<Response | null> {
     if (usersResponse !== null) return usersResponse;
   }
 
+  // Short links redirect
+  if (path.startsWith("/api/s/")) {
+    const shortResponse = await handleShortRoute(req, path);
+    if (shortResponse !== null) return shortResponse;
+  }
+
   // MCP Server
   if (path === "/mcp") {
     const mcpResponse = await handleMcpRoute(req, path);
@@ -92,6 +100,11 @@ export async function router(req: Request): Promise<Response | null> {
   if (path === "/api/skill/lookup" || path.startsWith("/api/skill/extract/")) {
     const skillExtractResponse = await handleSkillExtractRoute(req, path);
     if (skillExtractResponse !== null) return skillExtractResponse;
+  }
+
+  // Test IP extraction endpoint (for development/debugging)
+  if (path === "/api/test-ip" && req.method === "GET") {
+    return await testIPRoute(req);
   }
 
   // Admin routes: /api/admin/users/:id/...

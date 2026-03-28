@@ -2,7 +2,8 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import MainNav from '$lib/components/navigation/MainNav.svelte';
-	import { session } from '$lib/stores/session';
+	import { session } from '$lib/state';
+	import { afterNavigate } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	let { data, children } = $props<{
@@ -20,9 +21,32 @@
 		} | null;
 	}>();
 
-	// Hydrate session store from server data on mount
+	function hydrateSessionFromLayoutData() {
+		const user = data?.session?.user;
+
+		if (user) {
+			session.setAuthenticated({
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				avatar_url: user.avatarUrl ?? undefined,
+				rank: user.rank
+			});
+			return;
+		}
+
+		session.setGuest();
+	}
+
+	// Called at top-level — SvelteKit self-manages cleanup, no leak on HMR.
+	// Runs on every SvelteKit navigation (including the initial one after hydration).
+	afterNavigate(() => {
+		hydrateSessionFromLayoutData();
+	});
+
+	// onMount handles the very first client-side hydration before any navigation fires.
 	onMount(() => {
-		session.hydrate(data?.session || null);
+		hydrateSessionFromLayoutData();
 	});
 </script>
 
@@ -32,7 +56,7 @@
 </svelte:head>
 
 <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 font-sans antialiased text-gray-900 dark:text-gray-100">
-	<MainNav />
+	<MainNav session={data?.session ?? null} />
 
 	<main class="flex-grow">
 		{@render children()}

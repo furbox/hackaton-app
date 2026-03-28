@@ -21,9 +21,17 @@ function extractSessionToken(request: Request): string | null {
 	const cookieHeader = request.headers.get("Cookie");
 	if (cookieHeader) {
 		const cookies = cookieHeader.split(";").map((c) => c.trim());
-		const sessionCookie = cookies.find((c) => c.startsWith("urlft_session="));
-		if (sessionCookie) {
-			return sessionCookie.slice("urlft_session=".length);
+		const sessionCookieNames = [
+			"urlft_session",
+			"better-auth.session_token",
+			"__Secure-better-auth.session_token",
+		];
+
+		for (const cookieName of sessionCookieNames) {
+			const sessionCookie = cookies.find((c) => c.startsWith(`${cookieName}=`));
+			if (sessionCookie) {
+				return sessionCookie.slice(cookieName.length + 1);
+			}
 		}
 	}
 

@@ -167,6 +167,8 @@ export const actions = {
 
 Las tareas pesadas (Health Check, Reader Mode, Wayback Machine) se ejecutan en **background workers** usando `Bun.Worker` sin bloquear el servidor web ni la UX del usuario.
 
+**Nota:** Actualmente los workers se ejecutan en memoria sin persistencia. Si el servidor se reinicia, los jobs pendientes se pierden. La durabilidad está planificada para futuras versiones.
+
 ---
 
 ## 📡 API Reference
@@ -250,7 +252,9 @@ Las tareas pesadas (Health Check, Reader Mode, Wayback Machine) se ejecutan en *
 #### Short Links
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `GET` | `/s/:code` | Redirección al link original (incrementa views) |
+| `GET` | `/api/s/:code` | Redirección al link original (incrementa `links.views` y registra visita en `link_views`) |
+
+Nota de privacidad: la telemetría de visitas usa las reglas de `TRUST_PROXY`; cuando no hay proxy confiable o no existe header válido, `ip_address` se guarda como `"unknown"`.
 
 #### API Keys
 | Método | Ruta | Descripción |
@@ -377,6 +381,22 @@ CREATE TABLE favorites (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (link_id) REFERENCES links(id) ON DELETE CASCADE
 );
+
+-- Vistas por visita (telemetría de short links)
+CREATE TABLE link_views (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  link_id INTEGER NOT NULL,
+  user_id INTEGER,
+  ip_address TEXT NOT NULL,
+  user_agent TEXT NOT NULL,
+  visited_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (link_id) REFERENCES links(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_link_views_link_id_visited_at ON link_views(link_id, visited_at DESC);
+CREATE INDEX idx_link_views_visited_at ON link_views(visited_at DESC);
+CREATE INDEX idx_link_views_user_id_visited_at ON link_views(user_id, visited_at DESC);
 
 -- Sesiones (fingerprint por sesión)
 CREATE TABLE sessions (
@@ -676,6 +696,62 @@ SHORT_PREFIX=s
 # API Keys
 API_KEY_PREFIX=urlk                # Prefijo para las keys generadas (ej: urlk_a1b2c3d4)
 API_RATE_LIMIT=100                 # Requests por minuto por key
+
+# Workers Background Jobs
+WORKER_SWEEP_ENABLED=false         # Habilitar verificación periódica de links
+WORKER_SWEEP_INTERVAL_MS=300000    # Intervalo entre verificaciones (5 min)
+HEALTH_CHECK_BATCH_SIZE=50         # Links a procesar por lote
+
+# Worker Timeouts
+HEALTH_CHECK_TIMEOUT_MS=10000      # Timeout para health check (10s)
+READER_MODE_TIMEOUT_MS=15000       # Timeout para reader mode (15s)
+WAYBACK_TIMEOUT_MS=30000           # Timeout para wayback machine (30s)
+
+# Worker Retries
+WORKER_MAX_ATTEMPTS=3              # Máximo de intentos para retry
+WORKER_RETRY_BASE_DELAY_MS=1000    # Delay base para retry exponencial (1s)
+```
+
+#### Configuración de TRUST_PROXY
+
+La aplicación extrae direcciones IP de clientes para logs de auditoría y seguridad de sesiones. Por defecto, retorna `"unknown"` por privacidad.
+
+**¿Cuándo habilitar TRUST_PROXY?**
+
+Solo debes establecer `TRUST_PROXY=true` cuando tu aplicación está detrás de un **proxy reverso de confianza** que:
+- Reemplaza o elimina headers `x-forwarded-for` y `x-real-ip` de requests entrantes
+- No permite que clientes envíen estos headers directamente
+
+**Escenarios comunes:**
+
+- ✅ **Cloudflare**: `TRUST_PROXY=true` (Cloudflare sanitiza headers)
+- ✅ **Nginx/Apache** como frontend: `TRUST_PROXY=true` (si configurado correctamente)
+- ✅ **AWS ALB/GCP LB**: `TRUST_PROXY=true` (load balancers de confianza)
+- ❌ **VPS directo sin proxy**: `TRUST_PROXY=false` (¡riesgo de spoofing!)
+- ❌ **Desarrollo local**: `TRUST_PROXY=false` (no es necesario)
+
+**⚠️ ADVERTENCIA DE SEGURIDAD:**
+
+NUNCA habilites `TRUST_PROXY=true` si tu aplicación es accesible directamente desde internet sin un proxy de confianza. Los atacantes podrían falsificar headers y suplantár IPs reales.
+
+**Cómo funciona:**
+
+Cuando `TRUST_PROXY=true`, la app extrae IPs en este orden:
+1. `x-forwarded-for` (primera IP de la lista separada por comas)
+2. `x-real-ip`
+3. `"unknown"` (si no hay headers válidos)
+
+**Ejemplos de configuración:**
+
+```env
+# Producción con Cloudflare
+TRUST_PROXY=true
+
+# Desarrollo local
+TRUST_PROXY=false
+
+# VPS directo (sin proxy)
+TRUST_PROXY=false
 ```
 
 ---

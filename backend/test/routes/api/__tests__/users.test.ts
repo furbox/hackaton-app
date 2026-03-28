@@ -62,11 +62,18 @@ describe("users routes", () => {
       // Assert
       expect(response).not.toBeNull();
       const body = await response?.json();
-      expect(body).toEqual({
+      expect(body).toMatchObject({
+        id: 1,
         username: "alice",
         avatarUrl: "https://example.com/avatar.png",
         bio: "Link collector",
+        rank: "Legend",
         rankId: 5,
+        stats: {
+          totalLinks: 10,
+          totalViews: 100,
+          totalLikes: 25,
+        },
         totalLinks: 10,
         totalViews: 100,
         totalLikes: 25,
@@ -117,7 +124,7 @@ describe("users routes", () => {
       mockGetSession.mockResolvedValue(mockSession as any);
       mockGetPublicProfile.mockReturnValue({
         ok: true,
-        data: { username: "alice" },
+        data: { username: "alice", links: [], favorites: [] },
       });
 
       const request = new Request("http://localhost:3000/api/users/alice");

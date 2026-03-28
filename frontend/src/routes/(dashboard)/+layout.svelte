@@ -2,17 +2,11 @@
 	import Sidebar from '$lib/components/dashboard/Sidebar.svelte';
 	import Topbar from '$lib/components/dashboard/Topbar.svelte';
 	import { session } from '$lib/state';
-	import { goto } from '$app/navigation';
 
 	let { children } = $props();
-
-	// Guard reactivo: si por alguna razón el estado de sesión cambia a 'guest',
-	// redirigimos al login inmediatamente.
-	$effect(() => {
-		if (session.status === 'guest') {
-			goto('/auth/login');
-		}
-	});
+	// Redirect is handled server-side by +layout.ts (throw redirect(302, ...)).
+	// The $effect + goto() was removed: it caused N dangling subscriptions on HMR
+	// because the module-level singleton is never hot-reloaded, leading to heap OOM.
 </script>
 
 {#if session.isAuthenticated}

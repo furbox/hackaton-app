@@ -1,0 +1,14 @@
+# Normalize text files to LF
+* text=auto eol=lf
+
+# Explicitly declare markdown files as text with LF
+*.md text eol=lf
+
+# Keep SQLite files as binary
+*.sqlite binary
+*.sqlite-shm binary
+*.sqlite-wal binary
+
+# Keep Windows scripts as CRLF
+*.bat text eol=crlf
+*.ps1 text eol=crlf

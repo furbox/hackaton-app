@@ -1,9 +1,9 @@
-import { searchLinks } from "../../db/queries/search.ts";
+import { getLinks } from "../../services/links.service.ts";
 import type { MCPToolContext, MCPToolDefinition } from "../types.ts";
 import { MCPInternalError, MCPInvalidParamsError } from "./links.ts";
 
 export interface SearchToolDeps {
-  searchLinks: typeof searchLinks;
+  getLinks: typeof getLinks;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -41,30 +41,11 @@ function parseSearchInput(input: unknown): { query: string; categoryId?: number;
   };
 }
 
-function toLinkListItemDTO(
-  row: ReturnType<typeof searchLinks>[number]
-): Record<string, unknown> {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    url: row.url,
-    title: row.title,
-    description: row.description,
-    shortCode: row.short_code,
-    isPublic: row.is_public === 1,
-    categoryId: row.category_id,
-    views: row.views,
-    createdAt: row.created_at,
-    likesCount: row.likes_count,
-    favoritesCount: row.favorites_count,
-  };
-}
-
 export function createSearchTools(
   deps: Partial<SearchToolDeps> = {}
 ): Record<string, MCPToolDefinition> {
   const resolved: SearchToolDeps = {
-    searchLinks,
+    getLinks,
     ...deps,
   };
 
@@ -86,18 +67,34 @@ export function createSearchTools(
         const parsed = parseSearchInput(input);
 
         try {
-          const rows = resolved.searchLinks(parsed.query, {
-            category_id: parsed.categoryId,
-          });
+          const result = resolved.getLinks(
+            { userId: context.actor.userId },
+            {
+              q: parsed.query,
+              ownerUserId: context.actor.userId,
+              categoryId: parsed.categoryId,
+              page: 1,
+              limit: parsed.limit,
+              sort: "recent",
+            }
+          );
+
+          if (!result.ok) {
+            throw new MCPInternalError(result.error.message, {
+              serviceCode: result.error.code,
+              ...(result.error.details ? { details: result.error.details } : {}),
+            });
+          }
 
           return {
-            items: rows
-              .filter((row) => row.user_id === context.actor.userId)
-              .slice(0, parsed.limit)
-              .map(toLinkListItemDTO),
+            items: result.data.items,
             limit: parsed.limit,
           };
-        } catch {
+        } catch (error) {
+          if (error instanceof MCPInternalError) {
+            throw error;
+          }
+
           throw new MCPInternalError("Failed to search links", {
             serviceCode: "INTERNAL",
           });

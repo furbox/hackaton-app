@@ -1,0 +1,110 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary">
+      ¡Hola, <span class="text-accent-primary"><%= user.username %></span>! 👋
+    </h1>
+    <p class="mt-1 text-text-secondary">Aquí está tu resumen de actividad</p>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+
+    <div class="ui-card p-6 flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-accent-primary/15 text-2xl">🔗</div>
+      <div>
+        <p class="text-sm text-text-secondary">Links guardados</p>
+        <p class="text-3xl font-bold text-text-primary"><%= stats.totalLinks || 0 %></p>
+      </div>
+    </div>
+
+    <div class="ui-card p-6 flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-accent-secondary/15 text-2xl">👁</div>
+      <div>
+        <p class="text-sm text-text-secondary">Vistas totales</p>
+        <p class="text-3xl font-bold text-text-primary"><%= stats.totalViews || 0 %></p>
+      </div>
+    </div>
+
+    <div class="ui-card p-6 flex items-center gap-4">
+      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-error/15 text-2xl">❤️</div>
+      <div>
+        <p class="text-sm text-text-secondary">Likes recibidos</p>
+        <p class="text-3xl font-bold text-text-primary"><%= stats.totalLikes || 0 %></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Quick links nav -->
+  <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-10">
+    <a href="/dashboard/links"
+       class="ui-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-accent-primary/45 transition-all text-center">
+      <span class="text-2xl">🔗</span>
+      <span class="text-sm font-medium text-text-primary">Mis Links</span>
+    </a>
+    <a href="/dashboard/categories"
+       class="ui-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-accent-primary/45 transition-all text-center">
+      <span class="text-2xl">🏷️</span>
+      <span class="text-sm font-medium text-text-primary">Categorías</span>
+    </a>
+    <a href="/dashboard/favorites"
+       class="ui-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-accent-primary/45 transition-all text-center">
+      <span class="text-2xl">🔖</span>
+      <span class="text-sm font-medium text-text-primary">Guardados</span>
+    </a>
+    <a href="/dashboard/profile"
+       class="ui-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-accent-primary/45 transition-all text-center">
+      <span class="text-2xl">👤</span>
+      <span class="text-sm font-medium text-text-primary">Mi Perfil</span>
+    </a>
+    <a href="/dashboard/import"
+       class="ui-card rounded-xl p-4 flex flex-col items-center gap-2 hover:border-accent-primary/45 transition-all text-center">
+      <span class="text-2xl">📥</span>
+      <span class="text-sm font-medium text-text-primary">Importar</span>
+    </a>
+  </div>
+
+  <!-- Recent links -->
+  <div class="ui-card overflow-hidden">
+    <div class="flex items-center justify-between border-b border-border px-6 py-4">
+      <h2 class="text-lg font-semibold text-text-primary">Links recientes</h2>
+      <a href="/dashboard/links" class="text-sm font-medium text-accent-primary hover:text-cyan-300">
+        Ver todos →
+      </a>
+    </div>
+
+    <% if (recentLinks && recentLinks.length > 0) { %>
+      <div class="overflow-x-auto">
+        <table class="ui-table w-full text-sm">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Título / URL</th>
+              <th class="hidden px-4 py-3 text-center text-xs font-medium uppercase tracking-wider sm:table-cell">Visibilidad</th>
+              <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">👁</th>
+              <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">❤️</th>
+              <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">⭐</th>
+              <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recentLinks.forEach(function(link) { %>
+              <%- include('../../partials/link-row-simple', { link, showActions: false }) %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } else { %>
+      <div class="px-6 py-12 text-center">
+        <p class="text-4xl mb-3">🔗</p>
+        <p class="mb-4 text-text-secondary">Aún no tenés links guardados</p>
+        <a href="/dashboard/links"
+           class="ui-btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-medium">
+          + Agregar tu primer link
+        </a>
+      </div>
+    <% } %>
+  </div>
+
+</div>

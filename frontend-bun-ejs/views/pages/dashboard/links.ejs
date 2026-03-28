@@ -1,0 +1,237 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-text-primary">Mis Links</h1>
+    </div>
+    <button onclick="document.getElementById('create-modal').classList.remove('hidden')"
+            class="ui-btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-medium">
+      + Nuevo link
+    </button>
+  </div>
+
+  <% if (loadError) { %>
+    <div class="ui-card border-error/35 px-6 py-16 text-center mb-8">
+      <p class="text-5xl mb-4">⚠️</p>
+      <p class="mb-2 text-lg font-medium text-text-primary">No pudimos cargar tus links</p>
+      <p class="mb-6 text-text-secondary">Reintentá en unos segundos. Si el problema sigue, actualizá la página.</p>
+      <a href="/dashboard/links"
+         class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium">
+        Reintentar
+      </a>
+    </div>
+  <% } else if (totalLinks > 0) { %>
+    <!-- Filter Bar -->
+    <%- include('../../partials/filter-bar', { searchPlaceholder: 'Buscar links...', categories, query, action: '/dashboard/links' }) %>
+
+    <!-- Empty state for filtered results -->
+    <% if (links.length === 0) { %>
+      <div class="ui-card px-6 py-16 text-center">
+        <p class="text-5xl mb-4">🔎</p>
+        <p class="mb-2 text-lg font-medium text-text-primary">No encontramos links con esos filtros</p>
+        <p class="mb-6 text-text-secondary">Probá limpiar la búsqueda o elegir otra categoría.</p>
+        <a
+          href="/dashboard/links"
+          class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium"
+        >
+          Limpiar filtros
+        </a>
+      </div>
+    <% } else { %>
+      <!-- Links table -->
+      <div class="ui-card overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="ui-table w-full text-sm">
+            <thead>
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Título / URL</th>
+                <th class="hidden px-4 py-3 text-center text-xs font-medium uppercase tracking-wider sm:table-cell">Visibilidad</th>
+                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">👁</th>
+                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">❤️</th>
+                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">⭐</th>
+                <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% links.forEach(function(link) { %>
+                <%- include('../../partials/link-row-simple', { link, showActions: true }) %>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <%- include('../../partials/pagination', { page: query.page, totalPages: totalPages, hasNextPage: hasNextPage, baseUrl: baseUrl }) %>
+    <% } %>
+  <% } else { %>
+    <!-- Empty state: no links at all -->
+    <div class="ui-card overflow-hidden">
+      <div class="px-6 py-16 text-center">
+        <p class="text-5xl mb-4">🔗</p>
+        <p class="mb-2 text-lg font-medium text-text-primary">No tenés links todavía</p>
+        <p class="mb-6 text-text-secondary">¡Empezá a guardar tus links favoritos!</p>
+        <button onclick="document.getElementById('create-modal').classList.remove('hidden')"
+                class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium">
+          + Agregar tu primer link
+        </button>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Create Modal -->
+  <div id="create-modal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+    <div class="ui-card w-full max-w-lg p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-bold text-text-primary">Nuevo Link</h2>
+        <button onclick="document.getElementById('create-modal').classList.add('hidden')"
+                class="text-xl leading-none text-text-secondary hover:text-text-primary">&times;</button>
+      </div>
+
+      <form method="POST" action="/dashboard/links/create" class="space-y-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-text-secondary">URL *</label>
+          <input type="url" name="url" required placeholder="https://ejemplo.com"
+                 class="ui-input" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-text-secondary">Título *</label>
+          <input type="text" name="title" required placeholder="Mi link genial"
+                 class="ui-input" />
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-text-secondary">Descripción</label>
+          <textarea name="description" rows="2" placeholder="Descripción opcional..."
+                    class="ui-textarea resize-none"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Categoría</label>
+            <select name="categoryId"
+                    class="ui-select w-full">
+              <option value="">Sin categoría</option>
+              <% categories.forEach(function(cat) { %>
+                <option value="<%= cat.id %>"><%= cat.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-text-secondary">Visibilidad</label>
+            <select name="isPublic"
+                    class="ui-select w-full">
+              <option value="true">Público</option>
+              <option value="false">Privado</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')"
+                  class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
+            Cancelar
+          </button>
+          <button type="submit"
+                  class="ui-btn-primary flex-1 px-4 py-2 text-sm font-medium">
+            Guardar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- Edit Modal -->
+<div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+  <div class="ui-card w-full max-w-lg p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold text-text-primary">Editar Link</h2>
+      <button onclick="document.getElementById('edit-modal').classList.add('hidden')"
+              class="text-xl leading-none text-text-secondary hover:text-text-primary">&times;</button>
+    </div>
+    <form id="edit-form" method="POST" action="" class="space-y-4">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">URL *</label>
+        <input type="url" id="edit-url" name="url" required
+               class="ui-input" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Título *</label>
+        <input type="text" id="edit-title" name="title" required
+               class="ui-input" />
+      </div>
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Descripción</label>
+        <textarea id="edit-description" name="description" rows="2"
+                  class="ui-textarea resize-none"></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-text-secondary">Categoría</label>
+          <select id="edit-categoryId" name="categoryId"
+                  class="ui-select w-full">
+            <option value="">Sin categoría</option>
+            <% categories.forEach(function(cat) { %>
+              <option value="<%= cat.id %>"><%= cat.name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-text-secondary">Visibilidad</label>
+          <select id="edit-isPublic" name="isPublic"
+                  class="ui-select w-full">
+            <option value="true">Público</option>
+            <option value="false">Privado</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')"
+                class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="ui-btn-primary flex-1 px-4 py-2 text-sm font-medium">
+          Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function normalizeEditBoolean(value) {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'true') return true;
+    if (normalized === 'false') return false;
+  }
+
+  return false;
+}
+
+function normalizeEditCategoryId(link) {
+  const categoryId = link.category_id ?? link.categoryId;
+  if (categoryId === null || categoryId === undefined || categoryId === '') {
+    return '';
+  }
+
+  return String(categoryId);
+}
+
+function openEditModal(link) {
+  document.getElementById('edit-form').action = '/dashboard/links/' + link.id + '/edit';
+  document.getElementById('edit-url').value = link.url || '';
+  document.getElementById('edit-title').value = link.title || '';
+  document.getElementById('edit-description').value = link.description || '';
+  const catSelect = document.getElementById('edit-categoryId');
+  catSelect.value = normalizeEditCategoryId(link);
+  const pubSelect = document.getElementById('edit-isPublic');
+  pubSelect.value = normalizeEditBoolean(link.is_public ?? link.isPublic) ? 'true' : 'false';
+  document.getElementById('edit-modal').classList.remove('hidden');
+}
+</script>

@@ -15,3 +15,4 @@ export * from "./search.ts";
 export * from "./stats.ts";
 export * from "./api-keys.ts";
 export * from "./skill.ts";
+export * from "./link-details.ts";

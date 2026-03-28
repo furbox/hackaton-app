@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="URLoft — Tu gestor de enlaces con superpoderes" />
+  <title><%= title %> - URLoft</title>
+
+  <!-- Tailwind CSS Browser v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: #0E1116;
+      --color-surface: #151A22;
+      --color-border: #2A3342;
+      --color-text-primary: #E6ECF2;
+      --color-text-secondary: #A5B0BF;
+      --color-accent-primary: #4CC9F0;
+      --color-accent-secondary: #8B74FF;
+      --color-success: #3ECF8E;
+      --color-warning: #F4B740;
+      --color-error: #FF6B6B;
+    }
+
+    @layer base {
+      body {
+        @apply antialiased bg-bg text-text-primary;
+      }
+
+      a {
+        @apply text-accent-primary transition-colors;
+      }
+
+      a:hover {
+        @apply text-cyan-300;
+      }
+
+      *:focus-visible {
+        outline: 2px solid #4CC9F0;
+        outline-offset: 2px;
+      }
+
+      ::selection {
+        background: #4CC9F033;
+        color: #E6ECF2;
+      }
+    }
+
+    @layer components {
+      .ui-card {
+        @apply rounded-2xl border border-border bg-surface shadow-lg shadow-black/20;
+      }
+
+      .ui-input {
+        @apply w-full rounded-xl border border-border bg-slate-950/30 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/70 transition-colors focus:border-accent-primary;
+      }
+
+      .ui-select {
+        @apply rounded-xl border border-border bg-slate-950/30 px-4 py-2.5 text-sm text-text-primary transition-colors focus:border-accent-primary;
+      }
+
+      .ui-textarea {
+        @apply w-full rounded-xl border border-border bg-slate-950/30 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/70 transition-colors focus:border-accent-primary;
+      }
+
+      .ui-btn-primary {
+        @apply inline-flex items-center justify-center rounded-xl bg-accent-primary px-5 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-300;
+      }
+
+      .ui-btn-secondary {
+        @apply inline-flex items-center justify-center rounded-xl border border-border bg-slate-900/50 px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:border-accent-primary/60 hover:bg-slate-900;
+      }
+
+      .ui-btn-ghost {
+        @apply inline-flex items-center justify-center rounded-xl border border-border bg-transparent px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:text-text-primary hover:border-accent-primary/50;
+      }
+
+      .ui-table thead {
+        @apply bg-slate-900/60;
+      }
+
+      .ui-table thead th {
+        @apply text-text-secondary;
+      }
+
+      .ui-table tbody {
+        @apply divide-y divide-border;
+      }
+
+      .ui-table-row {
+        @apply transition-colors hover:bg-slate-900/40;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col">
+
+  <!-- Flash messages -->
+  <%- include('../partials/flash') %>
+
+  <!-- Navigation -->
+  <%- include('../partials/nav') %>
+
+  <!-- Main content -->
+  <main class="flex-1">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-border bg-surface/70 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🔗</span>
+          <span class="font-semibold text-text-primary">URLoft</span>
+        </div>
+        <p class="text-sm text-text-secondary">
+          Hecho con ❤️ para el Hackathon 2026 midudev
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.8"></script>
+</body>
+</html>

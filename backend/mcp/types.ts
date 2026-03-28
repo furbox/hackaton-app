@@ -14,6 +14,36 @@ export interface MCPRequest<TParams = unknown> {
   id?: MCPRequestId;
 }
 
+export interface MCPInitializeParams {
+  protocolVersion?: string;
+  capabilities?: Record<string, unknown>;
+  clientInfo?: {
+    name?: string;
+    version?: string;
+  };
+}
+
+export interface MCPInitializeResult {
+  protocolVersion: string;
+  capabilities: {
+    tools: Record<string, never>;
+  };
+  serverInfo: {
+    name: string;
+    version: string;
+  };
+}
+
+export interface MCPTextContentPiece {
+  type: "text";
+  text: string;
+}
+
+export interface MCPToolCallResult {
+  content: MCPTextContentPiece[];
+  structuredContent?: unknown;
+}
+
 export interface MCPError {
   code: number;
   message: string;

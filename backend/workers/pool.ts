@@ -16,7 +16,15 @@ const WORKER_RESTART_DELAY_MS = 5_000;
 
 type WorkerKind = "health" | "reader" | "wayback";
 
-type WorkerPoolLogger = Pick<Console, "error" | "warn">;
+type WorkerPoolLogger = Pick<Console, "error" | "warn" | "info">;
+
+type WorkerMetrics = {
+  dispatched: Record<WorkerKind, number>;
+  completed: Record<WorkerKind, number>;
+  failed: Record<WorkerKind, number>;
+};
+
+type DispatchTracker = Map<string, { kind: WorkerKind; timestamp: number }>;
 
 type PoolWorker = {
   postMessage: (message: WorkerMessage<unknown>) => void;
@@ -91,6 +99,14 @@ export class WorkerPool {
   private readonly restartTimers = new Map<WorkerKind, unknown>();
   private shuttingDown = false;
 
+  // Observability: metrics and dispatch tracking
+  private metrics: WorkerMetrics = {
+    dispatched: { health: 0, reader: 0, wayback: 0 },
+    completed: { health: 0, reader: 0, wayback: 0 },
+    failed: { health: 0, reader: 0, wayback: 0 },
+  };
+  private dispatchTracker: DispatchTracker = new Map();
+
   constructor(deps: WorkerPoolDeps = {}) {
     this.createWorker = deps.createWorker ?? createDefaultWorker;
     this.logger = deps.logger ?? console;
@@ -108,6 +124,23 @@ export class WorkerPool {
   }
 
   dispatch(message: WorkerMessage<unknown>): void {
+    const kind = this.getKindFromMessageType(message.type);
+    const timestamp = Date.now();
+
+    // Track dispatch for duration measurement
+    this.dispatchTracker.set(message.correlationId, { kind, timestamp });
+
+    // Update metrics
+    this.metrics.dispatched[kind] += 1;
+
+    // Log dispatch
+    this.logger.info(`[worker-pool] Dispatching ${kind} job`, {
+      type: message.type,
+      correlationId: message.correlationId,
+      kind,
+    });
+
+    // Send to worker
     if (message.type === WorkerMessageType.READER_MODE) {
       this.readerWorker.postMessage(message);
       return;
@@ -119,6 +152,21 @@ export class WorkerPool {
     }
 
     this.healthWorker.postMessage(message);
+  }
+
+  getMetrics(): WorkerMetrics {
+    // Return a copy to prevent external mutation
+    return {
+      dispatched: { ...this.metrics.dispatched },
+      completed: { ...this.metrics.completed },
+      failed: { ...this.metrics.failed },
+    };
+  }
+
+  private getKindFromMessageType(type: WorkerMessageType): WorkerKind {
+    if (type === WorkerMessageType.READER_MODE) return "reader";
+    if (type === WorkerMessageType.WAYBACK) return "wayback";
+    return "health";
   }
 
   async shutdown(): Promise<void> {
@@ -162,14 +210,34 @@ export class WorkerPool {
   }
 
   private handleWorkerMessage(kind: WorkerKind, result: WorkerResult<unknown>): void {
+    // Calculate duration from dispatch
+    const tracker = this.dispatchTracker.get(result.correlationId);
+    const durationMs = tracker ? Date.now() - tracker.timestamp : undefined;
+    this.dispatchTracker.delete(result.correlationId);
+
     if (result.status === "error") {
-      this.logger.warn(`[worker-pool] ${kind} worker returned error`, {
+      this.metrics.failed[kind] += 1;
+      this.logger.warn(`[worker-pool] ${kind} worker job failed`, {
         type: result.type,
         correlationId: result.correlationId,
+        kind,
+        durationMs,
         error: result.error,
       });
       return;
     }
+
+    // Update completed metrics
+    this.metrics.completed[kind] += 1;
+
+    // Log successful completion with duration
+    this.logger.info(`[worker-pool] ${kind} worker job completed`, {
+      type: result.type,
+      correlationId: result.correlationId,
+      kind,
+      durationMs,
+      status: result.status,
+    });
 
     try {
       if (kind === "health") {
@@ -226,7 +294,11 @@ export class WorkerPool {
   }
 
   private handleWorkerCrash(kind: WorkerKind, event: Event | ErrorEvent): void {
-    this.logError(`[worker-pool] ${kind} worker crashed`, event);
+    const errorDetails = event instanceof ErrorEvent
+      ? { message: event.message, filename: event.filename, lineno: event.lineno }
+      : { message: "Unknown worker crash" };
+
+    this.logError(`[worker-pool] ${kind} worker crashed`, errorDetails);
 
     if (this.shuttingDown) {
       return;

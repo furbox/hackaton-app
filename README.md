@@ -19,20 +19,20 @@ Todos tenemos decenas (o cientos) de links útiles repartidos entre notas, favor
 | Feature | Descripción |
 |---------|-------------|
 | 🔐 **Autenticación Segura** | Sesiones seguras con verificación de email y recuperación de contraseña |
-| 🔗 **URL Shortener** | Cada link guardado genera un short link único listo para compartir |
-| 🔒 **Público / Privado** | Control granular de visibilidad por enlace |
-| 🏆 **Gamificación (Rangos)** | Sistema de rangos que premia la actividad del usuario |
-| ❤️ **Social** | Likes, views y perfiles públicos para descubrir links de otros usuarios |
-| 🏷️ **Categorías Custom** | Cada usuario crea y gestiona sus propias categorías con colores |
+| 🔗 **URL Shortener** | Cada link guardado genera un short link único listo para compartir | 🆗
+| 🔒 **Público / Privado** | Control granular de visibilidad por enlace |🆗
+| 🏆 **Gamificación (Rangos)** | Sistema de rangos que premia la actividad del usuario |🆗
+| ❤️ **Social** | Likes, views y perfiles públicos para descubrir links de otros usuarios |🆗
+| 🏷️ **Categorías Custom** | Cada usuario crea y gestiona sus propias categorías con colores |🆗
 | 🔑 **API Keys** | Los usuarios generan sus propias API keys para conectar servicios externos |
-| 🤖 **Integración con IA** | MCP Server y Web Skill para conectar cualquier IA a tus links |
-| 🌐 **Extensión de Chrome** | Guarda la página actual con un click o consulta tus links sin salir del navegador |
+| 🤖 **Integración con IA** | MCP Server y Web Skill para conectar cualquier IA a tus links |🆗
+| 🌐 **Extensión de Chrome** | Guarda la página actual con un click o consulta tus links sin salir del navegador |🆗
 | 📸 **Link Preview** | Al pegar una URL se extraen automáticamente el título, descripción e imagen OG |
-| 📊 **Dashboard Completo** | Panel privado para gestionar perfil, links, categorías, API keys y favoritos |
-| 🔍 **Búsqueda Full-Text** | Búsqueda ultrarrápida que encuentra cualquier link al instante |
+| 📊 **Dashboard Completo** | Panel privado para gestionar perfil, links, categorías, API keys y favoritos |🆗
+| 🔍 **Búsqueda Full-Text** | Búsqueda ultrarrápida que encuentra cualquier link al instante |🆗
 | 🛡️ **Seguridad Avanzada** | Rate limiting y protección contra abuso |
 | 📱 **PWA** | Instala URLoft como app nativa en tu celular desde el navegador |
-| 📥 **Importar Bookmarks** | Sube el archivo HTML de Chrome/Firefox y tus bookmarks se importan automáticamente |
+| 📥 **Importar Bookmarks** | Sube el archivo HTML de Chrome/Firefox y tus bookmarks se importan automáticamente |🆗
 
 ---
 
@@ -42,8 +42,8 @@ Todos tenemos decenas (o cientos) de links útiles repartidos entre notas, favor
 
 - **Guardar enlaces** con título, descripción y URL original
 - **📸 Link Preview automático** — al pegar una URL se extraen automáticamente el título, descripción e imagen OG del sitio
-- **🩺 Link Health Checker** — verifica periódicamente el estado de tus enlaces para detectar "Link Rot"
-- **🏛️ Wayback Machine** — guarda una copia permanente de la URL al momento de agregarla
+- **🩺 Link Health Checker** — verifica el estado de tus enlaces al guardarlos (programado: verificación periódica futura)
+- **🏛️ Wayback Machine** — guarda una copia en segundo plano (puede tardar segundos/minutos)
 - **📖 Reader Mode** — extrae el texto limpio de los artículos para lectura sin distracciones
 - **🔍 Búsqueda full-text** — búsqueda ultrarrápida que encuentra cualquier link al instante
 - **Organización por categorías** propias y personalizadas
@@ -157,7 +157,9 @@ Servidor MCP integrado para que cualquier IA compatible (Claude, GPT, etc.) pued
 {
   "mcpServers": {
     "urloft": {
-      "url": "https://urloft.site/mcp",
+      "enabled": true,
+      "type": "remote",
+      "url": "https://api.urloft.site/mcp",
       "headers": {
         "Authorization": "Bearer tu-api-key"
       }
@@ -166,6 +168,79 @@ Servidor MCP integrado para que cualquier IA compatible (Claude, GPT, etc.) pued
 }
 ```
 
+#### Uso rápido del MCP (paso a paso)
+
+1. Crea una API key en `Dashboard -> Mis API Keys` con permiso `read+write`.
+2. Configura tu cliente MCP apuntando a `https://urloft.site/mcp` (o tu URL local/tunnel).
+3. Verifica handshake con `initialize`.
+4. Lista tools con `tools/list`.
+5. Ejecuta acciones con `tools/call`.
+
+Ejemplo `initialize`:
+
+```bash
+curl -X POST "https://urloft.site/mcp" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+      "protocolVersion": "2024-11-05",
+      "clientInfo": { "name": "curl", "version": "1.0.0" }
+    }
+  }'
+```
+
+Ejemplo `tools/list` (con API key):
+
+```bash
+curl -X POST "https://urloft.site/mcp" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer tu-api-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/list",
+    "params": {}
+  }'
+```
+
+Ejemplo `tools/call` para crear link:
+
+```bash
+curl -X POST "https://urloft.site/mcp" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer tu-api-key" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "tools/call",
+    "params": {
+      "name": "create_link",
+      "input": {
+        "url": "https://bun.sh/",
+        "title": "Bun",
+        "shortCode": "bun-docs-demo",
+        "description": "Runtime JavaScript/TypeScript",
+        "isPublic": true
+      }
+    }
+  }'
+```
+
+Tools disponibles actualmente:
+
+- `create_link`
+- `get_links`
+- `get_link`
+- `update_link`
+- `delete_link`
+- `search_links`
+- `get_categories`
+
+> Tip de seguridad: si exponés una API key por accidente (chat, screenshots, logs), revocala y generá una nueva.
+
 ### 🧠 Web Skill
 
 Skill diseñado para que las IAs busquen y extraigan información de tus links:
@@ -173,6 +248,12 @@ Skill diseñado para que las IAs busquen y extraigan información de tus links:
 - **Buscar URLs** — encontrar links por palabra clave, categoría o contenido
 - **Extraer información** — obtener metadata, descripciones y datos específicos
 - **Filtros avanzados** — búsqueda por categoría, visibilidad, fecha o popularidad
+
+Instalación directa con `npx skills` (desde GitHub):
+
+```bash
+npx skills add https://github.com/<tu-usuario>/<tu-repo> --skill urloft-url-search
+```
 
 ### 🌐 Extensión de Chrome
 

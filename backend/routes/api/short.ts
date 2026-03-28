@@ -16,19 +16,55 @@ import {
   mapPhase4ServiceError,
   type Phase4ServiceResult,
 } from "../../contracts/service-error.ts";
+import {
+  extractIP,
+  extractUserAgent,
+} from "../../middleware/auth/fingerprint.ts";
+
+type SessionLike = {
+  user: {
+    id: unknown;
+  };
+};
+
+async function getSessionFromMiddleware(request: Request): Promise<SessionLike | null> {
+  const { getSession } = await import("../../middleware/auth/session.ts");
+  return (await getSession(request)) as SessionLike | null;
+}
 
 // ============================================================================
 // DEPENDENCY INJECTION
 // ============================================================================
 
 export interface ShortRouteDeps {
+  getSession: (request: Request) => Promise<SessionLike | null>;
+  extractIP: (request: Request) => string;
+  extractUserAgent: (request: Request) => string;
   resolveShortCode: (
     input: ResolveShortCodeInput
   ) => Phase4ServiceResult<ResolvedLinkDTO>;
 }
 
 function defaultDeps(): ShortRouteDeps {
-  return { resolveShortCode };
+  return {
+    getSession: getSessionFromMiddleware,
+    extractIP,
+    extractUserAgent,
+    resolveShortCode,
+  };
+}
+
+function parseActorUserId(session: SessionLike | null): number | undefined {
+  if (!session) {
+    return undefined;
+  }
+
+  const numericUserId = Number(session.user.id);
+  if (!Number.isInteger(numericUserId) || numericUserId <= 0) {
+    return undefined;
+  }
+
+  return numericUserId;
 }
 
 // ============================================================================
@@ -61,7 +97,17 @@ export async function handleShortRoute(
   // Extract code from path: /api/s/<code>
   const code = path.slice(7); // Remove leading "/api/s/"
 
-  const result = d.resolveShortCode({ code });
+  const session = await d.getSession(request);
+  const actorUserId = parseActorUserId(session);
+  const ipAddress = d.extractIP(request);
+  const userAgent = d.extractUserAgent(request);
+
+  const result = d.resolveShortCode({
+    code,
+    ipAddress,
+    userAgent,
+    actorUserId,
+  });
 
   if (result.ok) {
     return Response.redirect(result.data.url, 302);

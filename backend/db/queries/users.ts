@@ -63,6 +63,41 @@ export interface UserVerificationRecord {
 }
 
 /**
+ * Represents a rank level from the ranks table.
+ */
+export interface RankRow {
+  id: number;
+  name: string;
+  min_links: number;
+  max_links: number | null;
+  display_name: string;
+  badge_url: string | null;
+  color: string;
+  description: string | null;
+}
+
+/**
+ * User's rank information with progression details.
+ */
+export interface UserRankWithProgress {
+  currentRank: {
+    id: number;
+    name: string;
+    displayName: string;
+    color: string;
+    description: string | null;
+  };
+  totalLinks: number;
+  nextRank: {
+    id: number;
+    name: string;
+    displayName: string;
+    minLinks: number;
+    linksNeeded: number;
+  } | null;
+}
+
+/**
  * Parameters for creating a new user.
  */
 export interface CreateUserParams {
@@ -159,6 +194,25 @@ const deactivateSessionsStmt = () => getDb().prepare(`
 
 const getUserByUsernameStmt = () => getDb().prepare(`
   SELECT * FROM users WHERE username = ? LIMIT 1
+`);
+
+const countUserLinksStmt = () => getDb().prepare(`
+  SELECT COUNT(*) as total FROM links WHERE user_id = ?
+`);
+
+const getRankByThresholdStmt = () => getDb().prepare(`
+  SELECT * FROM ranks
+  WHERE ? >= min_links AND (max_links IS NULL OR ? <= max_links)
+  ORDER BY min_links DESC
+  LIMIT 1
+`);
+
+const getAllRanksStmt = () => getDb().prepare(`
+  SELECT * FROM ranks ORDER BY min_links ASC
+`);
+
+const updateUserRankStmt = () => getDb().prepare(`
+  UPDATE users SET rank_id = ? WHERE id = ?
 `);
 
 // ============================================================================
@@ -358,4 +412,120 @@ export function invalidateUserSessions(userId: number): SessionRecord[] {
 export function getUserByUsername(username: string): User | null {
   const stmt = getUserByUsernameStmt();
   return stmt.get(username) as User | null;
+}
+
+/**
+ * Recalculates and updates a user's rank based on their total link count.
+ *
+ * This function counts the user's total links (including both public and private),
+ * determines the appropriate rank based on thresholds in the ranks table,
+ * and updates the user's rank_id if it has changed.
+ *
+ * @param userId - User's primary key ID
+ * @returns The updated user record, or null if user not found
+ *
+ * @example
+ * ```typescript
+ * const updated = recalculateAndUpdateRank(123);
+ * if (updated) {
+ *   console.log(`User rank updated to ${updated.rank_id}`);
+ * }
+ * ```
+ */
+export function recalculateAndUpdateRank(userId: number): User | null {
+  // 1. Count user's total links
+  const countStmt = countUserLinksStmt();
+  const countResult = countStmt.get(userId) as { total: number } | null;
+  const totalLinks = countResult?.total ?? 0;
+
+  // 2. Find the appropriate rank based on link count
+  const rankStmt = getRankByThresholdStmt();
+  const rank = rankStmt.get(totalLinks, totalLinks) as RankRow | null;
+
+  if (!rank) {
+    // Fallback: if no rank found (shouldn't happen with proper data), get the lowest rank
+    const allRanksStmt = getAllRanksStmt();
+    const allRanks = allRanksStmt.all() as RankRow[];
+    const lowestRank = allRanks[0];
+    if (!lowestRank) {
+      return null; // No ranks in database
+    }
+
+    // Update user to lowest rank
+    const updateStmt = updateUserRankStmt();
+    updateStmt.run(lowestRank.id, userId);
+  } else {
+    // 3. Update user's rank_id if different
+    const updateStmt = updateUserRankStmt();
+    updateStmt.run(rank.id, userId);
+  }
+
+  // 4. Return updated user
+  return getUserById(userId);
+}
+
+/**
+ * Retrieves detailed rank information with progression data for a user.
+ *
+ * Returns the user's current rank, total link count, and information about
+ * the next rank (if any) including how many more links are needed to reach it.
+ *
+ * @param userId - User's primary key ID
+ * @returns Rank information with progression details, or null if user not found
+ *
+ * @example
+ * ```typescript
+ * const rankInfo = getUserRankWithCounts(123);
+ * if (rankInfo) {
+ *   console.log(`Current rank: ${rankInfo.currentRank.displayName}`);
+ *   if (rankInfo.nextRank) {
+ *     console.log(`Need ${rankInfo.nextRank.linksNeeded} more links for ${rankInfo.nextRank.displayName}`);
+ *   }
+ * }
+ * ```
+ */
+export function getUserRankWithCounts(userId: number): UserRankWithProgress | null {
+  // 1. Get user info
+  const user = getUserById(userId);
+  if (!user) {
+    return null;
+  }
+
+  // 2. Count total links
+  const countStmt = countUserLinksStmt();
+  const countResult = countStmt.get(userId) as { total: number } | null;
+  const totalLinks = countResult?.total ?? 0;
+
+  // 3. Get current rank
+  const rankStmt = getRankByThresholdStmt();
+  const currentRank = rankStmt.get(totalLinks, totalLinks) as RankRow | null;
+
+  if (!currentRank) {
+    return null;
+  }
+
+  // 4. Get all ranks to find next rank
+  const allRanksStmt = getAllRanksStmt();
+  const allRanks = allRanksStmt.all() as RankRow[];
+
+  // 5. Find next rank (first rank with min_links > current totalLinks)
+  const nextRank = allRanks.find(r => r.min_links > totalLinks);
+
+  return {
+    currentRank: {
+      id: currentRank.id,
+      name: currentRank.name,
+      displayName: currentRank.display_name,
+      color: currentRank.color,
+      description: currentRank.description,
+    },
+    totalLinks,
+    nextRank: nextRank ? {
+      id: nextRank.id,
+      name: nextRank.name,
+      displayName: nextRank.display_name,
+      minLinks: nextRank.min_links,
+      linksNeeded: nextRank.min_links - totalLinks,
+    } : null,
+  };
 }

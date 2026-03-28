@@ -1,0 +1,144 @@
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-bg via-surface to-slate-950 py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+
+    <!-- Badge -->
+    <div class="mb-8 inline-flex items-center gap-2 rounded-full bg-accent-primary/15 px-4 py-1.5 text-sm font-medium text-accent-primary">
+      <span>✨</span>
+      <span>Hackathon 2026 midudev</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="mb-6 text-4xl font-extrabold leading-tight text-text-primary sm:text-5xl lg:text-6xl">
+      <%= headline %>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-text-secondary sm:text-xl">
+      <%= subtitle %>
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register"
+         class="ui-btn-primary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Empezar gratis →
+      </a>
+      <a href="/explore"
+         class="ui-btn-secondary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Explorar links públicos
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Stats Section (real data) -->
+<section class="border-y border-border bg-surface py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center text-white">
+      <div>
+        <div class="text-4xl font-extrabold mb-1"><%= stats.totalUsers %></div>
+        <div class="font-medium text-text-secondary">Usuarios</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1"><%= stats.totalLinks %></div>
+        <div class="font-medium text-text-secondary">Links guardados</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1"><%= stats.totalCategories %></div>
+        <div class="font-medium text-text-secondary">Categorías</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Links -->
+<% if (featuredLinks && featuredLinks.length > 0) { %>
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-bold text-text-primary">Links destacados</h2>
+      <a href="/explore" class="text-sm font-medium text-accent-primary transition-colors hover:text-cyan-300">
+        Ver todos →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% featuredLinks.forEach(function(link) { %>
+        <%- include('../partials/link-card', { link: link }) %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Features Section -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">
+      Todo lo que necesitás en un solo lugar
+    </h2>
+    <p class="mx-auto mb-16 max-w-xl text-center text-text-secondary">
+      URLoft combina las mejores herramientas para gestionar tus links de forma inteligente.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <!-- Feature 1 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔗</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Short Links</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Acortá cualquier URL y rastreá los clicks en tiempo real desde tu dashboard.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔍</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Búsqueda Full-Text</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Encontrá cualquier link al instante con búsqueda inteligente potenciada por SQLite FTS5.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🤖</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">MCP Server</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Conectá tu IA favorita y manejá todos tus links con comandos en lenguaje natural.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📁</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Categorías</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Organizá tus links con categorías personalizadas y colores para encontrarlos fácil.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">❤️</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Likes y Favoritos</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Guardá los mejores links de la comunidad y descubrí los más populares.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📱</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">PWA + Extensión</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Instalalo en tu móvil o usá la extensión de Chrome para guardar links al instante.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>

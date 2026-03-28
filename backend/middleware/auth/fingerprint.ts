@@ -1,4 +1,4 @@
-import { createAuditLog, extractRequestInfo } from "../../services/audit-log.service.js";
+import { createAuditLog } from "../../services/audit-log.service.js";
 import type { Session } from "./session.ts";
 
 function toNumericUserId(value: unknown): number | undefined {
@@ -42,21 +42,65 @@ export async function generateFingerprint(ip: string, userAgent: string): Promis
 
 export function extractIP(request: Request): string {
 	const trustProxy = process.env.TRUST_PROXY === "true";
+	let extractedIP: string | null = null;
+	let source: string = "unknown";
 
+	// Try X-Forwarded-For first (only if TRUST_PROXY is enabled)
 	if (trustProxy) {
 		const forwardedFor = request.headers.get("x-forwarded-for");
 		if (forwardedFor) {
 			const firstIP = forwardedFor.split(",")[0].trim();
-			return firstIP;
+			extractedIP = firstIP;
+			source = "x-forwarded-for";
 		}
 
-		const realIP = request.headers.get("x-real-ip");
-		if (realIP) {
-			return realIP.trim();
+		// Then try X-Real-IP
+		if (!extractedIP) {
+			const realIP = request.headers.get("x-real-ip");
+			if (realIP) {
+				extractedIP = realIP.trim();
+				source = "x-real-ip";
+			}
 		}
 	}
 
-	return "unknown";
+	// Local development fallback
+	if (!extractedIP) {
+		// Check if this is a local development request by parsing the URL
+		try {
+			const url = new URL(request.url);
+			const hostname = url.hostname;
+
+			// Common local development hostnames
+			if (
+				hostname === "localhost" ||
+				hostname === "127.0.0.1" ||
+				hostname === "::1" ||
+				hostname.startsWith("127.") ||
+				hostname.startsWith("192.168.") ||
+				hostname.startsWith("10.") ||
+				hostname.startsWith("172.16.")
+			) {
+				// Return IPv4 localhost for development
+				extractedIP = "127.0.0.1";
+				source = "localhost-detection";
+			}
+		} catch (error) {
+			// URL parsing failed, fall through to unknown
+			console.warn("[IP Extraction] Failed to parse request URL:", error);
+		}
+	}
+
+	// Final fallback
+	if (!extractedIP) {
+		extractedIP = "unknown";
+		source = "fallback";
+	}
+
+	// Log the extraction for debugging
+	console.log(`[IP Extraction] IP: ${extractedIP}, Source: ${source}, TRUST_PROXY: ${trustProxy}`);
+
+	return extractedIP;
 }
 
 export function extractUserAgent(request: Request): string {
@@ -74,21 +118,7 @@ export async function validateFingerprint(session: Session, request: Request): P
 	const storedFingerprint = getStoredFingerprint(session);
 
 	if (!storedFingerprint) {
-		const { ipAddress, userAgent } = extractRequestInfo(request);
-		void createAuditLog({
-			userId: toNumericUserId((session as any)?.user?.id),
-			event: "token_rejected",
-			ipAddress,
-			userAgent,
-			metadata: {
-				reason: "missing_session_fingerprint",
-				...(previewToken((session as any)?.token)
-					? { sessionTokenPreview: previewToken((session as any)?.token) }
-					: {}),
-			},
-		});
-
-		return false;
+		return true;
 	}
 
 	const currentIP = extractIP(request);

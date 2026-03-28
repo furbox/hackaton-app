@@ -2,7 +2,7 @@
  * Auth Router
  *
  * Handles `POST /api/auth/register`, `POST /api/auth/login`,
- * `POST /api/auth/logout`, `GET /api/auth/verify/:token`, and
+ * `GET /api/auth/session`, `POST /api/auth/logout`, `GET /api/auth/verify/:token`, and
  * `POST /api/auth/resend-verification`.
  *
  * ## Flow Overview
@@ -703,6 +703,50 @@ async function handleLogout(req: Request, deps: AuthDeps): Promise<Response> {
   }
 }
 
+/**
+ * Handles `GET /api/auth/session`.
+ *
+ * Returns a normalized session payload for frontend SSR and route guards.
+ */
+async function handleSession(req: Request, deps: AuthDeps): Promise<Response> {
+  const sessionResult = await deps.authenticateSession(req);
+
+  if (sessionResult instanceof Response) {
+    return Response.json({ user: null, token: null }, { status: 200 });
+  }
+
+  const rawUser = (sessionResult.user ?? {}) as Record<string, unknown>;
+  const id = toNumericUserId(rawUser.id);
+
+  if (!id) {
+    return authError(500, "Invalid session user id", "AUTH_PROVIDER_ERROR");
+  }
+
+  const email = typeof rawUser.email === "string" ? rawUser.email : "";
+  const fallbackUsername = email.includes("@") ? email.split("@")[0] : `user-${id}`;
+  const username =
+    typeof rawUser.username === "string" && rawUser.username.length > 0
+      ? rawUser.username
+      : fallbackUsername;
+
+  const avatarUrl = typeof rawUser.avatarUrl === "string" ? rawUser.avatarUrl : null;
+  const rank = typeof rawUser.rank === "string" && rawUser.rank.length > 0 ? rawUser.rank : "newbie";
+
+  return Response.json(
+    {
+      user: {
+        id,
+        username,
+        email,
+        avatarUrl,
+        rank,
+      },
+      token: null,
+    },
+    { status: 200 }
+  );
+}
+
 // ============================================================================
 // DEFAULT PRODUCTION DEPS
 // ============================================================================
@@ -757,6 +801,7 @@ function getDefaultDeps(): AuthDeps {
  * Handles:
  * - `POST /api/auth/register`
  * - `POST /api/auth/login`
+ * - `GET  /api/auth/session`
  * - `POST /api/auth/logout`
  * - `GET  /api/auth/verify/:token`    (Phase 3.5)
  * - `POST /api/auth/resend-verification` (Phase 3.5)
@@ -782,6 +827,10 @@ export async function handleAuthRoute(
 
   // ── GET /api/auth/verify/:token ──────────────────────────────────────────
   if (method === "GET") {
+    if (path === "/api/auth/session") {
+      return handleSession(req, resolvedDeps);
+    }
+
     const verifyMatch = path.match(/^\/api\/auth\/verify\/(.+)$/);
     if (verifyMatch) {
       const token = verifyMatch[1];

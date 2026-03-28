@@ -20,8 +20,10 @@
 
 		return async ({ result }) => {
 			if (result.type === 'redirect') {
+				isLoading = false;
 				await goto(result.location, {
-					replaceState: true
+					replaceState: true,
+					invalidateAll: true
 				});
 				return;
 			}
@@ -38,7 +40,7 @@
 </svelte:head>
 
 <AuthFormWrapper title="Inicia sesión">
-	<form method="POST" action="?/login" class="space-y-6" use:enhance={enhanceLogin} onsubmit={() => (isLoading = true)}>
+	<form method="POST" action="?/login" class="space-y-6" use:enhance={enhanceLogin}>
 		{#if isLoading}
 			<div
 				class="rounded-md border border-sky-200 bg-sky-50 p-3 text-sm text-sky-800 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-100"

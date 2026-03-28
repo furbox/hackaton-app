@@ -29,6 +29,7 @@ describe("health-checker.worker", () => {
     const methods: string[] = [];
     const statusCode = await checkUrlStatusCode("https://timeout.example.com", {
       timeoutMs: 50,
+      maxAttempts: 1, // Disable retries to test single-attempt behavior
       fetchImpl: async (_input, init) => {
         methods.push(init?.method ?? "GET");
         throw new DOMException("aborted", "AbortError");
@@ -43,6 +44,7 @@ describe("health-checker.worker", () => {
     const methods: string[] = [];
     const statusCode = await checkUrlStatusCode("https://offline.example.com", {
       timeoutMs: 50,
+      maxAttempts: 1, // Disable retries to test single-attempt behavior
       fetchImpl: async (_input, init) => {
         methods.push(init?.method ?? "GET");
         throw new Error("network down");
@@ -51,6 +53,61 @@ describe("health-checker.worker", () => {
 
     expect(statusCode).toBe(0);
     expect(methods).toEqual(["HEAD", "GET"]);
+  });
+
+  test("timeout retries with exponential backoff then fails", async () => {
+    const methods: string[] = [];
+    const delays: number[] = [];
+
+    const statusCode = await checkUrlStatusCode("https://retry-timeout.example.com", {
+      timeoutMs: 50,
+      maxAttempts: 3,
+      baseDelayMs: 100,
+      sleepImpl: async (ms) => {
+        delays.push(ms);
+      },
+      fetchImpl: async (_input, init) => {
+        methods.push(init?.method ?? "GET");
+        throw new DOMException("aborted", "AbortError");
+      },
+    });
+
+    expect(statusCode).toBe(-1);
+    expect(methods).toEqual(["HEAD", "HEAD", "HEAD"]);
+    expect(delays).toEqual([100, 200]); // Exponential backoff: 100ms, 200ms
+  });
+
+  test("5xx status retries with exponential backoff then succeeds", async () => {
+    const methods: string[] = [];
+    const delays: number[] = [];
+    let attempt = 0;
+
+    const statusCode = await checkUrlStatusCode("https://retry-5xx.example.com", {
+      timeoutMs: 50,
+      maxAttempts: 3,
+      baseDelayMs: 100,
+      sleepImpl: async (ms) => {
+        delays.push(ms);
+      },
+      fetchImpl: async (_input, init) => {
+        methods.push(init?.method ?? "GET");
+        attempt += 1;
+
+        if (attempt === 1) {
+          return new Response(null, { status: 503 });
+        }
+
+        if (attempt === 2) {
+          return new Response(null, { status: 502 });
+        }
+
+        return new Response(null, { status: 200 });
+      },
+    });
+
+    expect(statusCode).toBe(200);
+    expect(methods).toEqual(["HEAD", "HEAD", "HEAD"]);
+    expect(delays).toEqual([100, 200]); // Exponential backoff: 100ms, 200ms
   });
 
   test("fallback GET path works when HEAD fails", async () => {

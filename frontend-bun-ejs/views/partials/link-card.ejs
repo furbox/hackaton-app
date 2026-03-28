@@ -1,0 +1,125 @@
+<%
+  const rawUrl = typeof link.url === "string" ? link.url.trim() : "";
+  let hostname = "";
+
+  if (rawUrl.length > 0) {
+    try {
+      hostname = new URL(rawUrl).hostname;
+    } catch {
+      try {
+        hostname = new URL(`https://${rawUrl}`).hostname;
+      } catch {
+        hostname = "";
+      }
+    }
+  }
+
+  const fallbackName = "Link";
+  const displayName =
+    typeof link.title === "string" && link.title.trim().length > 0
+      ? link.title.trim()
+      : fallbackName;
+
+  const shortCode =
+    typeof link.short_code === "string" && link.short_code.trim().length > 0
+      ? link.short_code.trim()
+      : typeof link.shortCode === "string" && link.shortCode.trim().length > 0
+      ? link.shortCode.trim()
+      : "";
+  const shortHref = shortCode ? `/s/${encodeURIComponent(shortCode)}` : "#";
+
+  const ogImage =
+    typeof link.og_image === "string" && link.og_image.trim().length > 0
+      ? link.og_image.trim()
+      : typeof link.ogImage === "string" && link.ogImage.trim().length > 0
+      ? link.ogImage.trim()
+      : "";
+  const hasOgImage = ogImage.length > 0;
+  const faviconUrl = hostname
+    ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`
+    : "";
+  const mediaLinkClasses = hasOgImage
+    ? "block h-20 w-full shrink-0 overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5 sm:h-24 sm:w-32"
+    : "inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5";
+
+  const userData = link && typeof link.user === "object" && link.user !== null ? link.user : null;
+  const username =
+    typeof link.username === "string" && link.username.trim().length > 0
+      ? link.username.trim()
+      : userData && typeof userData.username === "string" && userData.username.trim().length > 0
+      ? userData.username.trim()
+      : typeof link.owner_username === "string" && link.owner_username.trim().length > 0
+      ? link.owner_username.trim()
+      : typeof link.ownerUsername === "string" && link.ownerUsername.trim().length > 0
+      ? link.ownerUsername.trim()
+      : "";
+  const avatarUrl =
+    typeof link.avatar_url === "string" && link.avatar_url.trim().length > 0
+      ? link.avatar_url.trim()
+      : typeof link.avatarUrl === "string" && link.avatarUrl.trim().length > 0
+      ? link.avatarUrl.trim()
+      : userData && typeof userData.avatar_url === "string" && userData.avatar_url.trim().length > 0
+      ? userData.avatar_url.trim()
+      : userData && typeof userData.avatarUrl === "string" && userData.avatarUrl.trim().length > 0
+      ? userData.avatarUrl.trim()
+      : "";
+  const userInitial = username.length > 0 ? username.charAt(0).toUpperCase() : "U";
+  const idSuffixRaw = typeof idSuffix === "string" ? idSuffix.trim() : "";
+  const idSuffixSafe = idSuffixRaw.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
+  const cardSuffix = idSuffixSafe.length > 0 ? `-${idSuffixSafe}` : "";
+%>
+
+<article
+  id="favorite-card-<%= link.id %><%= cardSuffix %>"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <a href="<%= shortHref %>" class="<%= mediaLinkClasses %>" target="_blank" rel="noopener noreferrer">
+      <% if (ogImage) { %>
+        <img src="<%= ogImage %>" alt="Imagen del enlace" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
+      <% } else if (faviconUrl) { %>
+        <img src="<%= faviconUrl %>" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+      <% } else { %>
+        <span class="text-xl text-text-secondary/70">🌐</span>
+      <% } %>
+    </a>
+
+    <div class="min-w-0 flex-1">
+      <a href="<%= shortHref %>" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="<%= displayName %>">
+        <%= displayName %>
+      </a>
+
+      <% if (username) { %>
+        <a href="/u/<%= encodeURIComponent(username) %>" class="mt-2 inline-flex max-w-full items-center gap-2 rounded-full border border-border/80 bg-slate-900/40 px-2.5 py-1 text-xs text-text-secondary transition-colors hover:border-accent-primary/40 hover:text-text-primary">
+          <span class="truncate">@<%= username %></span>
+        </a>
+      <% } %>
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-<%= link.id %><%= cardSuffix %>" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span><%= link.views || 0 %></span>
+      </span>
+      <%- include('./like-button', {
+        linkId: link.id,
+        idSuffix: idSuffixSafe,
+        liked: Boolean(link.liked_by_me),
+        count: Number(link.likes_count) || 0,
+      }) %>
+      <%- include('./favorite-button', {
+        linkId: link.id,
+        idSuffix: idSuffixSafe,
+        favorited: Boolean(link.favorited_by_me),
+        count: Number(link.favorites_count) || 0,
+      }) %>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,32 @@
+<div class="auth-container">
+  <div class="auth__header">
+    <h1 class="auth__title">🔗 URLoft</h1>
+    <p class="auth__subtitle">Conectá tu cuenta para guardar links</p>
+  </div>
+
+  <form id="auth-form" class="auth__form">
+    <div class="form-group">
+      <label for="api-key" class="form-label">API Key</label>
+      <input
+        type="text"
+        id="api-key"
+        class="form-input"
+        placeholder="urlk_a1b2c3d4..."
+        required
+        pattern="urlk_[a-f0-9]{32}"
+        autocomplete="off"
+        spellcheck="false"
+      >
+      <small class="form-help">
+        Pegá tu API Key desde
+        <a href="https://urloft.site/dashboard/keys" target="_blank" rel="noopener">
+          urloft.site/dashboard/keys
+        </a>
+      </small>
+    </div>
+
+    <button type="submit" class="btn btn--primary btn--full">Conectar</button>
+  </form>
+
+  <div id="error-message" class="error-message" hidden></div>
+</div>

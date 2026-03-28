@@ -20,7 +20,7 @@
 		goto(url.toString());
 	};
 
-	const visiblePages = $derived(() => {
+	const visiblePages = $derived.by(() => {
 		const pages: (number | string)[] = [];
 		const delta = 2;
 
@@ -98,7 +98,7 @@
 						</svg>
 					</button>
 
-					{#each visiblePages() as pageNum (pageNum)}
+					{#each visiblePages as pageNum (pageNum)}
 						{#if pageNum === '...'}
 							<span class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300">
 								...

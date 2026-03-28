@@ -4,6 +4,7 @@ import { closeDatabase, setTestDatabase } from "../../db/connection.js";
 import {
   createLink,
   deleteLink,
+  getFavoriteLinks,
   getLinkById,
   getLinks,
   previewLink,
@@ -22,7 +23,8 @@ function createSchema(db: Database): void {
   db.run(`
     CREATE TABLE users (
       id INTEGER PRIMARY KEY,
-      username TEXT NOT NULL
+      username TEXT NOT NULL,
+      avatar_url TEXT
     )
   `);
   db.run(`
@@ -57,6 +59,36 @@ function createSchema(db: Database): void {
       FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
       UNIQUE(user_id, url)
     )
+  `);
+  db.run(`
+    CREATE VIRTUAL TABLE links_fts USING fts5(
+      title,
+      description,
+      url,
+      content_text,
+      content='links',
+      content_rowid='id'
+    )
+  `);
+  db.run(`
+    CREATE TRIGGER links_ai AFTER INSERT ON links BEGIN
+      INSERT INTO links_fts(rowid, title, description, url, content_text)
+      VALUES (new.id, new.title, new.description, new.url, new.content_text);
+    END
+  `);
+  db.run(`
+    CREATE TRIGGER links_ad AFTER DELETE ON links BEGIN
+      INSERT INTO links_fts(links_fts, rowid, title, description, url, content_text)
+      VALUES('delete', old.id, old.title, old.description, old.url, old.content_text);
+    END
+  `);
+  db.run(`
+    CREATE TRIGGER links_au AFTER UPDATE ON links BEGIN
+      INSERT INTO links_fts(links_fts, rowid, title, description, url, content_text)
+      VALUES('delete', old.id, old.title, old.description, old.url, old.content_text);
+      INSERT INTO links_fts(rowid, title, description, url, content_text)
+      VALUES (new.id, new.title, new.description, new.url, new.content_text);
+    END
   `);
   db.run(`
     CREATE TABLE likes (
@@ -210,6 +242,95 @@ describe("links.service core CRUD", () => {
       expect(listed.data.limit).toBe(100);
       expect(listed.data.sort).toBe("recent");
       expect(Array.isArray(listed.data.items)).toBe(true);
+      expect(listed.data.items[0]?.ownerUsername).toBe("owner");
+      expect(listed.data.items[0]?.ownerAvatarUrl).toBeNull();
+    }
+  });
+
+  test("getLinks applies q filter when provided", () => {
+    const google = createLink({ userId: 1 }, {
+      url: "https://google.com",
+      title: "Google Search",
+      shortCode: "qf1111",
+      isPublic: true,
+    });
+
+    const bun = createLink({ userId: 1 }, {
+      url: "https://bun.sh",
+      title: "Bun Runtime",
+      shortCode: "qf1112",
+      isPublic: true,
+    });
+
+    if (!google.ok || !bun.ok) {
+      throw new Error("seed failed");
+    }
+
+    const listed = getLinks(null, {
+      ownerUserId: 1,
+      q: "google",
+      page: 1,
+      limit: 20,
+      sort: "recent",
+    });
+
+    expect(listed.ok).toBe(true);
+    if (listed.ok) {
+      expect(listed.data.items).toHaveLength(1);
+      expect(listed.data.items[0]?.id).toBe(google.data.id);
+    }
+  });
+
+  test("getFavoriteLinks requires auth and returns normalized favorite rows", () => {
+    const unauthorized = getFavoriteLinks(null);
+    expect(unauthorized.ok).toBe(false);
+    if (!unauthorized.ok) {
+      expect(unauthorized.error.code).toBe("UNAUTHORIZED");
+    }
+
+    const ownPrivate = createLink({ userId: 2 }, {
+      url: "https://favorite-own-private.example.com",
+      title: "own-private",
+      shortCode: "favpvt1",
+      isPublic: false,
+    });
+    const publicLink = createLink({ userId: 1 }, {
+      url: "https://favorite-public.example.com",
+      title: "public",
+      shortCode: "favpub1",
+      isPublic: true,
+    });
+
+    if (!ownPrivate.ok || !publicLink.ok) throw new Error("seed failed");
+
+    const favOwn = toggleFavorite({ userId: 2 }, ownPrivate.data.id);
+    const favPublic = toggleFavorite({ userId: 2 }, publicLink.data.id);
+    if (!favOwn.ok || !favPublic.ok) throw new Error("favorite seed failed");
+
+    const listed = getFavoriteLinks({ userId: 2 });
+    expect(listed.ok).toBe(true);
+
+    if (listed.ok) {
+      expect(Array.isArray(listed.data.links)).toBe(true);
+      expect(listed.data.links.length).toBe(2);
+
+      const ids = listed.data.links.map((link) => link.id);
+      expect(ids).toContain(ownPrivate.data.id);
+      expect(ids).toContain(publicLink.data.id);
+
+      for (const link of listed.data.links) {
+        expect(typeof link.shortCode).toBe("string");
+        expect(typeof link.views).toBe("number");
+        expect(typeof link.likesCount).toBe("number");
+        expect(typeof link.favoritesCount).toBe("number");
+        expect(typeof link.favoritedByMe).toBe("boolean");
+        expect(typeof link.ownerUsername).toBe("string");
+        expect(link.ownerAvatarUrl).toBeNull();
+      }
+
+      const owners = listed.data.links.map((link) => link.ownerUsername);
+      expect(owners).toContain("owner");
+      expect(owners).toContain("other");
     }
   });
 

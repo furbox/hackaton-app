@@ -1,5 +1,14 @@
 /**
  * Estado global de la sesión del usuario usando Svelte 5 Runes.
+ *
+ * SSR Safety: This singleton is ONLY imported in .svelte files (client-side).
+ * It is NOT imported in any hooks.server.ts, +layout.server.ts, or +page.server.ts.
+ * The dashboard layout has `ssr = false`, so SessionState is never instantiated
+ * or mutated during SSR. No browser guard is needed here.
+ *
+ * If this file is ever imported in a server-side context in the future, the
+ * setAuthenticated/setGuest calls MUST be wrapped with a `browser` guard from
+ * `$app/environment` to prevent cross-request reactive graph growth.
  */
 
 interface User {

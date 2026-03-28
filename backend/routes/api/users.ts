@@ -124,9 +124,9 @@ export async function handleUsersRoute(
       );
     }
 
-    const session = await resolvedDeps.getSession(request);
-    const actor = parseActorOptional(session);
-    const serviceResult = resolvedDeps.getPublicProfile(actor, { username });
+    // For public profile pages, always use actor=null to show ONLY public links
+    // regardless of who is viewing (even the profile owner)
+    const serviceResult = resolvedDeps.getPublicProfile(null, { username });
 
     if (!serviceResult.ok) {
       const { status, body } = mapPhase4ServiceError(serviceResult.error);

@@ -1,0 +1,91 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+  <!-- Profile header -->
+  <div class="ui-card p-8 mb-8">
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+
+      <!-- Avatar -->
+      <div class="flex-shrink-0">
+        <% if (profile.avatar_url) { %>
+          <img src="<%= profile.avatar_url %>" alt="<%= profile.username %>"
+               class="h-20 w-20 rounded-full border-2 border-accent-primary/35 object-cover" />
+        <% } else { %>
+          <div class="flex h-20 w-20 items-center justify-center rounded-full border-2 border-accent-primary/45 bg-accent-primary/12 text-3xl">
+            👤
+          </div>
+        <% } %>
+      </div>
+
+      <!-- Info -->
+      <div class="flex-1 text-center sm:text-left">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+          <h1 class="text-2xl font-bold text-text-primary"><%= profile.username %></h1>
+          <% if (profile.rank) { %>
+            <span class="inline-block rounded-full bg-accent-secondary/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-accent-secondary">
+              <%= profile.rank %>
+            </span>
+          <% } %>
+        </div>
+
+        <% if (profile.bio) { %>
+          <p class="max-w-md text-sm leading-relaxed text-text-secondary"><%= profile.bio %></p>
+        <% } %>
+
+        <!-- Stats row -->
+        <div class="flex items-center justify-center sm:justify-start gap-6 mt-4 text-sm">
+          <div class="text-center">
+            <div class="text-lg font-bold text-text-primary"><%= stats.totalLinks ?? createdLinks.length %></div>
+            <div class="text-xs text-text-secondary">Links</div>
+          </div>
+          <% if (stats.totalLikes !== undefined) { %>
+          <div class="text-center">
+            <div class="text-lg font-bold text-text-primary"><%= stats.totalLikes %></div>
+            <div class="text-xs text-text-secondary">Likes recibidos</div>
+          </div>
+          <% } %>
+          <% if (stats.totalViews !== undefined) { %>
+          <div class="text-center">
+            <div class="text-lg font-bold text-text-primary"><%= stats.totalViews %></div>
+            <div class="text-xs text-text-secondary">Vistas totales</div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Created links -->
+  <% if (createdLinks && createdLinks.length > 0) { %>
+    <h2 class="mb-5 text-xl font-semibold text-text-primary">
+      Links creados por <span class="text-accent-primary"><%= profile.username %></span>
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <% createdLinks.forEach(function(link) { %>
+        <%- include('../partials/link-card', { link: link, idSuffix: 'created' }) %>
+      <% }) %>
+    </div>
+
+    <div class="my-8 border-t border-border/70"></div>
+  <% } %>
+
+  <!-- Favorite links -->
+  <% if (favoriteLinks && favoriteLinks.length > 0) { %>
+    <h2 class="mb-5 text-xl font-semibold text-text-primary">
+      Favoritos de <span class="text-accent-secondary"><%= profile.username %></span>
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <% favoriteLinks.forEach(function(link) { %>
+        <%- include('../partials/link-card', { link: link, idSuffix: 'favorites' }) %>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <% if ((!createdLinks || createdLinks.length === 0) && (!favoriteLinks || favoriteLinks.length === 0)) { %>
+    <div class="py-16 text-center text-text-secondary">
+      <div class="text-4xl mb-3">📭</div>
+      <p class="font-medium">Este usuario no tiene contenido visible todavía.</p>
+    </div>
+  <% } %>
+
+</div>

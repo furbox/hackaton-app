@@ -69,54 +69,61 @@
 - [x] 6.3 Create `backend/skill/search.ts` with full-text search using FTS5
 - [x] 6.4 Create `backend/skill/extract.ts` with link metadata extraction endpoint
 
-## Phase 7: Frontend - SvelteKit Setup (6 tasks)
+## Phase 7-10: Frontend SvelteKit ❌ IGNORED
 
-- [ ] 7.1 Initialize SvelteKit project in `frontend/` with TypeScript and Tailwind
-- [ ] 7.2 Create file-based routing structure: `routes/`, `routes/(dashboard)/`, `routes/api/`
-- [ ] 7.3 Set up Svelte 5 Runes in `app.html` and configure `$state`, `$derived` stores
-- [ ] 7.4 Create shared layout `routes/+layout.svelte` with navigation and auth state
-- [ ] 7.5 Create dashboard layout `routes/(dashboard)/+layout.ts` with `ssr=false` for SPA behavior
-- [ ] 7.6 Set up SvelteKit server actions for form submissions (createLink, updateProfile, etc.)
+> **⚠️ DECISIÓN DE ARQUITECTURA:** El frontend SvelteKit ha sido reemplazado por **frontend-bun-ejs** (Bun + EJS + Tailwind).
+>
+> Las tareas de frontend ahora viven en **`TASKS_FRONTEND.md`**.
+>
+> **Razón:** Para el hackatón priorizamos velocidad de desarrollo y simplicidad. Bun + EJS nos permite:
+> - Zero-config build (Bun sirve estáticos directamente)
+> - Templates HTML simples y fáciles de modificar
+> - Integración directa con Tailwind vía CDN
+> - Menor curva de aprendizaje para presentaciones/demos
+>
+> **Estado del frontend SvelteKit:** Archivado en `frontend/` pero no activo. Puede reactivarse en el futuro si se desea migrar.
 
-## Phase 8: Frontend - Public Pages (5 tasks)
-
-- [ ] 8.1 Create `routes/+page.svelte` (Home) with hero section, featured links, top users, global stats
-- [ ] 8.2 Create `routes/explore/+page.svelte` with search, filters, and link cards
-- [ ] 8.3 Create `routes/u/[username]/+page.svelte` for public user profiles
-- [ ] 8.4 Create `routes/auth/login/+page.svelte` and `routes/auth/register/+page.svelte` with forms
-- [ ] 8.5 Create auth flow pages: verify, forgot-password, reset-password
-
-## Phase 9: Frontend - Dashboard Pages (7 tasks)
-
-- [ ] 9.1 Create `routes/(dashboard)/+page.svelte` (Dashboard home) with stats summary
-- [ ] 9.2 Create `routes/(dashboard)/links/+page.svelte` with CRUD table and filters
-- [ ] 9.3 Create `routes/(dashboard)/categories/+page.svelte` with category CRUD UI
-- [ ] 9.4 Create `routes/(dashboard)/keys/+page.svelte` with API key management
-- [ ] 9.5 Create `routes/(dashboard)/favorites/+page.svelte` with favorited links
-- [ ] 9.6 Create `routes/(dashboard)/profile/+page.svelte` with profile editing
-- [ ] 9.7 Create `routes/(dashboard)/import/+page.svelte` with bookmark HTML upload
-
-## Phase 10: Frontend Components (6 tasks)
-
-- [ ] 10.1 Create `LinkCard.svelte` with OG image, title, description, stats, like/favorite buttons
-- [ ] 10.2 Create `SearchBar.svelte` with debounced input and filter dropdown
-- [ ] 10.3 Create `CategoryBadge.svelte` with color display and link filtering
-- [ ] 10.4 Create `UserAvatar.svelte` with fallback initials and profile link
-- [ ] 10.5 Create `StatCard.svelte` for dashboard stats display
-- [ ] 10.6 Create `Modal.svelte` and `Toast.svelte` for feedback dialogs
+- [ ] 7.1 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 7.2 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 7.3 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 7.4 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 7.5 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 7.6 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 8.1 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 8.2 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 8.3 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 8.4 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 8.5 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.1 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.2 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.3 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.4 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.5 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.6 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 9.7 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 10.1 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 10.2 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 10.3 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 10.4 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 10.5 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
+- [ ] 10.6 ❌ IGNORED - See `TASKS_FRONTEND.md` for EJS frontend tasks
 
 ## Phase 11: Chrome Extension (4 tasks)
 
+> **⚠️ NOTA:** Originalmente planeado con Svelte, ahora usaremos HTML/JS vanilla o Alpine.js para el popup.
+
 - [ ] 11.1 Create `extension/manifest.json` with permissions (activeTab, storage) and background service worker
-- [ ] 11.2 Create `extension/popup/App.svelte` with save button, category selector, and API key input
+- [ ] 11.2 Create `extension/popup/` with HTML/CSS/JS popup (save button, category selector, API key input)
 - [ ] 11.3 Create `extension/background/service-worker.ts` with tab metadata extraction
-- [ ] 11.4 Build extension with `bun run ext:build` script using Vite
+- [ ] 11.4 Build extension with `bun run ext:build` script
 
 ## Phase 12: PWA Configuration (3 tasks)
 
-- [ ] 12.1 Create `public/manifest.json` with app name, icons, colors, and display mode
-- [ ] 12.2 Create `public/sw.js` service worker with offline support and asset caching
-- [ ] 12.3 Add PWA install prompt logic in frontend with beforeinstallprompt event
+> **⚠️ NOTA:** PWA se implementa en `frontend-bun-ejs/` (no en el frontend SvelteKit archivado).
+
+- [ ] 12.1 Create `frontend-bun-ejs/public/manifest.json` with app name, icons, colors, and display mode
+- [ ] 12.2 Create `frontend-bun-ejs/public/sw.js` service worker with offline support and asset caching
+- [ ] 12.3 Add PWA install prompt logic in EJS templates with beforeinstallprompt event
 
 ## Phase 13: Security & Rate Limiting (4 tasks)
 
@@ -127,35 +134,37 @@
 
 ## Phase 14: Testing Suite (5 tasks)
 
+> **⚠️ NOTA:** Testing de componentes Svelte reemplazado por testing de templates EJS (si aplica).
+
 - [ ] 14.1 Write `backend/__tests__/auth.test.ts` with register, login, logout flows
 - [ ] 14.2 Write `backend/__tests__/links.test.ts` with CRUD and pagination tests
 - [ ] 14.3 Write `backend/__tests__/workers.test.ts` with mock worker messaging
-- [ ] 14.4 Install Vitest + `@testing-library/svelte` and write component tests for LinkCard, SearchBar
+- [ ] 14.4 Smoke tests for EJS frontend (manual or with Playwright)
 - [ ] 14.5 Set up Playwright E2E tests for critical flows (register → create link → verify in dashboard)
 
 ## Phase 15: Deployment & Build (4 tasks)
 
-- [ ] 15.1 Verify `backend/bun.lock` and `frontend/bun.lock` are committed and dependencies resolve correctly
-- [ ] 15.2 Ensure frontend build command exists (`frontend/package.json` → `bun run build`) for production bundle
+- [ ] 15.1 Verify `backend/bun.lock` and `frontend-bun-ejs/bun.lock` are committed and dependencies resolve correctly
+- [ ] 15.2 Ensure frontend-bun-ejs dev command works (`frontend-bun-ejs/package.json` → `bun run dev`)
 - [ ] 15.3 Create `.env.example` with all required variables (`BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `TRUST_PROXY`, `RESEND_API_KEY`, `DATABASE_URL`)
 - [ ] 15.4 Write deployment scripts for Railway/Fly.io with health check and startup commands
 
-**Total Tasks: 88**
+**Total Tasks: 88** (24 frontend tasks archived, see `TASKS_FRONTEND.md` for EJS tasks)
 
 ---
 
 ## Implementation Order
 
-**Critical Path:** Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 7 → Phase 8 → Phase 9
+**Critical Path (Backend):** Phase 1 → Phase 2 → Phase 3 → Phase 4 ✅ COMPLETO
+
+**Critical Path (Frontend):** Ver `TASKS_FRONTEND.md` para roadmap completo de `frontend-bun-ejs/`
 
 **Parallelizable:**
 - Phase 5 (Workers) can run parallel to Phase 4
-- Phase 10 (Components) can start during Phase 8
 - Phase 11 (Extension) and Phase 12 (PWA) are independent
 - Phase 14 (Testing) should run alongside each phase
 
 **Dependencies:**
 - Phase 3 (Auth) must complete before Phase 4 (Core APIs)
 - Phase 2 (DB) must complete before Phase 3
-- Phase 4 (Backend APIs) must partially complete before Phase 7 (Frontend integration)
-- Phase 7 (Frontend setup) must complete before Phase 8 and 9 (Pages)
+- Phase 4 (Backend APIs) must partially complete before Frontend integration

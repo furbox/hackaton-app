@@ -1,0 +1,58 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Page header -->
+  <div class="mb-8">
+    <h1 class="mb-1 text-3xl font-bold text-text-primary">Explorar links</h1>
+    <p class="text-text-secondary">Descubrí lo que la comunidad está guardando.</p>
+  </div>
+
+  <!-- Search + filter bar -->
+  <form method="GET" action="/explore" class="flex flex-col sm:flex-row gap-3 mb-8">
+    <!-- Search input -->
+    <div class="flex-1">
+      <input
+        type="text"
+        name="q"
+        value="<%= query.q %>"
+        placeholder="Buscar links..."
+        class="ui-input"
+      />
+    </div>
+
+    <!-- Sort select -->
+    <select name="sort"
+            class="ui-select">
+      <option value="recent"  <%= query.sort === 'recent'    ? 'selected' : '' %>>Más recientes</option>
+      <option value="likes"   <%= query.sort === 'likes'     ? 'selected' : '' %>>Más likes</option>
+      <option value="views"   <%= query.sort === 'views'     ? 'selected' : '' %>>Más vistos</option>
+      <option value="favorites" <%= query.sort === 'favorites' ? 'selected' : '' %>>Más favoritos</option>
+    </select>
+
+    <button type="submit"
+            class="ui-btn-primary px-6 py-2.5 text-sm font-semibold">
+      Buscar
+    </button>
+  </form>
+
+  <!-- Results -->
+  <% if (links && links.length > 0) { %>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <% links.forEach(function(link) { %>
+        <%- include('../partials/link-card', { link: link }) %>
+      <% }) %>
+    </div>
+
+    <!-- Pagination -->
+    <%- include('../partials/pagination', { page: query.page, totalPages: totalPages, hasNextPage: hasNextPage, baseUrl: baseUrl }) %>
+  <% } else { %>
+    <div class="py-20 text-center text-text-secondary">
+      <div class="text-5xl mb-4">🔍</div>
+      <p class="text-lg font-medium text-text-primary">No se encontraron links</p>
+      <p class="text-sm mt-2">Intentá con otra búsqueda o explorá sin filtros.</p>
+      <a href="/explore" class="mt-6 inline-block text-sm font-medium text-accent-primary hover:underline">
+        Limpiar filtros
+      </a>
+    </div>
+  <% } %>
+
+</div>

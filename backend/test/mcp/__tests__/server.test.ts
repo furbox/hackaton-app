@@ -66,7 +66,7 @@ describe("MCP server route", () => {
       name: "URLoft MCP Server",
       endpoint: "/mcp",
       protocol: "JSON-RPC 2.0",
-      methods: ["tools/list", "tools/call"],
+      methods: ["initialize", "notifications/initialized", "tools/list", "tools/call"],
     });
   });
 
@@ -94,19 +94,60 @@ describe("MCP server route", () => {
     });
   });
 
-  test("returns invalid request when JSON-RPC envelope is incomplete", async () => {
-    const request = rpcRequest({ jsonrpc: "2.0", method: "tools/list" });
+  test("accepts notifications/initialized without id", async () => {
+    const request = new Request("http://localhost:3000/mcp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "notifications/initialized",
+      }),
+    });
 
     const response = await handleMcpRoute(request, "/mcp", buildDeps());
-    expect(response?.status).toBe(400);
+    expect(response?.status).toBe(204);
+    expect(mockVerifyApiKey).not.toHaveBeenCalled();
+  });
+
+  test("supports initialize without API key", async () => {
+    const request = new Request("http://localhost:3000/mcp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "initialize",
+        params: {
+          protocolVersion: "2024-11-05",
+          clientInfo: {
+            name: "MCP Inspector",
+            version: "1.0.0",
+          },
+        },
+        id: 1,
+      }),
+    });
+
+    const response = await handleMcpRoute(request, "/mcp", buildDeps());
+    expect(response?.status).toBe(200);
+    expect(mockVerifyApiKey).not.toHaveBeenCalled();
 
     const body = await response?.json();
     expect(body).toEqual({
       jsonrpc: "2.0",
-      id: null,
-      error: {
-        code: -32600,
-        message: "Invalid request",
+      id: 1,
+      result: {
+        protocolVersion: "2024-11-05",
+        capabilities: {
+          tools: {},
+        },
+        serverInfo: {
+          name: "URLoft MCP Server",
+          version: "0.4.0",
+        },
       },
     });
   });
@@ -245,8 +286,67 @@ describe("MCP server route", () => {
       jsonrpc: "2.0",
       id: 3,
       result: {
-        id: 1,
-        actor: 7,
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(
+              {
+                id: 1,
+                actor: 7,
+              },
+              null,
+              2
+            ),
+          },
+        ],
+        structuredContent: {
+          id: 1,
+          actor: 7,
+        },
+      },
+    });
+  });
+
+  test("keeps MCP-native tools/call response shape when handler already returns content", async () => {
+    const tools: Record<string, MCPToolDefinition> = {
+      get_link: {
+        name: "get_link",
+        description: "Get a link by id",
+        inputSchema: { type: "object", required: ["id"] },
+        handler: () => ({
+          content: [
+            {
+              type: "text",
+              text: "ok",
+            },
+          ],
+          structuredContent: { ok: true },
+        }),
+      },
+    };
+
+    const request = rpcRequest({
+      jsonrpc: "2.0",
+      method: "tools/call",
+      params: { name: "get_link", input: { id: 1 } },
+      id: 31,
+    });
+
+    const response = await handleMcpRoute(request, "/mcp", buildDeps(tools));
+    expect(response?.status).toBe(200);
+
+    const body = await response?.json();
+    expect(body).toEqual({
+      jsonrpc: "2.0",
+      id: 31,
+      result: {
+        content: [
+          {
+            type: "text",
+            text: "ok",
+          },
+        ],
+        structuredContent: { ok: true },
       },
     });
   });

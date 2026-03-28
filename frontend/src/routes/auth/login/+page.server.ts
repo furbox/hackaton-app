@@ -23,7 +23,11 @@ function mapLoginErrorMessage(code: string | undefined, message: string): string
 	return message;
 }
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals, url }) => {
+	if (locals.session?.user) {
+		throw redirect(303, resolvePostLoginPath(url));
+	}
+
 	return {};
 };
 

@@ -50,6 +50,27 @@ export interface UserPublicProfile {
   total_likes: number;
 }
 
+export interface UserProfileLinkRow {
+  id: number;
+  user_id: number;
+  url: string;
+  title: string;
+  description: string | null;
+  short_code: string;
+  is_public: number;
+  category_id: number | null;
+  views: number;
+  created_at: string;
+  likes_count: number;
+  favorites_count: number;
+  liked_by_me: number;
+  favorited_by_me: number;
+  category_name: string | null;
+  category_color: string | null;
+  owner_username: string;
+  owner_avatar_url: string | null;
+}
+
 // ============================================================================
 // PREPARED STATEMENT FACTORIES
 // ============================================================================
@@ -75,7 +96,7 @@ const getUserStatsByIdStmt = () => getDb().prepare(`
 const getGlobalStatsStmt = () => getDb().prepare(`
   SELECT
     (SELECT COUNT(*) FROM users) as total_users,
-    (SELECT COUNT(*) FROM links WHERE is_public = 1) as total_links,
+    (SELECT COUNT(*) FROM links) as total_links,
     (SELECT COUNT(*) FROM categories) as total_categories
 `);
 
@@ -94,6 +115,81 @@ const getUserPublicProfileStmt = () => getDb().prepare(`
   LEFT JOIN likes lk ON l.id = lk.link_id
   WHERE u.username = ?
   GROUP BY u.id
+`);
+
+const getProfileCreatedLinksVisibleToActorStmt = () => getDb().prepare(`
+  SELECT
+    l.id,
+    l.user_id,
+    l.url,
+    l.title,
+    l.description,
+    l.short_code,
+    l.is_public,
+    l.category_id,
+    l.views,
+    l.created_at,
+    COUNT(DISTINCT lk.user_id) as likes_count,
+    COUNT(DISTINCT fav_all.user_id) as favorites_count,
+    EXISTS(
+      SELECT 1 FROM likes lk_me
+      WHERE lk_me.link_id = l.id AND lk_me.user_id = ?
+    ) AS liked_by_me,
+    EXISTS(
+      SELECT 1 FROM favorites fav_me
+      WHERE fav_me.link_id = l.id AND fav_me.user_id = ?
+    ) AS favorited_by_me,
+    c.name AS category_name,
+    c.color AS category_color,
+    owner.username AS owner_username,
+    owner.avatar_url AS owner_avatar_url
+  FROM links l
+  INNER JOIN users owner ON owner.id = l.user_id
+  LEFT JOIN likes lk ON lk.link_id = l.id
+  LEFT JOIN favorites fav_all ON fav_all.link_id = l.id
+  LEFT JOIN categories c ON c.id = l.category_id
+  WHERE l.user_id = ?
+    AND (l.is_public = 1 OR (? IS NOT NULL AND l.user_id = ?))
+  GROUP BY l.id
+  ORDER BY l.created_at DESC
+`);
+
+const getProfileFavoriteLinksVisibleToActorStmt = () => getDb().prepare(`
+  SELECT
+    l.id,
+    l.user_id,
+    l.url,
+    l.title,
+    l.description,
+    l.short_code,
+    l.is_public,
+    l.category_id,
+    l.views,
+    l.created_at,
+    COUNT(DISTINCT lk.user_id) as likes_count,
+    COUNT(DISTINCT fav_all.user_id) as favorites_count,
+    EXISTS(
+      SELECT 1 FROM likes lk_me
+      WHERE lk_me.link_id = l.id AND lk_me.user_id = ?
+    ) AS liked_by_me,
+    EXISTS(
+      SELECT 1 FROM favorites fav_me
+      WHERE fav_me.link_id = l.id AND fav_me.user_id = ?
+    ) AS favorited_by_me,
+    c.name AS category_name,
+    c.color AS category_color,
+    owner.username AS owner_username,
+    owner.avatar_url AS owner_avatar_url
+  FROM favorites fav_profile
+  INNER JOIN links l ON l.id = fav_profile.link_id
+  INNER JOIN users owner ON owner.id = l.user_id
+  LEFT JOIN likes lk ON lk.link_id = l.id
+  LEFT JOIN favorites fav_all ON fav_all.link_id = l.id
+  LEFT JOIN categories c ON c.id = l.category_id
+  WHERE fav_profile.user_id = ?
+    AND (l.is_public = 1 OR (? IS NOT NULL AND l.user_id = ?))
+  GROUP BY l.id
+  ORDER BY fav_profile.created_at DESC
 `);
 
 // ============================================================================
@@ -165,4 +261,32 @@ export function getGlobalStats(): GlobalStatsRow {
 export function getUserPublicProfile(username: string): UserPublicProfile | null {
   const stmt = getUserPublicProfileStmt();
   return stmt.get(username) as UserPublicProfile | null;
+}
+
+export function getProfileCreatedLinksVisibleToActor(
+  profileUserId: number,
+  actorUserId?: number
+): UserProfileLinkRow[] {
+  const stmt = getProfileCreatedLinksVisibleToActorStmt();
+  return stmt.all(
+    actorUserId ?? null,
+    actorUserId ?? null,
+    profileUserId,
+    actorUserId ?? null,
+    actorUserId ?? null
+  ) as UserProfileLinkRow[];
+}
+
+export function getProfileFavoriteLinksVisibleToActor(
+  profileUserId: number,
+  actorUserId?: number
+): UserProfileLinkRow[] {
+  const stmt = getProfileFavoriteLinksVisibleToActorStmt();
+  return stmt.all(
+    actorUserId ?? null,
+    actorUserId ?? null,
+    profileUserId,
+    actorUserId ?? null,
+    actorUserId ?? null
+  ) as UserProfileLinkRow[];
 }
