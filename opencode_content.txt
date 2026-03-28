@@ -1,0 +1,87 @@
+GitHub [132K]
+Documentación
+Zen
+Go
+Enterprise
+Gratis
+Nuevo
+Aplicación de escritorio disponible en beta en macOS, Windows y Linux.
+Descargar ahora
+El agente de codificación IA de código abierto
+
+Modelos gratuitos incluidos o conecta cualquier modelo de cualquier proveedor,
+incluyendo Claude, GPT, Gemini y más.
+
+curl
+npm
+bun
+brew
+paru
+curl -fsSL https://opencode.ai/install | bash
+¿Qué es OpenCode?
+
+OpenCode es un agente de código abierto que te ayuda a escribir código en tu terminal, IDE o escritorio.
+
+[*]
+LSP habilitado Carga automáticamente los LSPs correctos para el LLM
+[*]
+Multi-sesión Inicia múltiples agentes en paralelo en el mismo proyecto
+[*]
+Compartir enlaces Comparte un enlace a cualquier sesión para referencia o depuración
+[*]
+GitHub Copilot Inicia sesión con GitHub para usar tu cuenta de Copilot
+[*]
+ChatGPT Plus/Pro Inicia sesión con OpenAI para usar tu cuenta de ChatGPT Plus o Pro
+[*]
+Cualquier modelo Más de 75 proveedores de LLM a través de Models.dev, incluyendo modelos locales
+[*]
+Cualquier editor Disponible como interfaz de terminal, aplicación de escritorio y extensión de IDE
+Leer documentación
+El agente de codificación IA de código abierto
+[*]
+
+Con más de 120,000 estrellas en GitHub, 800 colaboradores y más de 10,000 commits, OpenCode es usado y confiado por más de 5M desarrolladores cada mes.
+
+Fig 1.
+120K
+Estrellas en GitHub
+Fig 2.
+800
+Colaboradores
+Fig 3.
+5M
+Desarrolladores Mensuales
+Creado pensando en la privacidad
+[*]
+
+OpenCode no almacena tu código ni datos de contexto, para que pueda operar en entornos sensibles a la privacidad. Más información sobre privacidad.
+
+FAQ
+¿Qué es OpenCode?
+¿Cómo uso OpenCode?
+¿Necesito suscripciones extra de IA para usar OpenCode?
+¿Puedo usar mis suscripciones de IA existentes con OpenCode?
+¿Solo puedo usar OpenCode en la terminal?
+¿Cuánto cuesta OpenCode?
+¿Qué hay sobre datos y privacidad?
+¿Es OpenCode de código abierto?
+Accede a modelos optimizados y confiables para agentes de codificación
+
+Zen te da acceso a un conjunto seleccionado de modelos de IA que OpenCode ha probado y evaluado específicamente para agentes de codificación. No necesitas preocuparte por el rendimiento y la calidad inconsistentes entre proveedores, usa modelos validados que funcionan.
+
+Aprende sobre Zen
+Sé el primero en enterarte cuando lancemos nuevos productos
+
+Únete a la lista de espera para acceso anticipado.
+
+Suscribirse
+GitHub [132 mil]
+Documentación
+Registro de cambios
+Discord
+X
+©2026 Anomaly
+Marca
+Privacidad
+Términos
+Español

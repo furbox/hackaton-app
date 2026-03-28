@@ -50,6 +50,9 @@ export interface CreateLinkInput {
   url: string;
   title: string;
   description?: string | null;
+  ogTitle?: string | null;
+  ogDescription?: string | null;
+  ogImage?: string | null;
   shortCode: string;
   isPublic?: boolean;
   categoryId?: number | null;
@@ -70,6 +73,9 @@ export interface UpdateLinkInput {
     url?: string;
     title?: string;
     description?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    ogImage?: string | null;
     isPublic?: boolean;
     categoryId?: number | null;
   };
@@ -404,6 +410,9 @@ export function createLink(
     url,
     title,
     description: input.description ?? null,
+    og_title: input.ogTitle ?? null,
+    og_description: input.ogDescription ?? null,
+    og_image: input.ogImage ?? null,
     short_code: shortCode,
     is_public: input.isPublic === false ? 0 : 1,
     category_id: input.categoryId ?? null,
@@ -591,6 +600,9 @@ export function updateLink(
   if ("url" in input.patch) patch.url = input.patch.url;
   if ("title" in input.patch) patch.title = input.patch.title;
   if ("description" in input.patch) patch.description = input.patch.description ?? null;
+  if ("ogTitle" in input.patch) patch.og_title = input.patch.ogTitle ?? null;
+  if ("ogDescription" in input.patch) patch.og_description = input.patch.ogDescription ?? null;
+  if ("ogImage" in input.patch) patch.og_image = input.patch.ogImage ?? null;
   if ("isPublic" in input.patch) patch.is_public = input.patch.isPublic ? 1 : 0;
   if ("categoryId" in input.patch) patch.category_id = input.patch.categoryId ?? null;
 

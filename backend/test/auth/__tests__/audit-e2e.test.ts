@@ -427,7 +427,7 @@ describe("E2E: Complete user lifecycle audit trail", () => {
     const resetPasswordResponse = await callRoute(
       makePost("/api/auth/reset-password", {
         token: resetToken,
-        newPassword: TEST_USER.newPassword,
+        password: TEST_USER.newPassword,
       }),
       "/api/auth/reset-password"
     );

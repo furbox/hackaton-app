@@ -1,9 +1,15 @@
 <div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
   <div class="w-full max-w-md text-center">
 
+    <img
+      src="/public/logo-urloft.png"
+      alt="URLoft logo"
+      class="mx-auto mb-6 h-14 w-14 rounded-2xl border border-border/80 bg-slate-950/40 object-cover p-1 shadow-lg shadow-black/35"
+    />
+
     <% if (verified) { %>
       <!-- Success -->
-      <div class="text-6xl mb-4">✅</div>
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-success/30 bg-success/12 text-4xl">✅</div>
       <h1 class="mb-3 text-2xl font-bold text-text-primary">¡Email verificado!</h1>
       <p class="mb-8 text-sm leading-relaxed text-text-secondary">
         <%= message %>
@@ -14,7 +20,7 @@
       </a>
     <% } else { %>
       <!-- Error -->
-      <div class="text-6xl mb-4">❌</div>
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-error/35 bg-error/12 text-4xl">❌</div>
       <h1 class="mb-3 text-2xl font-bold text-text-primary">Token inválido</h1>
       <p class="mb-8 text-sm leading-relaxed text-text-secondary">
         <%= message %>

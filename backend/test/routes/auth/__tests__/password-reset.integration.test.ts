@@ -209,7 +209,7 @@ describe("POST /api/auth/reset-password", () => {
     const hash = await hashResetToken(token);
     insertPasswordResetToken(userId, hash);
 
-    const req = makePost("/api/auth/reset-password", { token, newPassword: "NewPass123" });
+    const req = makePost("/api/auth/reset-password", { token, password: "NewPass123" });
     const res = await callRoute(req, "/api/auth/reset-password");
     expect(res.status).toBe(200);
     const body = await res.json() as { message: string };
@@ -226,7 +226,7 @@ describe("POST /api/auth/reset-password", () => {
   });
 
   test("invalid token returns RESET_TOKEN_INVALID", async () => {
-    const req = makePost("/api/auth/reset-password", { token: "nope", newPassword: "NewPass123" });
+    const req = makePost("/api/auth/reset-password", { token: "nope", password: "NewPass123" });
     const res = await callRoute(req, "/api/auth/reset-password");
     expect(res.status).toBe(400);
     const body = await res.json() as { code: string };
@@ -241,7 +241,7 @@ describe("POST /api/auth/reset-password", () => {
     const past = formatSqlDatetime(new Date(Date.now() - 2 * 60 * 60 * 1000));
     testDb.run("UPDATE password_resets SET expires_at = ? WHERE id = ?", [past, insertedId]);
 
-    const req = makePost("/api/auth/reset-password", { token, newPassword: "NewPass123" });
+    const req = makePost("/api/auth/reset-password", { token, password: "NewPass123" });
     const res = await callRoute(req, "/api/auth/reset-password");
     expect(res.status).toBe(400);
     const body = await res.json() as { code: string };
@@ -255,7 +255,7 @@ describe("POST /api/auth/reset-password", () => {
     insertPasswordResetToken(userId, hash);
     await consumePasswordResetToken(hash);
 
-    const req = makePost("/api/auth/reset-password", { token, newPassword: "NewPass123" });
+    const req = makePost("/api/auth/reset-password", { token, password: "NewPass123" });
     const res = await callRoute(req, "/api/auth/reset-password");
     expect(res.status).toBe(400);
     const body = await res.json() as { code: string };

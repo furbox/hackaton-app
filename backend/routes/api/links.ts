@@ -163,7 +163,17 @@ async function parseJsonObjectBody(request: Request): Promise<Record<string, unk
 }
 
 function parseCreateLinkInput(body: Record<string, unknown>): CreateLinkInput | Response {
-  const { url, title, shortCode, description, isPublic, categoryId } = body;
+  const {
+    url,
+    title,
+    shortCode,
+    description,
+    ogTitle,
+    ogDescription,
+    ogImage,
+    isPublic,
+    categoryId,
+  } = body;
 
   if (typeof url !== "string" || typeof title !== "string" || typeof shortCode !== "string") {
     return validationError("url, title and shortCode must be strings");
@@ -171,6 +181,18 @@ function parseCreateLinkInput(body: Record<string, unknown>): CreateLinkInput | 
 
   if (description !== undefined && description !== null && typeof description !== "string") {
     return validationError("description must be a string or null");
+  }
+
+  if (ogTitle !== undefined && ogTitle !== null && typeof ogTitle !== "string") {
+    return validationError("ogTitle must be a string or null");
+  }
+
+  if (ogDescription !== undefined && ogDescription !== null && typeof ogDescription !== "string") {
+    return validationError("ogDescription must be a string or null");
+  }
+
+  if (ogImage !== undefined && ogImage !== null && typeof ogImage !== "string") {
+    return validationError("ogImage must be a string or null");
   }
 
   if (isPublic !== undefined && typeof isPublic !== "boolean") {
@@ -191,6 +213,15 @@ function parseCreateLinkInput(body: Record<string, unknown>): CreateLinkInput | 
 
   if (description !== undefined) {
     input.description = description;
+  }
+  if (ogTitle !== undefined) {
+    input.ogTitle = ogTitle;
+  }
+  if (ogDescription !== undefined) {
+    input.ogDescription = ogDescription;
+  }
+  if (ogImage !== undefined) {
+    input.ogImage = ogImage;
   }
   if (isPublic !== undefined) {
     input.isPublic = isPublic;
@@ -224,6 +255,27 @@ function parseUpdateLinkPatch(body: Record<string, unknown>): UpdateLinkInput["p
       return validationError("description must be a string or null");
     }
     patch.description = body.description;
+  }
+
+  if (hasOwn(body, "ogTitle")) {
+    if (body.ogTitle !== null && typeof body.ogTitle !== "string") {
+      return validationError("ogTitle must be a string or null");
+    }
+    patch.ogTitle = body.ogTitle;
+  }
+
+  if (hasOwn(body, "ogDescription")) {
+    if (body.ogDescription !== null && typeof body.ogDescription !== "string") {
+      return validationError("ogDescription must be a string or null");
+    }
+    patch.ogDescription = body.ogDescription;
+  }
+
+  if (hasOwn(body, "ogImage")) {
+    if (body.ogImage !== null && typeof body.ogImage !== "string") {
+      return validationError("ogImage must be a string or null");
+    }
+    patch.ogImage = body.ogImage;
   }
 
   if (hasOwn(body, "isPublic")) {

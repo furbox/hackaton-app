@@ -25,7 +25,7 @@ import { loadTemplate } from "../emails/load-template.js";
 
 const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
 const DEFAULT_EMAIL_FROM = "URLoft <noreply@urloft.site>";
-const DEFAULT_FRONTEND_URL = "http://localhost:5173";
+const DEFAULT_FRONTEND_URL = "http://localhost:3001";
 const RESET_EMAIL_SUBJECT = "Reset your URLoft password";
 
 // ---------------------------------------------------------------------------

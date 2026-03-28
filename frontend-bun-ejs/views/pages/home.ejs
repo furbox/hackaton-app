@@ -22,14 +22,43 @@
     <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
       <a href="/auth/register"
          class="ui-btn-primary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
-        Empezar gratis →
+        Empezar gratis
       </a>
       <a href="/explore"
          class="ui-btn-secondary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
-        Explorar links públicos
+        Explorar links publicos
       </a>
     </div>
 
+  </div>
+</section>
+
+<!-- Problem + Solution -->
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <article class="ui-card p-6 sm:p-8">
+        <p class="mb-3 inline-flex rounded-full bg-warning/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-warning">
+          Problema
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Tus links estan por todos lados</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          Notas rapidas, chats, favoritos del navegador y docs sueltos. Cuando necesitas algo importante,
+          perdes tiempo buscando en cinco lugares distintos.
+        </p>
+      </article>
+
+      <article class="ui-card p-6 sm:p-8 border-accent-primary/40">
+        <p class="mb-3 inline-flex rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-success">
+          Solucion URLoft
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Una sola biblioteca, con control total</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          URLoft centraliza todos tus enlaces, permite busqueda full-text real y te deja decidir si cada link
+          es publico o privado segun el contexto.
+        </p>
+      </article>
+    </div>
   </div>
 </section>
 
@@ -47,7 +76,7 @@
       </div>
       <div>
         <div class="text-4xl font-extrabold mb-1"><%= stats.totalCategories %></div>
-        <div class="font-medium text-text-secondary">Categorías</div>
+        <div class="font-medium text-text-secondary">Categorias</div>
       </div>
     </div>
   </div>
@@ -77,68 +106,210 @@
   <div class="max-w-6xl mx-auto">
 
     <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">
-      Todo lo que necesitás en un solo lugar
+      Features principales para ganar velocidad
     </h2>
     <p class="mx-auto mb-16 max-w-xl text-center text-text-secondary">
-      URLoft combina las mejores herramientas para gestionar tus links de forma inteligente.
+      Todo lo necesario para guardar, encontrar y activar conocimiento sin friccion.
     </p>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-      <!-- Feature 1 -->
       <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
         <div class="text-3xl mb-4">🔗</div>
-        <h3 class="mb-2 text-lg font-bold text-text-primary">Short Links</h3>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Guardado inteligente + short links</h3>
         <p class="text-sm leading-relaxed text-text-secondary">
-          Acortá cualquier URL y rastreá los clicks en tiempo real desde tu dashboard.
+          Guarda cualquier URL con metadata automatica y compartila con enlaces cortos listos para usar.
         </p>
       </div>
 
-      <!-- Feature 2 -->
       <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
         <div class="text-3xl mb-4">🔍</div>
-        <h3 class="mb-2 text-lg font-bold text-text-primary">Búsqueda Full-Text</h3>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Busqueda full-text con filtros</h3>
         <p class="text-sm leading-relaxed text-text-secondary">
-          Encontrá cualquier link al instante con búsqueda inteligente potenciada por SQLite FTS5.
+          Encuentra al instante por titulo, descripcion o contenido, filtrando por categoria y popularidad.
         </p>
       </div>
 
-      <!-- Feature 3 -->
-      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
-        <div class="text-3xl mb-4">🤖</div>
-        <h3 class="mb-2 text-lg font-bold text-text-primary">MCP Server</h3>
-        <p class="text-sm leading-relaxed text-text-secondary">
-          Conectá tu IA favorita y manejá todos tus links con comandos en lenguaje natural.
-        </p>
-      </div>
-
-      <!-- Feature 4 -->
       <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
         <div class="text-3xl mb-4">📁</div>
-        <h3 class="mb-2 text-lg font-bold text-text-primary">Categorías</h3>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Categorias, favoritos e importacion</h3>
         <p class="text-sm leading-relaxed text-text-secondary">
-          Organizá tus links con categorías personalizadas y colores para encontrarlos fácil.
+          Ordena por temas, marca favoritos y migra tus bookmarks de navegador en minutos.
         </p>
       </div>
 
-      <!-- Feature 5 -->
       <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
-        <div class="text-3xl mb-4">❤️</div>
-        <h3 class="mb-2 text-lg font-bold text-text-primary">Likes y Favoritos</h3>
+        <div class="text-3xl mb-4">🔐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Privacidad publico/privado</h3>
         <p class="text-sm leading-relaxed text-text-secondary">
-          Guardá los mejores links de la comunidad y descubrí los más populares.
+          Decide que compartis con la comunidad y que queda solo para tu espacio interno.
         </p>
       </div>
 
-      <!-- Feature 6 -->
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🌐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Descubrimiento social</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Explora perfiles, likes y vistas para detectar rapido lo mas valioso de la comunidad.
+        </p>
+      </div>
+
       <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
         <div class="text-3xl mb-4">📱</div>
-        <h3 class="mb-2 text-lg font-bold text-text-primary">PWA + Extensión</h3>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Productividad diaria</h3>
         <p class="text-sm leading-relaxed text-text-secondary">
-          Instalalo en tu móvil o usá la extensión de Chrome para guardar links al instante.
+          Dashboard web, extension de Chrome y experiencia PWA para capturar links desde cualquier contexto.
         </p>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- Chrome Extension -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+    <article class="ui-card p-6 lg:col-span-2">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-accent-primary">Extension Chrome</p>
+      <h2 class="mb-3 text-2xl font-bold text-text-primary">Guarda links sin salir de la pagina donde estas</h2>
+      <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+        Con un click capturas URL, titulo y contexto. Ideal para research, curacion de contenido y trabajo diario
+        en equipo durante el hackathon.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Manifest V3</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Popup rapido</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Flujo 1 click</span>
+      </div>
+    </article>
+    <article class="ui-card p-6">
+      <h3 class="mb-3 text-lg font-bold text-text-primary">Por que suma</h3>
+      <ul class="space-y-2 text-sm text-text-secondary">
+        <li>Reduce friccion al capturar referencias.</li>
+        <li>Evita perder links entre pestanas abiertas.</li>
+        <li>Acelera la carga de conocimiento compartido.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- AI Integration -->
+<section class="py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Integracion con IA</h2>
+    <p class="mx-auto mb-10 max-w-2xl text-center text-text-secondary">
+      URLoft se conecta con asistentes para operar tus links desde lenguaje natural, sin inventar workflows nuevos.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">MCP Server</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Expone herramientas para crear, listar, actualizar y buscar links autenticados via API key.
+        </p>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">Web Skill</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Endpoints de search, lookup y extract para que una IA consulte tu biblioteca con contexto util.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Security -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Seguridad de base, no parche</h2>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Better Auth</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Sesiones seguras</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Revocacion inmediata</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Rate limiting</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Audit log</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technology -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Tecnologia completa, sin complejidad innecesaria</h2>
+    <p class="mx-auto mb-12 max-w-3xl text-center text-text-secondary">
+      Stack del producto URLoft pensado para shipping rapido: backend robusto, datos embebidos y ecosistema listo para web, extension e integraciones IA.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Core tecnico</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Backend:</span> Bun + TypeScript.</li>
+          <li><span class="text-text-primary font-semibold">Data:</span> SQLite + FTS5 para busqueda full-text.</li>
+          <li><span class="text-text-primary font-semibold">Auth:</span> Better Auth con sesiones stateful.</li>
+          <li><span class="text-text-primary font-semibold">Workers:</span> procesos asincronos para tareas pesadas.</li>
+        </ul>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Ecosistema de producto</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Sitio actual:</span> esta home esta renderizada con Bun + EJS.</li>
+          <li><span class="text-text-primary font-semibold">Canales:</span> extension Chrome + PWA instalable.</li>
+          <li><span class="text-text-primary font-semibold">IA:</span> MCP Server y Web Skill para search/lookup/extract.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="mt-8 text-center text-lg font-semibold text-accent-primary">
+      Menos complejidad operativa, mas velocidad de producto.
+    </p>
+  </div>
+</section>
+
+<!-- Use Cases -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-8 text-center text-3xl font-bold text-text-primary">Casos de uso reales</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Guardar recursos</h3>
+        <p class="text-sm text-text-secondary">Centraliza docs, tutoriales y herramientas en una sola base consultable.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Curar colecciones</h3>
+        <p class="text-sm text-text-secondary">Arma colecciones publicas por tema para compartir conocimiento de valor.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Links privados</h3>
+        <p class="text-sm text-text-secondary">Maneja enlaces internos del equipo sin exponer informacion sensible.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Integracion IA</h3>
+        <p class="text-sm text-text-secondary">Permite que asistentes consulten y operen tu biblioteca con permisos claros.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <h2 class="mb-4 text-3xl sm:text-4xl font-extrabold text-text-primary">
+      Converti tus links en una biblioteca util para todo tu equipo
+    </h2>
+    <p class="mx-auto mb-10 max-w-2xl text-text-secondary">
+      Deja de perder tiempo buscando. Empieza a construir un sistema de conocimiento reusable desde hoy.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register" class="ui-btn-primary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Crear cuenta</a>
+      <a href="/explore" class="ui-btn-secondary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Explorar</a>
     </div>
   </div>
 </section>

@@ -370,6 +370,49 @@ describe("links.service core CRUD", () => {
     }
   });
 
+  test("createLink and updateLink persist OG metadata when provided", () => {
+    const created = createLink({ userId: 1 }, {
+      url: "https://og.example.com",
+      title: "og",
+      shortCode: "og1111",
+      ogTitle: "OG Title",
+      ogDescription: "OG Description",
+      ogImage: "https://cdn.example.com/og.png",
+    });
+    expect(created.ok).toBe(true);
+    if (!created.ok) throw new Error("seed failed");
+
+    const createdRow = testDb
+      .query("SELECT og_title, og_description, og_image FROM links WHERE id = ?")
+      .get(created.data.id) as
+      | { og_title: string | null; og_description: string | null; og_image: string | null }
+      | undefined;
+
+    expect(createdRow?.og_title).toBe("OG Title");
+    expect(createdRow?.og_description).toBe("OG Description");
+    expect(createdRow?.og_image).toBe("https://cdn.example.com/og.png");
+
+    const updated = updateLink({ userId: 1 }, {
+      id: created.data.id,
+      patch: {
+        ogTitle: "OG Updated",
+        ogDescription: null,
+        ogImage: null,
+      },
+    });
+    expect(updated.ok).toBe(true);
+
+    const updatedRow = testDb
+      .query("SELECT og_title, og_description, og_image FROM links WHERE id = ?")
+      .get(created.data.id) as
+      | { og_title: string | null; og_description: string | null; og_image: string | null }
+      | undefined;
+
+    expect(updatedRow?.og_title).toBe("OG Updated");
+    expect(updatedRow?.og_description).toBeNull();
+    expect(updatedRow?.og_image).toBeNull();
+  });
+
   test("deleteLink enforces owner policy and deletes owned links", () => {
     const created = createLink({ userId: 1 }, {
       url: "https://delete.example.com",

@@ -251,7 +251,7 @@ describe("auth endpoint audit integration", () => {
     insertPasswordResetToken(401, hash);
 
     const response = await callRoute(
-      makePost("/api/auth/reset-password", { token, newPassword: "NewSecret123" }),
+      makePost("/api/auth/reset-password", { token, password: "NewSecret123" }),
       "/api/auth/reset-password"
     );
 

@@ -6,14 +6,6 @@ import {
 } from "../../api/client.ts";
 import { getFlash } from "../../utils/flash.ts";
 
-const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
-const ALLOWED_AVATAR_MIME_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-]);
-
 function extractErrorMessage(payload: unknown, fallback: string): string {
   if (typeof payload === "string") {
     const message = payload.trim();
@@ -47,12 +39,6 @@ function extractErrorMessage(payload: unknown, fallback: string): string {
 function readFormString(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
-}
-
-async function buildAvatarDataUrl(file: File): Promise<string> {
-  const bytes = await file.arrayBuffer();
-  const base64 = Buffer.from(bytes).toString("base64");
-  return `data:${file.type};base64,${base64}`;
 }
 
 // ─── GET /dashboard/profile ───────────────────────────────────────────────────
@@ -100,30 +86,24 @@ export const profileGetController = withAuth(async (req, _params, user) => {
 export const profilePostController = withAuth(async (req, _params, user) => {
   let username = "";
   let bio = "";
-  let avatarUrl: string | undefined;
+  let avatarUrl = "";
 
   try {
     const formData = await req.formData();
     username = readFormString(formData, "username");
     bio = readFormString(formData, "bio");
+    avatarUrl = readFormString(formData, "avatarUrl");
 
-    const avatarFile = formData.get("avatar");
-    if (avatarFile instanceof File && avatarFile.size > 0) {
-      if (!ALLOWED_AVATAR_MIME_TYPES.has(avatarFile.type)) {
+    // Optional: validate URL format
+    if (avatarUrl) {
+      try {
+        new URL(avatarUrl);
+      } catch {
         return Response.redirect(
-          "/dashboard/profile?flash=Formato+de+avatar+inv%C3%A1lido.+Us%C3%A1+JPG%2C+PNG+o+GIF&flashType=error",
+          "/dashboard/profile?flash=URL+de+avatar+inv%C3%A1lida&flashType=error",
           302
         );
       }
-
-      if (avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
-        return Response.redirect(
-          "/dashboard/profile?flash=El+avatar+supera+el+m%C3%A1ximo+de+2MB&flashType=error",
-          302
-        );
-      }
-
-      avatarUrl = await buildAvatarDataUrl(avatarFile);
     }
   } catch {
     return Response.redirect(

@@ -569,7 +569,7 @@ describe("Authentication with database verification", () => {
     const resetResponse = await callRoute(
       makePost("/api/auth/reset-password", {
         token: resetToken,
-        newPassword: TEST_USER.newPassword,
+        password: TEST_USER.newPassword,
       }),
       "/api/auth/reset-password"
     );

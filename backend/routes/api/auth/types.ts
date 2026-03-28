@@ -71,6 +71,8 @@ export interface LoginBody {
   email: string;
   /** User's password */
   password: string;
+  /** Whether to remember the user for an extended period (default: false) */
+  rememberMe?: boolean;
 }
 
 /**
@@ -88,7 +90,7 @@ export interface ResetPasswordBody {
   /** Reset token received via email */
   token: string;
   /** New password that must satisfy strength requirements */
-  newPassword: string;
+  password: string;
 }
 
 // ============================================================================

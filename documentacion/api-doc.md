@@ -96,10 +96,12 @@ Creates a new user account. Sends a verification email via Resend.
 {
   "email": "user@example.com",
   "password": "securepassword123",
-  "name": "John Doe",
-  "username": "johndoe"
+  "name": "johndoe"
 }
 ```
+
+**Field Notes:**
+- `name`: Represents the **username/pseudonym** (not full name). Must be unique across all users. Used for public profiles (e.g., `/u/johndoe`).
 
 ### Login
 `POST /api/auth/login`
@@ -111,9 +113,15 @@ In frontend flow, login is executed via server action in `frontend/src/routes/au
 ```json
 {
   "email": "user@example.com",
-  "password": "securepassword123"
+  "password": "securepassword123",
+  "rememberMe": false
 }
 ```
+
+**Field Notes:**
+- `rememberMe` (optional): 
+  - `true`: Creates a persistent session lasting **30 days**. Session cookie is stored across browser restarts.
+  - `false` (default): Creates a temporary **session cookie** that expires when the browser is closed.
 
 ### Logout
 `POST /api/auth/logout`
@@ -136,13 +144,27 @@ Consumes verification token and marks user email as verified.
 `POST /api/auth/reset-password`
 Consumes reset token and updates password.
 
+**Request Body:**
+```json
+{
+  "token": "reset_token_from_email",
+  "password": "new_secure_password"
+}
+```
+
+**Field Notes:**
+- `token`: The reset token received via email.
+- `password`: The new password to set for the user account.
+
 ---
 
 ## 🔗 Links Management
 
-### List/Search Links
+### List/Search Links (Public Only)
 `GET /api/links`
-Returns a paginated list of public links. Supports filtering and sorting.
+Returns a paginated list of **public links only**. Supports filtering and sorting.
+
+**Important:** This endpoint **always returns only public links**, regardless of authentication. Even authenticated users will only see links where `isPublic = true`. This endpoint is used by the `/explore` page.
 
 **Query Parameters:**
 - `q`: Search query (FTS5 powered).
@@ -200,6 +222,91 @@ Deletes a link and removes it from FTS5 index.
 - `POST /api/links/:id/favorite`: Toggles 'Favorite' status.
 - `POST /api/links/preview`: Injects a URL and returns extracted OG metadata (Title, Desc, Image) without saving.
 
+### Get My Links (All)
+`GET /api/links/me` (Requires Auth)
+Returns **all links** owned by the authenticated user, including both public and private links. Used by the `/dashboard/links` page.
+
+**Query Parameters:**
+- `sort` (optional): Sorting strategy. 
+  - `recent` (default): Most recently created
+  - `likes`: Most liked
+  - `views`: Most viewed
+  - `favorites`: Most favorited
+- `limit` (optional): Maximum number of results to return. Default varies, typically 20-50.
+
+**Response:**
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "url": "https://bun.sh",
+      "title": "Bun - Fast all-in-one JavaScript runtime",
+      "description": "Bun is a fast JavaScript runtime...",
+      "shortCode": "bun-runtime",
+      "isPublic": true,
+      "likesCount": 42,
+      "views": 105,
+      "favoritesCount": 8,
+      "categoryId": 3,
+      "createdAt": "2026-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+**Key Differences from GET /api/links:**
+- Returns **user's private links** in addition to public ones
+- No pagination (controlled by `limit` param)
+- Includes `favoritesCount` field
+- Used for dashboard management, not public exploration
+
+### Get Link Details (Statistics)
+`GET /api/links/:id/details` (Requires Auth - Owner Only)
+Returns detailed statistics for a specific link, including view history, user lists for likes/favorites, and engagement analytics. Only the link owner can access this endpoint.
+
+**Response:**
+```json
+{
+  "link": {
+    "id": 1,
+    "title": "Bun - Fast all-in-one JavaScript runtime",
+    "views": 150,
+    "likesCount": 42,
+    "favoritesCount": 8,
+    "createdAt": "2026-01-15T10:30:00Z"
+  },
+  "viewsList": [
+    {
+      "id": 1,
+      "ipAddress": "192.168.1.xxx",
+      "userAgent": "Mozilla/5.0...",
+      "visitedAt": "2026-03-28T14:25:00Z",
+      "userId": null
+    }
+  ],
+  "likedBy": [
+    {
+      "id": 5,
+      "username": "alice",
+      "avatarUrl": "https://..."
+    }
+  ],
+  "favoritedBy": [
+    {
+      "id": 8,
+      "username": "bob",
+      "avatarUrl": "https://..."
+    }
+  ]
+}
+```
+
+**Privacy Notes:**
+- `ipAddress` is **anonymized** for privacy (last octet masked as `.xxx` or `.xxx.xxx` depending on IPv4/IPv6)
+- `userId` is only present for authenticated users' visits (null for anonymous visitors)
+- This endpoint is restricted to the link owner only
+
 ---
 
 ## 📁 Categories
@@ -226,11 +333,51 @@ Returns public info, stats, and public links of a user.
 
 ### User Stats
 `GET /api/stats/me` (Requires Auth)
-Returns private stats: total links, total views, total likes received, and current rank.
+Returns private stats: total links, total views, total likes received, current rank, and rank progression.
+
+**Response:**
+```json
+{
+  "totalLinks": 45,
+  "totalViews": 1250,
+  "totalLikes": 89,
+  "rank": "user",
+  "rankProgression": {
+    "currentRank": "user",
+    "nextRank": "power_user",
+    "currentLinks": 45,
+    "requiredForNext": 50,
+    "progressPercent": 90,
+    "remainingLinks": 5
+  }
+}
+```
+
+**Rank Progression Fields:**
+- `currentRank`: The user's current rank (e.g., `"newbie"`, `"user"`, `"power_user"`, `"expert"`)
+- `nextRank`: The next rank to achieve (or `null` if already at maximum)
+- `currentLinks`: Number of links created by the user
+- `requiredForNext`: Number of links needed to reach the next rank
+- `progressPercent`: Percentage progress toward next rank (0-100)
+- `remainingLinks`: How many more links until the next rank (0 if already at max)
 
 ### Global Stats
 `GET /api/stats/global`
-Returns system-wide stats: total users, total links, total categories.
+Returns system-wide stats: total users, **all links** (public + private), and total categories.
+
+**Response:**
+```json
+{
+  "totalUsers": 150,
+  "totalLinks": 3450,
+  "totalCategories": 280
+}
+```
+
+**Important Note:**
+- `totalLinks` includes **ALL links** in the system (both public and private), not just public links.
+- This differs from `GET /api/links` which only returns public links.
+- Used for displaying global statistics on the home page.
 
 ---
 

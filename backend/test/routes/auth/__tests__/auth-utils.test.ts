@@ -201,6 +201,65 @@ describe("validateLoginBody", () => {
     }
   });
 
+  test("accepts rememberMe: true", () => {
+    const result = validateLoginBody({
+      email: "alice@example.com",
+      password: "anypassword",
+      rememberMe: true,
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.rememberMe).toBe(true);
+    }
+  });
+
+  test("accepts rememberMe: false", () => {
+    const result = validateLoginBody({
+      email: "alice@example.com",
+      password: "anypassword",
+      rememberMe: false,
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.rememberMe).toBe(false);
+    }
+  });
+
+  test("defaults rememberMe to false when not provided", () => {
+    const result = validateLoginBody({
+      email: "alice@example.com",
+      password: "anypassword",
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.rememberMe).toBe(false);
+    }
+  });
+
+  test("accepts kebab-case remember-me from HTML forms", () => {
+    const result = validateLoginBody({
+      email: "alice@example.com",
+      password: "anypassword",
+      "remember-me": true,
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.rememberMe).toBe(true);
+    }
+  });
+
+  test("defaults rememberMe to false for invalid values", () => {
+    const result = validateLoginBody({
+      email: "alice@example.com",
+      password: "anypassword",
+      rememberMe: "true" as any, // string instead of boolean
+    });
+    expect(result.valid).toBe(true);
+    if (result.valid) {
+      expect(result.data.rememberMe).toBe(false);
+    }
+  });
+
   test("rejects missing email", () => {
     const result = validateLoginBody({ password: "anypassword" });
     expect(result.valid).toBe(false);

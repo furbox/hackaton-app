@@ -155,7 +155,7 @@ export async function sendVerificationEmail(
   const frontendUrl =
     rawFrontendUrl && rawFrontendUrl !== "undefined" && rawFrontendUrl !== "null"
       ? rawFrontendUrl.replace(/\/+$/, "")
-      : "http://localhost:5173";
+      : "http://localhost:3001";
   const normalizedToken = token.trim();
   const from = Bun.env.EMAIL_FROM ?? "URLoft <noreply@urloft.site>";
 

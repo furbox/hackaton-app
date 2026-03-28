@@ -434,6 +434,42 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
     expect(calls).toBe(1);
   });
 
+  test("POST forwards OG metadata fields to createLink input", async () => {
+    let receivedInput: Record<string, unknown> | null = null;
+
+    const deps: LinksRouteDeps = {
+      ...successDeps(),
+      createLink: (_actor, input) => {
+        receivedInput = input as Record<string, unknown>;
+        return { ok: true, data: { id: 9 } };
+      },
+    };
+
+    const response = await handleLinksRoute(
+      makeRequest("/api/links", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          url: "https://example.com",
+          title: "x",
+          shortCode: "x1",
+          ogTitle: "OG title",
+          ogDescription: "OG description",
+          ogImage: "https://cdn.example.com/og.png",
+        }),
+      }),
+      "/api/links",
+      deps
+    );
+
+    expect(response?.status).toBe(201);
+    expect(receivedInput).toMatchObject({
+      ogTitle: "OG title",
+      ogDescription: "OG description",
+      ogImage: "https://cdn.example.com/og.png",
+    });
+  });
+
   test("GET favorites delegates once and returns data envelope", async () => {
     let calls = 0;
     const deps: LinksRouteDeps = {
@@ -510,6 +546,39 @@ describe("handleLinksRoute delegation and deterministic error mapping", () => {
     expect(deleteResponse?.status).toBe(200);
     expect(updateCalls).toBe(1);
     expect(deleteCalls).toBe(1);
+  });
+
+  test("PUT forwards nullable OG metadata fields to updateLink patch", async () => {
+    let receivedPatch: Record<string, unknown> | null = null;
+
+    const deps: LinksRouteDeps = {
+      ...successDeps(),
+      updateLink: (_actor, input) => {
+        receivedPatch = input.patch as Record<string, unknown>;
+        return { ok: true, data: { id: 1 } };
+      },
+    };
+
+    const response = await handleLinksRoute(
+      makeRequest("/api/links/7", {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          ogTitle: "Nuevo OG",
+          ogDescription: null,
+          ogImage: null,
+        }),
+      }),
+      "/api/links/7",
+      deps
+    );
+
+    expect(response?.status).toBe(200);
+    expect(receivedPatch).toMatchObject({
+      ogTitle: "Nuevo OG",
+      ogDescription: null,
+      ogImage: null,
+    });
   });
 
   test("POST like/favorite delegate and preserve deterministic snapshot fields", async () => {

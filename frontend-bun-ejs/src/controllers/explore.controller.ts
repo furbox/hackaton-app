@@ -1,4 +1,4 @@
-import { renderPage } from "../renderer.ts";
+import { renderPage, renderPartial } from "../renderer.ts";
 import { getSession } from "../middleware/session.ts";
 import {
   apiFetch,
@@ -187,6 +187,7 @@ function normalizeLink(raw: unknown): Link | null {
 export async function exploreController(
   request: Request
 ): Promise<Response> {
+  const isHtmxRequest = request.headers.get("HX-Request") === "true";
   const url = new URL(request.url);
   const q = url.searchParams.get("q") ?? "";
   const sort = url.searchParams.get("sort") ?? "recent";
@@ -216,10 +217,7 @@ export async function exploreController(
 
   const total = extractNumber(linksResult.data, ["total", "totalCount", "count"]);
   const backendTotalPages = extractNumber(linksResult.data, ["totalPages", "pages"]);
-  const hasNextPage =
-    (typeof total === "number" && total > page * limit)
-    || (typeof backendTotalPages === "number" && page < backendTotalPages)
-    || (typeof total !== "number" && typeof backendTotalPages !== "number" && links.length === limit);
+  const hasNextPage = links.length === limit;
 
   const totalPages =
     typeof backendTotalPages === "number"
@@ -237,6 +235,19 @@ export async function exploreController(
   const baseQuery = baseParams.toString();
   const baseUrl = baseQuery.length > 0 ? `/explore?${baseQuery}` : "/explore";
 
+  const nextPageParams = new URLSearchParams(baseParams);
+  nextPageParams.set("page", String(page + 1));
+  const nextPageUrl = hasNextPage ? `/explore?${nextPageParams.toString()}` : null;
+
+  if (isHtmxRequest) {
+    return renderPartial("partials/explore-results.ejs", {
+      links,
+      page,
+      hasNextPage,
+      nextPageUrl,
+    });
+  }
+
   return renderPage("explore", {
     data: {
       title: "Explorar",
@@ -248,6 +259,7 @@ export async function exploreController(
       hasNextPage,
       page,
       baseUrl,
+      nextPageUrl,
     },
   });
 }

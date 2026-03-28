@@ -12,6 +12,7 @@ import { emitUnauthorized } from './app.js';
 
 // Track whether this tab was already initialized
 let _initialized = false;
+let _categoryDropdownCleanup = null;
 
 /**
  * Initialize the save-link tab.
@@ -34,6 +35,11 @@ async function _init(state) {
   const titleInput    = document.getElementById('link-title');
   const descInput     = document.getElementById('link-description');
   const catSelect     = document.getElementById('link-category');
+  const catDropdown   = document.getElementById('link-category-custom');
+  const catTrigger    = document.getElementById('link-category-trigger');
+  const catPanel      = document.getElementById('link-category-panel');
+  const catOptions    = document.getElementById('link-category-options');
+  const catSelected   = document.getElementById('link-category-selected');
   const publicCheck   = document.getElementById('link-public');
   const saveBtn       = document.getElementById('save-submit-btn');
   const saveError     = document.getElementById('save-error');
@@ -91,7 +97,20 @@ async function _init(state) {
   }
 
   // Step 4: Load categories
-  await _loadCategories(state, catSelect);
+  _categoryDropdownCleanup?.();
+  _categoryDropdownCleanup = null;
+
+  const categoryDropdown = _initCategoryDropdown({
+    container: catDropdown,
+    select: catSelect,
+    trigger: catTrigger,
+    panel: catPanel,
+    optionsList: catOptions,
+    selectedText: catSelected,
+  });
+  _categoryDropdownCleanup = categoryDropdown.destroy;
+
+  await _loadCategories(state, catSelect, categoryDropdown);
 
   // ── Cancel duplicate ────────────────────────────────────────────
   dupCancelBtn?.addEventListener('click', () => {
@@ -148,7 +167,8 @@ async function _init(state) {
         opt.value = String(newCat.id);
         opt.textContent = newCat.name;
         catSelect?.appendChild(opt);
-        if (catSelect) catSelect.value = String(newCat.id);
+        categoryDropdown.refreshOptions();
+        categoryDropdown.setValue(String(newCat.id));
       }
 
       if (newCatForm) newCatForm.classList.add('hidden');
@@ -197,7 +217,7 @@ async function _init(state) {
       // Reset form
       if (titleInput)  titleInput.value  = '';
       if (descInput)   descInput.value   = '';
-      if (catSelect)   catSelect.value   = '';
+      categoryDropdown.setValue('');
       if (publicCheck) publicCheck.checked = true;
 
     } catch (err) {
@@ -213,6 +233,228 @@ async function _init(state) {
       }
     }
   });
+}
+
+function _initCategoryDropdown({ container, select, trigger, panel, optionsList, selectedText }) {
+  if (!container || !select || !trigger || !panel || !optionsList || !selectedText) {
+    return {
+      refreshOptions: () => {},
+      setValue: () => {},
+      destroy: () => {},
+    };
+  }
+
+  let options = [];
+  let highlightedIndex = -1;
+  const PANEL_GAP = 4;
+  const VIEWPORT_MARGIN = 8;
+  const MIN_PANEL_HEIGHT = 96;
+
+  const _clearPanelDirection = () => {
+    panel.classList.remove('custom-select__panel--up', 'custom-select__panel--down');
+  };
+
+  const _positionPanel = () => {
+    const triggerRect = trigger.getBoundingClientRect();
+    const spaceAbove = triggerRect.top - VIEWPORT_MARGIN;
+    const spaceBelow = window.innerHeight - triggerRect.bottom - VIEWPORT_MARGIN;
+
+    const prevMaxHeight = panel.style.maxHeight;
+    panel.style.maxHeight = 'none';
+    const naturalHeight = panel.scrollHeight;
+    panel.style.maxHeight = prevMaxHeight;
+
+    const opensDown = spaceBelow >= naturalHeight;
+    const availableSpace = opensDown ? spaceBelow : spaceAbove;
+    const availableHeight = Math.max(0, Math.floor(availableSpace - PANEL_GAP));
+    const nextMaxHeight = Math.max(
+      Math.min(availableHeight, naturalHeight),
+      Math.min(MIN_PANEL_HEIGHT, availableHeight)
+    );
+
+    _clearPanelDirection();
+    panel.classList.add(opensDown ? 'custom-select__panel--down' : 'custom-select__panel--up');
+    panel.style.maxHeight = `${nextMaxHeight}px`;
+  };
+
+  const close = () => {
+    panel.classList.add('hidden');
+    trigger.setAttribute('aria-expanded', 'false');
+    highlightedIndex = -1;
+    _clearPanelDirection();
+    panel.style.maxHeight = '';
+    _renderOptions();
+  };
+
+  const open = () => {
+    panel.classList.remove('hidden');
+    trigger.setAttribute('aria-expanded', 'true');
+    _positionPanel();
+    const selectedIndex = options.findIndex(opt => opt.value === select.value);
+    highlightedIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    _renderOptions();
+  };
+
+  const isOpen = () => !panel.classList.contains('hidden');
+
+  const _syncSelectedLabel = () => {
+    const selectedOption = options.find(opt => opt.value === select.value);
+    selectedText.textContent = selectedOption?.label || 'Sin categoría';
+  };
+
+  const _renderOptions = () => {
+    optionsList.innerHTML = '';
+
+    options.forEach((opt, index) => {
+      const item = document.createElement('li');
+      const isSelected = opt.value === select.value;
+      const isHighlighted = index === highlightedIndex;
+
+      item.className = 'custom-select__option';
+      if (isSelected) item.classList.add('custom-select__option--selected');
+      if (isHighlighted) item.classList.add('custom-select__option--highlighted');
+
+      item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+      item.dataset.value = opt.value;
+      item.textContent = opt.label;
+
+      item.addEventListener('click', () => {
+        setValue(opt.value);
+        close();
+        trigger.focus();
+      });
+
+      optionsList.appendChild(item);
+    });
+  };
+
+  const refreshOptions = () => {
+    options = Array.from(select.options).map(option => ({
+      value: option.value,
+      label: option.textContent || '',
+    }));
+
+    const valueExists = options.some(opt => opt.value === select.value);
+    if (!valueExists) {
+      select.value = '';
+    }
+
+    _syncSelectedLabel();
+    _renderOptions();
+
+    if (isOpen()) {
+      _positionPanel();
+    }
+  };
+
+  const setValue = (value) => {
+    const nextValue = value == null ? '' : String(value);
+    select.value = nextValue;
+
+    if (select.value !== nextValue) {
+      select.value = '';
+    }
+
+    _syncSelectedLabel();
+    _renderOptions();
+  };
+
+  const moveHighlight = (step) => {
+    if (!options.length) return;
+    if (!isOpen()) open();
+
+    const start = highlightedIndex >= 0 ? highlightedIndex : 0;
+    highlightedIndex = (start + step + options.length) % options.length;
+    _renderOptions();
+  };
+
+  const onTriggerClick = () => {
+    if (isOpen()) {
+      close();
+      return;
+    }
+    open();
+  };
+
+  const onTriggerKeyDown = (event) => {
+    if (event.key === 'Escape') {
+      if (isOpen()) {
+        event.preventDefault();
+        close();
+      }
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+
+      if (!isOpen()) {
+        open();
+        return;
+      }
+
+      if (highlightedIndex >= 0 && options[highlightedIndex]) {
+        setValue(options[highlightedIndex].value);
+      }
+      close();
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveHighlight(1);
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveHighlight(-1);
+    }
+  };
+
+  const onPanelKeyDown = (event) => {
+    if (event.key === 'Tab') {
+      close();
+      return;
+    }
+
+    onTriggerKeyDown(event);
+  };
+
+  const onClickOutside = (event) => {
+    if (!container.contains(event.target)) {
+      close();
+    }
+  };
+
+  const onViewportChange = () => {
+    if (!isOpen()) return;
+    _positionPanel();
+  };
+
+  trigger.addEventListener('click', onTriggerClick);
+  trigger.addEventListener('keydown', onTriggerKeyDown);
+  panel.addEventListener('keydown', onPanelKeyDown);
+  document.addEventListener('mousedown', onClickOutside);
+  window.addEventListener('resize', onViewportChange);
+  window.addEventListener('scroll', onViewportChange, true);
+
+  refreshOptions();
+
+  return {
+    refreshOptions,
+    setValue,
+    destroy: () => {
+      close();
+      trigger.removeEventListener('click', onTriggerClick);
+      trigger.removeEventListener('keydown', onTriggerKeyDown);
+      panel.removeEventListener('keydown', onPanelKeyDown);
+      document.removeEventListener('mousedown', onClickOutside);
+      window.removeEventListener('resize', onViewportChange);
+      window.removeEventListener('scroll', onViewportChange, true);
+    },
+  };
 }
 
 // ── Duplicate check ────────────────────────────────────────────────
@@ -249,7 +491,7 @@ async function _checkDuplicate(url, state, els) {
 }
 
 // ── Load categories ────────────────────────────────────────────────
-async function _loadCategories(state, select) {
+async function _loadCategories(state, select, categoryDropdown) {
   if (!select) return;
   try {
     const res = await getCategories(state.apiKey);
@@ -266,6 +508,9 @@ async function _loadCategories(state, select) {
       opt.textContent = cat.name;
       select.appendChild(opt);
     });
+
+    categoryDropdown?.refreshOptions();
+    categoryDropdown?.setValue(select.value || '');
   } catch (err) {
     // Log for debug — categories are optional so we don't break the UI.
     console.error('[URLoft] _loadCategories error:', err?.message || err);

@@ -10,7 +10,7 @@
   <div class="ui-card p-6 mb-6">
     <h2 class="mb-5 text-lg font-semibold text-text-primary">Editar Perfil</h2>
 
-    <form method="POST" action="/dashboard/profile" enctype="multipart/form-data" class="space-y-4" id="profile-form">
+    <form method="POST" action="/dashboard/profile" class="space-y-4" id="profile-form">
 
       <!-- Avatar preview -->
       <div class="flex items-center gap-4 mb-2">
@@ -64,15 +64,16 @@
       </div>
 
       <div>
-        <label for="avatar" class="mb-1 block text-sm font-medium text-text-secondary">Avatar</label>
+        <label for="avatarUrl" class="mb-1 block text-sm font-medium text-text-secondary">URL del Avatar</label>
         <input
-          id="avatar"
-          name="avatar"
-          type="file"
-          accept="image/*"
+          id="avatarUrl"
+          name="avatarUrl"
+          type="url"
+          placeholder="https://ejemplo.com/avatar.jpg"
+          value="<%= user.avatar_url || '' %>"
           class="ui-input"
         />
-        <p class="mt-1 text-xs text-text-secondary">Formatos permitidos: JPG, PNG, GIF. Tamaño máximo: 2MB.</p>
+        <p class="mt-1 text-xs text-text-secondary">Pegá la URL de tu imagen (JPG, PNG, GIF, WebP).</p>
         <p id="avatar-error" class="mt-1 hidden text-xs text-error"></p>
       </div>
 
@@ -128,12 +129,10 @@
 
 <script>
   (() => {
-    const avatarInput = document.getElementById("avatar");
+    const avatarInput = document.getElementById("avatarUrl");
     const avatarError = document.getElementById("avatar-error");
     const avatarImage = document.getElementById("avatar-preview-image");
     const avatarFallback = document.getElementById("avatar-preview-fallback");
-    const MAX_SIZE_BYTES = 2 * 1024 * 1024;
-    const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/gif", "image/webp"]);
 
     if (!avatarInput || !avatarError || !avatarImage) {
       return;
@@ -149,37 +148,43 @@
       avatarError.classList.add("hidden");
     };
 
-    avatarInput.addEventListener("change", () => {
-      const file = avatarInput.files && avatarInput.files[0] ? avatarInput.files[0] : null;
-      if (!file) {
-        clearError();
-        return;
-      }
-
-      if (!ALLOWED_MIME_TYPES.has(file.type)) {
-        showError("Formato inválido. Usá JPG, PNG o GIF.");
-        avatarInput.value = "";
-        return;
-      }
-
-      if (file.size > MAX_SIZE_BYTES) {
-        showError("El archivo supera el límite de 2MB.");
-        avatarInput.value = "";
-        return;
-      }
-
-      clearError();
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          avatarImage.src = reader.result;
-          avatarImage.classList.remove("hidden");
-          if (avatarFallback) {
-            avatarFallback.classList.add("hidden");
-          }
+    const updatePreview = (url) => {
+      if (url && url.trim()) {
+        avatarImage.src = url;
+        avatarImage.classList.remove("hidden");
+        if (avatarFallback) {
+          avatarFallback.classList.add("hidden");
         }
-      };
-      reader.readAsDataURL(file);
+      } else {
+        avatarImage.classList.add("hidden");
+        if (avatarFallback) {
+          avatarFallback.classList.remove("hidden");
+        }
+      }
+    };
+
+    avatarInput.addEventListener("input", () => {
+      const url = avatarInput.value.trim();
+
+      if (!url) {
+        clearError();
+        updatePreview("");
+        return;
+      }
+
+      // Basic URL validation
+      try {
+        new URL(url);
+        clearError();
+        updatePreview(url);
+      } catch {
+        showError("URL inválida. Asegurate de que sea una URL válida (https://...)");
+      }
+    });
+
+    // Handle image load errors
+    avatarImage.addEventListener("error", () => {
+      showError("No se pudo cargar la imagen. Verificá que la URL sea correcta y accesible.");
     });
   })();
 </script>

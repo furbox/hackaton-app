@@ -165,10 +165,34 @@
 
             <div class="form-group form-group--row">
               <div class="form-group__expand">
-                <label for="link-category" class="form-label">Categoría</label>
-                <select id="link-category" class="form-select">
-                  <option value="">Sin categoría</option>
-                </select>
+                <label for="link-category-trigger" class="form-label">Categoría</label>
+                <div id="link-category-custom" class="custom-select">
+                  <button
+                    type="button"
+                    id="link-category-trigger"
+                    class="custom-select__trigger"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="link-category-options"
+                  >
+                    <span id="link-category-selected">Sin categoría</span>
+                    <span class="custom-select__chevron" aria-hidden="true">▾</span>
+                  </button>
+
+                  <div id="link-category-panel" class="custom-select__panel hidden" role="presentation">
+                    <ul
+                      id="link-category-options"
+                      class="custom-select__options"
+                      role="listbox"
+                      tabindex="-1"
+                      aria-label="Categorías"
+                    ></ul>
+                  </div>
+
+                  <select id="link-category" class="form-select custom-select__native-hidden" aria-hidden="true" tabindex="-1">
+                    <option value="">Sin categoría</option>
+                  </select>
+                </div>
               </div>
               <button type="button" id="new-category-btn" class="btn btn--ghost btn--sm">
                 + Nueva

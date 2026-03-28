@@ -25,6 +25,11 @@ function readFormString(formData: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function readNullableFormString(formData: FormData, key: string): string | null {
+  const value = readFormString(formData, key);
+  return value.length > 0 ? value : null;
+}
+
 function hashBase36(value: string): string {
   let hash = 0;
   for (let i = 0; i < value.length; i += 1) {
@@ -163,6 +168,9 @@ export const linksCreateController = withAuth(async (req, _params, user) => {
   let title = "";
   let shortCode = "";
   let description = "";
+  let ogTitle: string | null = null;
+  let ogDescription: string | null = null;
+  let ogImage: string | null = null;
   let isPublic = true;
   let categoryId: number | null = null;
 
@@ -171,6 +179,9 @@ export const linksCreateController = withAuth(async (req, _params, user) => {
     url = readFormString(formData, "url");
     title = readFormString(formData, "title");
     description = readFormString(formData, "description");
+    ogTitle = readNullableFormString(formData, "ogTitle");
+    ogDescription = readNullableFormString(formData, "ogDescription");
+    ogImage = readNullableFormString(formData, "ogImage");
     shortCode = buildShortCode(title, url, readFormString(formData, "shortCode"));
     isPublic = formData.get("isPublic") !== "false";
     const catId = readFormString(formData, "categoryId");
@@ -189,7 +200,16 @@ export const linksCreateController = withAuth(async (req, _params, user) => {
     );
   }
 
-  const body: Record<string, unknown> = { url, title, shortCode, description, isPublic };
+  const body: Record<string, unknown> = {
+    url,
+    title,
+    shortCode,
+    description,
+    ogTitle,
+    ogDescription,
+    ogImage,
+    isPublic,
+  };
   if (categoryId !== null) body.categoryId = categoryId;
 
   const result = await apiFetch<{ id: number }>(
@@ -220,22 +240,36 @@ export const linksEditController = withAuth(async (req, params, user) => {
   let url = "";
   let title = "";
   let description = "";
+  let ogTitle: string | null = null;
+  let ogDescription: string | null = null;
+  let ogImage: string | null = null;
   let isPublic = true;
   let categoryId: number | null = null;
 
   try {
     const formData = await req.formData();
-    url = (formData.get("url") as string) ?? "";
-    title = (formData.get("title") as string) ?? "";
-    description = (formData.get("description") as string) ?? "";
+    url = readFormString(formData, "url");
+    title = readFormString(formData, "title");
+    description = readFormString(formData, "description");
+    ogTitle = readNullableFormString(formData, "ogTitle");
+    ogDescription = readNullableFormString(formData, "ogDescription");
+    ogImage = readNullableFormString(formData, "ogImage");
     isPublic = formData.get("isPublic") !== "false";
-    const catId = formData.get("categoryId") as string;
-    categoryId = catId && catId !== "" ? parseInt(catId, 10) : null;
+    const catId = readFormString(formData, "categoryId");
+    categoryId = catId ? parseInt(catId, 10) : null;
   } catch {
     return Response.redirect("/dashboard/links?flash=Error+al+procesar+el+formulario&flashType=error", 302);
   }
 
-  const body: Record<string, unknown> = { url, title, description, isPublic };
+  const body: Record<string, unknown> = {
+    url,
+    title,
+    description,
+    ogTitle,
+    ogDescription,
+    ogImage,
+    isPublic,
+  };
   if (categoryId !== null) body.categoryId = categoryId;
 
   const result = await apiFetch<unknown>(

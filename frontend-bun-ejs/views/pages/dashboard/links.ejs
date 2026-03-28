@@ -5,7 +5,7 @@
     <div>
       <h1 class="text-3xl font-bold text-text-primary">Mis Links</h1>
     </div>
-    <button onclick="document.getElementById('create-modal').classList.remove('hidden')"
+    <button onclick="window.__createLinkPreviewReset && window.__createLinkPreviewReset(); document.getElementById('create-modal').classList.remove('hidden')"
             class="ui-btn-primary inline-flex items-center gap-2 px-4 py-2 text-sm font-medium">
       + Nuevo link
     </button>
@@ -72,7 +72,7 @@
         <p class="text-5xl mb-4">🔗</p>
         <p class="mb-2 text-lg font-medium text-text-primary">No tenés links todavía</p>
         <p class="mb-6 text-text-secondary">¡Empezá a guardar tus links favoritos!</p>
-        <button onclick="document.getElementById('create-modal').classList.remove('hidden')"
+        <button onclick="window.__createLinkPreviewReset && window.__createLinkPreviewReset(); document.getElementById('create-modal').classList.remove('hidden')"
                 class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium">
           + Agregar tu primer link
         </button>
@@ -89,20 +89,21 @@
                 class="text-xl leading-none text-text-secondary hover:text-text-primary">&times;</button>
       </div>
 
-      <form method="POST" action="/dashboard/links/create" class="space-y-4">
+      <form id="create-form" method="POST" action="/dashboard/links/create" class="space-y-4">
         <div>
           <label class="mb-1 block text-sm font-medium text-text-secondary">URL *</label>
-          <input type="url" name="url" required placeholder="https://ejemplo.com"
+          <input type="url" id="create-url" name="url" required placeholder="https://ejemplo.com"
                  class="ui-input" />
+          <p id="create-preview-status" class="mt-1 hidden text-xs text-text-secondary" aria-live="polite"></p>
         </div>
         <div>
           <label class="mb-1 block text-sm font-medium text-text-secondary">Título *</label>
-          <input type="text" name="title" required placeholder="Mi link genial"
+          <input type="text" id="create-title" name="title" required placeholder="Mi link genial"
                  class="ui-input" />
         </div>
         <div>
           <label class="mb-1 block text-sm font-medium text-text-secondary">Descripción</label>
-          <textarea name="description" rows="2" placeholder="Descripción opcional..."
+          <textarea id="create-description" name="description" rows="2" placeholder="Descripción opcional..."
                     class="ui-textarea resize-none"></textarea>
         </div>
         <div class="grid grid-cols-2 gap-4">
@@ -125,6 +126,9 @@
             </select>
           </div>
         </div>
+        <input type="hidden" id="create-ogTitle" name="ogTitle" value="" />
+        <input type="hidden" id="create-ogDescription" name="ogDescription" value="" />
+        <input type="hidden" id="create-ogImage" name="ogImage" value="" />
         <div class="flex gap-3 pt-2">
           <button type="button" onclick="document.getElementById('create-modal').classList.add('hidden')"
                   class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
@@ -154,6 +158,7 @@
         <label class="mb-1 block text-sm font-medium text-text-secondary">URL *</label>
         <input type="url" id="edit-url" name="url" required
                class="ui-input" />
+        <p id="edit-preview-status" class="mt-1 hidden text-xs text-text-secondary" aria-live="polite"></p>
       </div>
       <div>
         <label class="mb-1 block text-sm font-medium text-text-secondary">Título *</label>
@@ -185,6 +190,9 @@
           </select>
         </div>
       </div>
+      <input type="hidden" id="edit-ogTitle" name="ogTitle" value="" />
+      <input type="hidden" id="edit-ogDescription" name="ogDescription" value="" />
+      <input type="hidden" id="edit-ogImage" name="ogImage" value="" />
       <div class="flex gap-3 pt-2">
         <button type="button" onclick="document.getElementById('edit-modal').classList.add('hidden')"
                 class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
@@ -224,14 +232,246 @@ function normalizeEditCategoryId(link) {
 }
 
 function openEditModal(link) {
+  if (window.__editLinkPreviewReset) {
+    window.__editLinkPreviewReset();
+  }
+
   document.getElementById('edit-form').action = '/dashboard/links/' + link.id + '/edit';
   document.getElementById('edit-url').value = link.url || '';
   document.getElementById('edit-title').value = link.title || '';
   document.getElementById('edit-description').value = link.description || '';
+  document.getElementById('edit-ogTitle').value = link.og_title || link.ogTitle || '';
+  document.getElementById('edit-ogDescription').value = link.og_description || link.ogDescription || '';
+  document.getElementById('edit-ogImage').value = link.og_image || link.ogImage || '';
   const catSelect = document.getElementById('edit-categoryId');
   catSelect.value = normalizeEditCategoryId(link);
   const pubSelect = document.getElementById('edit-isPublic');
   pubSelect.value = normalizeEditBoolean(link.is_public ?? link.isPublic) ? 'true' : 'false';
   document.getElementById('edit-modal').classList.remove('hidden');
 }
+
+(function initAutomaticLinkPreview() {
+  const PREVIEW_ENDPOINT = '/api/links/preview';
+  const DEBOUNCE_MS = 400;
+
+  function setPreviewStatus(statusNode, kind, message) {
+    if (!statusNode) return;
+
+    if (!message) {
+      statusNode.textContent = '';
+      statusNode.classList.add('hidden');
+      statusNode.classList.remove('text-error');
+      return;
+    }
+
+    statusNode.textContent = message;
+    statusNode.classList.remove('hidden');
+    statusNode.classList.toggle('text-error', kind === 'error');
+  }
+
+  function createPreviewController(options) {
+    const {
+      urlInput,
+      titleInput,
+      descriptionInput,
+      ogTitleInput,
+      ogDescriptionInput,
+      ogImageInput,
+      statusNode,
+    } = options;
+
+    if (!urlInput || !titleInput || !descriptionInput || !ogTitleInput || !ogDescriptionInput || !ogImageInput) {
+      return {
+        reset() {},
+      };
+    }
+
+    let debounceTimer = null;
+    let abortController = null;
+    let requestToken = 0;
+    let titleEditedManually = false;
+    let descriptionEditedManually = false;
+
+    function setOgMetadata(metadata) {
+      ogTitleInput.value = metadata.title || '';
+      ogDescriptionInput.value = metadata.description || '';
+      ogImageInput.value = metadata.image || '';
+    }
+
+    function clearOgMetadata() {
+      setOgMetadata({ title: '', description: '', image: '' });
+    }
+
+    function cleanupPendingRequest() {
+      if (debounceTimer !== null) {
+        clearTimeout(debounceTimer);
+        debounceTimer = null;
+      }
+
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
+    }
+
+    function reset() {
+      cleanupPendingRequest();
+      requestToken += 1;
+      titleEditedManually = false;
+      descriptionEditedManually = false;
+      clearOgMetadata();
+      setPreviewStatus(statusNode, 'idle', '');
+    }
+
+    titleInput.addEventListener('input', function onTitleInput() {
+      titleEditedManually = true;
+    });
+
+    descriptionInput.addEventListener('input', function onDescriptionInput() {
+      descriptionEditedManually = true;
+    });
+
+    async function requestPreview(urlValue) {
+      cleanupPendingRequest();
+
+      const trimmedUrl = urlValue.trim();
+      if (!trimmedUrl) {
+        setPreviewStatus(statusNode, 'idle', '');
+        return;
+      }
+
+      const currentToken = ++requestToken;
+      abortController = new AbortController();
+
+      setPreviewStatus(statusNode, 'loading', 'Obteniendo preview...');
+
+      try {
+        const response = await fetch(PREVIEW_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({ url: trimmedUrl }),
+          signal: abortController.signal,
+        });
+
+        const payload = await response.json().catch(function parseFallback() {
+          return {};
+        });
+
+        if (currentToken !== requestToken) {
+          return;
+        }
+
+        abortController = null;
+
+        if (!response.ok) {
+          clearOgMetadata();
+          setPreviewStatus(statusNode, 'error', 'No se pudo obtener preview.');
+          return;
+        }
+
+        const previewData = payload && typeof payload === 'object' && payload.data && typeof payload.data === 'object'
+          ? payload.data
+          : (payload && typeof payload === 'object' ? payload : {});
+
+        const previewTitle = typeof previewData.title === 'string' ? previewData.title.trim() : '';
+        const previewDescription = typeof previewData.description === 'string'
+          ? previewData.description.trim()
+          : '';
+        const previewImage = typeof previewData.image === 'string' ? previewData.image.trim() : '';
+
+        setOgMetadata({
+          title: previewTitle,
+          description: previewDescription,
+          image: previewImage,
+        });
+
+        let applied = false;
+
+        if (!titleEditedManually && previewTitle) {
+          titleInput.value = previewTitle;
+          applied = true;
+        }
+
+        if (!descriptionEditedManually && previewDescription) {
+          descriptionInput.value = previewDescription;
+          applied = true;
+        }
+
+        if (applied) {
+          setPreviewStatus(statusNode, 'success', 'Preview aplicado.');
+          return;
+        }
+
+        if (!previewTitle && !previewDescription) {
+          clearOgMetadata();
+          setPreviewStatus(statusNode, 'idle', 'No encontramos metadata para autocompletar.');
+          return;
+        }
+
+        setPreviewStatus(statusNode, 'idle', '');
+      } catch (error) {
+        if (currentToken !== requestToken) {
+          return;
+        }
+
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
+        abortController = null;
+        clearOgMetadata();
+        setPreviewStatus(statusNode, 'error', 'No se pudo obtener preview.');
+      }
+    }
+
+    urlInput.addEventListener('input', function onUrlInput() {
+      const currentValue = urlInput.value;
+      clearOgMetadata();
+
+      if (debounceTimer !== null) {
+        clearTimeout(debounceTimer);
+      }
+
+      if (!currentValue.trim()) {
+        cleanupPendingRequest();
+        setPreviewStatus(statusNode, 'idle', '');
+        return;
+      }
+
+      debounceTimer = setTimeout(function onDebouncedPreview() {
+        requestPreview(currentValue);
+      }, DEBOUNCE_MS);
+    });
+
+    return {
+      reset,
+    };
+  }
+
+  const createPreviewControllerInstance = createPreviewController({
+    urlInput: document.getElementById('create-url'),
+    titleInput: document.getElementById('create-title'),
+    descriptionInput: document.getElementById('create-description'),
+    ogTitleInput: document.getElementById('create-ogTitle'),
+    ogDescriptionInput: document.getElementById('create-ogDescription'),
+    ogImageInput: document.getElementById('create-ogImage'),
+    statusNode: document.getElementById('create-preview-status'),
+  });
+
+  const editPreviewControllerInstance = createPreviewController({
+    urlInput: document.getElementById('edit-url'),
+    titleInput: document.getElementById('edit-title'),
+    descriptionInput: document.getElementById('edit-description'),
+    ogTitleInput: document.getElementById('edit-ogTitle'),
+    ogDescriptionInput: document.getElementById('edit-ogDescription'),
+    ogImageInput: document.getElementById('edit-ogImage'),
+    statusNode: document.getElementById('edit-preview-status'),
+  });
+
+  window.__createLinkPreviewReset = createPreviewControllerInstance.reset;
+  window.__editLinkPreviewReset = editPreviewControllerInstance.reset;
+})();
 </script>

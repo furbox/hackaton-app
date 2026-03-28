@@ -62,9 +62,9 @@ export async function homeController(request: Request): Promise<Response> {
       flash,
       stats,
       featuredLinks,
-      headline: "URLoft — Tu gestor de enlaces con superpoderes",
+      headline: "Tu biblioteca inteligente de links",
       subtitle:
-        "Guarda, organiza y comparte tus links favoritos. Con búsqueda inteligente, short links y mucho más.",
+        "Guarda, organiza y encontra cualquier enlace en segundos. Todo en un solo lugar: desde links del dia a dia hasta recursos clave para tu equipo.",
     },
   });
 }

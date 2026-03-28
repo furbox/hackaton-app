@@ -177,11 +177,20 @@ export function validateLoginBody(
     errors.password = "Password is required";
   }
 
+  // rememberMe is optional - default to false if not provided or invalid
+  // Accept both camelCase (rememberMe) and kebab-case (remember-me) from HTML forms
+  const rememberMe =
+    typeof body.rememberMe === "boolean"
+      ? body.rememberMe
+      : typeof body["remember-me"] === "boolean"
+        ? body["remember-me"]
+        : false;
+
   if (Object.keys(errors).length > 0) {
     return { valid: false, errors };
   }
 
-  return { valid: true, data: { email, password } };
+  return { valid: true, data: { email, password, rememberMe } };
 }
 
 /**
@@ -230,15 +239,15 @@ export function validateResetPasswordBody(
     errors.token = "Reset token is required";
   }
 
-  const newPassword = typeof body.newPassword === "string" ? body.newPassword : "";
-  const passwordError = validatePassword(newPassword);
+  const password = typeof body.password === "string" ? body.password : "";
+  const passwordError = validatePassword(password);
   if (passwordError) {
-    errors.newPassword = passwordError;
+    errors.password = passwordError;
   }
 
   if (Object.keys(errors).length > 0) {
     return { valid: false, errors };
   }
 
-  return { valid: true, data: { token, newPassword } };
+  return { valid: true, data: { token, password } };
 }

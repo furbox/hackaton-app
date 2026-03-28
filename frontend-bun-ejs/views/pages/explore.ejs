@@ -36,10 +36,13 @@
 
   <!-- Results -->
   <% if (links && links.length > 0) { %>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      <% links.forEach(function(link) { %>
-        <%- include('../partials/link-card', { link: link }) %>
-      <% }) %>
+    <div id="explore-results">
+      <%- include('../partials/explore-results', {
+        links,
+        page: query.page,
+        hasNextPage,
+        nextPageUrl,
+      }) %>
     </div>
 
     <!-- Pagination -->

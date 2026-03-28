@@ -3,6 +3,8 @@ import { handleRequest, addRoute, listRoutes } from "./src/router.ts";
 // ─── Batch 3: Public pages ────────────────────────────────────────────────────
 import { homeController } from "./src/controllers/home.controller.ts";
 import { exploreController } from "./src/controllers/explore.controller.ts";
+import { behindScenesController } from "./src/controllers/behind-scenes.controller.ts";
+import { tecnologiaController } from "./src/controllers/tecnologia.controller.ts";
 import { profileController } from "./src/controllers/profile.controller.ts";
 
 // ─── Batch 4: Auth pages ──────────────────────────────────────────────────────
@@ -66,6 +68,8 @@ import { shortLinkController } from "./src/controllers/short-link.controller.ts"
 // Public pages
 addRoute("GET", "/", homeController);
 addRoute("GET", "/explore", exploreController);
+addRoute("GET", "/como-lo-hice", behindScenesController);
+addRoute("GET", "/tecnologia", tecnologiaController);
 addRoute("GET", "/u/:username", profileController);
 
 // Auth

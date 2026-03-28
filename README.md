@@ -18,7 +18,7 @@ Todos tenemos decenas (o cientos) de links útiles repartidos entre notas, favor
 
 | Feature | Descripción |
 |---------|-------------|
-| 🔐 **Autenticación Segura** | Sesiones seguras con verificación de email y recuperación de contraseña |
+| 🔐 **Autenticación Segura** | Sesiones seguras con verificación de email y recuperación de contraseña |🆗
 | 🔗 **URL Shortener** | Cada link guardado genera un short link único listo para compartir | 🆗
 | 🔒 **Público / Privado** | Control granular de visibilidad por enlace |🆗
 | 🏆 **Gamificación (Rangos)** | Sistema de rangos que premia la actividad del usuario |🆗

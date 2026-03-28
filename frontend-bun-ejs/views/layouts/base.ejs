@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="URLoft — Tu gestor de enlaces con superpoderes" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/icons/icon-16.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/icons/icon-48.png" />
+  <link rel="apple-touch-icon" sizes="128x128" href="/public/icons/icon-128.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="URLoft" />
+  <meta property="og:description" content="URLoft — Tu gestor de enlaces con superpoderes" />
+  <meta property="og:image" content="/public/logo-urloft.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="URLoft" />
+  <meta name="twitter:description" content="URLoft — Tu gestor de enlaces con superpoderes" />
+  <meta name="twitter:image" content="/public/logo-urloft.png" />
   <title><%= title %> - URLoft</title>
 
   <!-- Tailwind CSS Browser v4 -->
@@ -111,9 +122,12 @@
   <footer class="mt-16 border-t border-border bg-surface/70 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">🔗</span>
-          <span class="font-semibold text-text-primary">URLoft</span>
+        <div class="flex items-center" aria-label="URLoft">
+          <img
+            src="/public/logo-urloft.png"
+            alt="URLoft logo"
+            class="h-9 w-auto object-contain object-center"
+          />
         </div>
         <p class="text-sm text-text-secondary">
           Hecho con ❤️ para el Hackathon 2026 midudev

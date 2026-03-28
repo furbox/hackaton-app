@@ -75,7 +75,7 @@ export interface AuthDeps {
   }): Promise<{ headers: Headers; response: { user: Record<string, unknown>; token: string | null } }>;
 
   signInEmail(opts: {
-    body: { email: string; password: string };
+    body: { email: string; password: string; rememberMe?: boolean };
     headers: Headers;
     returnHeaders: true;
   }): Promise<{ headers: Headers; response: { token: string; user: Record<string, unknown>; redirect: boolean } }>;
@@ -332,7 +332,7 @@ async function handleLogin(req: Request, deps: AuthDeps): Promise<Response> {
     return authError(400, firstError, "VALIDATION_ERROR");
   }
 
-  const { email, password } = validation.data;
+  const { email, password, rememberMe } = validation.data;
 
   // 3. Check email verification BEFORE calling Better Auth (NEW — Phase 3.5)
   //    This gives a clear "verify your email" message instead of a generic BA error.
@@ -378,7 +378,7 @@ async function handleLogin(req: Request, deps: AuthDeps): Promise<Response> {
   // 4. Call Better Auth to sign in
   try {
     const baResponse = await deps.signInEmail({
-      body: { email, password },
+      body: { email, password, rememberMe },
       headers: req.headers,
       returnHeaders: true,
     });
@@ -473,7 +473,7 @@ async function handleResetPassword(req: Request): Promise<Response> {
     return authError(400, firstError, "VALIDATION_ERROR");
   }
 
-  const { token, newPassword } = validation.data;
+  const { token, password } = validation.data;
 
   let consumed;
   try {
@@ -489,7 +489,7 @@ async function handleResetPassword(req: Request): Promise<Response> {
 
   let hashedPassword: string;
   try {
-    hashedPassword = await Bun.password.hash(newPassword);
+    hashedPassword = await Bun.password.hash(password);
   } catch (err) {
     console.error("[reset-password] Failed to hash password", err);
     return authError(500, "An unexpected authentication error occurred", "AUTH_PROVIDER_ERROR");
