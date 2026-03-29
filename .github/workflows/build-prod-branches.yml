@@ -1,4 +1,4 @@
-name: Build Clean Production Branches
+name: Build Clean Production Branch
 
 on:
   push:
@@ -6,62 +6,87 @@ on:
       - main
 
 jobs:
-  build-clean-backend:
+  build-clean-prod:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
 
-      - name: Prepare clean backend
+      - name: Prepare clean prod branch
         run: |
-          mkdir -p /tmp/backend-clean
-          cp -r backend/* /tmp/backend-clean/
+          # 1. Crear carpeta temporal
+          mkdir -p /tmp/prod-clean
           
-          cd /tmp/backend-clean
+          # 2. Copiar todo el repositorio
+          cp -r . /tmp/prod-clean/ || true
+          
+          cd /tmp/prod-clean/
+          
+          # 3. Eliminar la propia carpeta .git para evitar anidamientos extraños
+          rm -rf .git
+          
+          # --- EXCLUSIONES A NIVEL RAIZ ---
+          # Borrar cosas que el VPS no necesita
+          rm -rf .agents/
+          rm -rf .atl/
+          rm -rf documentacion/
+          rm -rf extension/
+          rm -rf openspec/
+          rm -rf scripts/
+          rm -rf sdd/
+          rm -rf skills/
+          rm -rf tasks/
+          
+          # Borrar archivos innecesarios de raiz
+          rm -f *.md
+          rm -f .env .env.example
+          rm -f dev-start.sh
+          rm -f skills-lock.json
+          rm -f readme_temp.txt
+          rm -f Pendientes
+          rm -f nul
+          
           # --- EXCLUSIONES BACKEND ---
-          rm -rf node_modules/
-          rm -rf test/
-          rm -rf db/*.sqlite db/*.sqlite-wal db/*.sqlite-shm database.sqlite database.sqlite-wal database.sqlite-shm
-          rm -rf scripts/
-          rm -rf **/*.md
-          rm -f .env
-          # ---------------------------
-
-      - name: Push to prod-backend
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /tmp/backend-clean
-          publish_branch: prod-backend
-          force_orphan: true
-          commit_message: "🚀 Deploy backend limpio (bot)"
-
-  build-clean-frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
-
-      - name: Prepare clean frontend
-        run: |
-          mkdir -p /tmp/frontend-clean
-          cp -r frontend-bun-ejs/* /tmp/frontend-clean/
+          if [ -d "backend" ]; then
+            cd backend
+            rm -rf node_modules/
+            rm -rf test/
+            rm -rf db/*.sqlite db/*.sqlite-wal db/*.sqlite-shm database.sqlite database.sqlite-wal database.sqlite-shm
+            rm -rf scripts/
+            rm -rf **/*.md
+            rm -f .env
+            cd ..
+          fi
           
-          cd /tmp/frontend-clean
-          # --- EXCLUSIONES FRONTEND ---
-          rm -rf node_modules/
-          rm -rf test/
-          rm -rf scripts/
-          rm -f *.log
-          rm -rf **/*.md
-          rm -f .env
-          # ----------------------------
+          # --- EXCLUSIONES FRONTEND (frontend-bun-ejs) ---
+          if [ -d "frontend-bun-ejs" ]; then
+            cd frontend-bun-ejs
+            rm -rf node_modules/
+            rm -rf test/
+            rm -rf scripts/
+            rm -f *.log
+            rm -rf **/*.md
+            rm -f .env
+            cd ..
+          fi
+          
+          # --- EXCLUSIONES FRONTEND (frontend original) ---
+          # Por si lo seguís usando o querés limpiarlo tambien
+          if [ -d "frontend" ]; then
+            cd frontend
+            rm -rf node_modules/
+            rm -rf test/
+            rm -rf scripts/
+            rm -rf **/*.md
+            rm -f .env
+            cd ..
+          fi
 
-      - name: Push to prod-frontend
+      - name: Push to prod branch
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: /tmp/frontend-clean
-          publish_branch: prod-frontend
+          publish_dir: /tmp/prod-clean
+          publish_branch: prod
           force_orphan: true
-          commit_message: "🚀 Deploy frontend limpio (bot)"
+          commit_message: "🚀 Deploy limpio (bot) de main a prod"
