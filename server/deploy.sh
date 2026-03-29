@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Ensure bun is available (not loaded via .bashrc in non-interactive SSH)
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 APP_DIR="/home/urloft"
 TARGET="${1:-all}"
 BRANCH="${2:-prod}"
