@@ -15,7 +15,10 @@
 <div class="min-h-[calc(100vh-12rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
 	<div class="max-w-md w-full space-y-8">
 		<div class="text-center">
-			<h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">
+			<a href="/" class="inline-flex items-center text-primary font-bold text-3xl tracking-tight mb-2">
+				urloft
+			</a>
+			<h2 class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white">
 				{title}
 			</h2>
 		</div>

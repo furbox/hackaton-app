@@ -31,6 +31,13 @@
 
 <div class="min-h-[calc(100vh-12rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
 	<div class="max-w-md w-full">
+		<!-- Logo igual al nav -->
+		<div class="text-center mb-8">
+			<a href="/" class="inline-flex items-center text-primary font-bold text-3xl tracking-tight">
+				urloft
+			</a>
+		</div>
+
 		{#if data.success}
 			<div class="text-center">
 				<div
@@ -69,7 +76,7 @@
 		{:else}
 			<div class="text-center">
 				<div
-					class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/30"
+					class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 dark:bg-red-900/30 mb-2"
 				>
 					<svg
 						class="h-12 w-12 text-red-600 dark:text-red-400"
