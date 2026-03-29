@@ -14,7 +14,7 @@ module.exports = {
     {
       name: "urloft-frontend",
       cwd: "/home/urloft/frontend-bun-ejs",
-      script: "build/index.js",
+      script: "index.ts",
       interpreter: "bun",
       env: {
         NODE_ENV: "production",

@@ -25,8 +25,7 @@ deploy_backend() {
 }
 
   deploy_frontend() {
-  bun install --cwd frontend-bun-ejs --frozen-lockfile
-  bun run --cwd frontend-bun-ejs build
+  # Frontend Bun + EJS no necesita build, solo recargar
   reload_pm2_app "urloft-frontend"
 }
 

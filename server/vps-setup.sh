@@ -81,8 +81,8 @@ bun install --cwd frontend-bun-ejs --frozen-lockfile
 # =============================================================================
 # 8. BUILD DEL FRONTEND
 # =============================================================================
-echo "🔨 Build del frontend..."
-bun run --cwd frontend-bun-ejs build
+echo "⚡ Frontend no necesita build (Bun + EJS)..."
+echo "✓ Listo para iniciar directamente"
 
 # =============================================================================
 # 9. CREAR VARIABLES DE ENTORNO
