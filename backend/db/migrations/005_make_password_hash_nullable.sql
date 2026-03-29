@@ -1,4 +1,4 @@
--- Migration 005: Make password_hash nullable
+-- Migration 005: Make password_hash nullable (Safe version)
 --
 -- Better Auth creates users without password_hash when using OAuth or
 -- when the user creation flow is handled internally by Better Auth.
@@ -12,7 +12,7 @@
 
 PRAGMA foreign_keys = OFF;
 
-CREATE TABLE users_new (
+CREATE TABLE IF NOT EXISTS users_new (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -24,10 +24,26 @@ CREATE TABLE users_new (
   verification_token TEXT,
   verification_expires DATETIME,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  role TEXT DEFAULT 'user',
+  banned INTEGER DEFAULT 0,
+  ban_reason TEXT,
+  ban_expires DATETIME,
   FOREIGN KEY (rank_id) REFERENCES ranks(id) ON DELETE RESTRICT
 );
 
-INSERT INTO users_new SELECT * FROM users;
+-- Copy data specifying all columns explicitly so it doesn't crash 
+-- if the old table has different columns
+INSERT INTO users_new (
+  id, username, email, password_hash, avatar_url, bio, rank_id, 
+  email_verified, verification_token, verification_expires, created_at,
+  role, banned, ban_reason, ban_expires
+)
+SELECT 
+  id, username, email, password_hash, avatar_url, bio, rank_id, 
+  email_verified, verification_token, verification_expires, created_at,
+  role, banned, ban_reason, ban_expires
+FROM users;
+
 DROP TABLE users;
 ALTER TABLE users_new RENAME TO users;
 

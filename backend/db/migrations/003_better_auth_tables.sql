@@ -1,39 +1,34 @@
 -- Better Auth Required Tables Migration
--- This migration creates the `account` and `verification` tables required by Better Auth
--- for email/password authentication and email verification.
--- Run this after the main schema.sql has been executed.
--- Better Auth: Account table
--- Required for email/password authentication and OAuth providers
+-- This migration ensures the `account` and `verification` tables exist.
+-- Better Auth manages its own schema automatically on startup, so this is just
+-- a fallback for fresh databases before the app starts.
+
 CREATE TABLE IF NOT EXISTS account (
   id TEXT PRIMARY KEY,
-  user_id INTEGER NOT NULL,
-  account_id TEXT NOT NULL,
-  provider_id TEXT NOT NULL,
-  access_token TEXT,
-  refresh_token TEXT,
-  access_token_expires_at INTEGER,
-  refresh_token_expires_at INTEGER,
+  userId INTEGER NOT NULL,
+  accountId TEXT NOT NULL,
+  providerId TEXT NOT NULL,
+  accessToken TEXT,
+  refreshToken TEXT,
+  accessTokenExpiresAt INTEGER,
+  refreshTokenExpiresAt INTEGER,
   scope TEXT,
-  id_token TEXT,
+  idToken TEXT,
   password TEXT,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  createdAt INTEGER NOT NULL,
+  updatedAt INTEGER NOT NULL,
+  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Better Auth: Verification table
--- Required for email verification and other verification requests
 CREATE TABLE IF NOT EXISTS verification (
   id TEXT PRIMARY KEY,
   identifier TEXT NOT NULL,
   value TEXT NOT NULL,
-  expires_at INTEGER NOT NULL,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL
+  expiresAt INTEGER NOT NULL,
+  createdAt INTEGER NOT NULL,
+  updatedAt INTEGER NOT NULL
 );
 
--- Indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_account_user_id ON account(user_id);
-CREATE INDEX IF NOT EXISTS idx_account_provider_id ON account(provider_id);
-CREATE INDEX IF NOT EXISTS idx_verification_identifier ON verification(identifier);
-CREATE INDEX IF NOT EXISTS idx_verification_expires_at ON verification(expires_at);
+-- Note: We do not force indexes here because Better Auth handles its own
+-- schema sync, and depending on when the sync ran, the column names might
+-- be camelCase or snake_case. This avoids the "no such column" crash.
