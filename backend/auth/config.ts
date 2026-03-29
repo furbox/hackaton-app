@@ -155,6 +155,12 @@ export const authConfig = betterAuth({
     useSecureCookies: process.env.NODE_ENV === "production",
 
     /**
+     * Trust proxy headers (X-Forwarded-For, X-Forwarded-Proto).
+     * Required when behind Cloudflare, Nginx, or any reverse proxy.
+     */
+    trustOrigin: true,
+
+    /**
      * Cross-subdomain cookies - disabled for same-origin security.
      */
     crossSubDomainCookies: {
