@@ -109,6 +109,12 @@ export type LinkDTO = {
   isPublic: boolean;
   categoryId: number | null;
   views: number;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImage: string | null;
+  statusCode: number;
+  archiveUrl: string | null;
+  contentText: string | null;
   createdAt: string;
 };
 
@@ -238,6 +244,12 @@ function toLinkDTO(row: Link): LinkDTO {
     isPublic: row.is_public === 1,
     categoryId: row.category_id,
     views: row.views,
+    ogTitle: row.og_title,
+    ogDescription: row.og_description,
+    ogImage: row.og_image,
+    statusCode: row.status_code,
+    archiveUrl: row.archive_url,
+    contentText: row.content_text,
     createdAt: row.created_at,
   };
 }

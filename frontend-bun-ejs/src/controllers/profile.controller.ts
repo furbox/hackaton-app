@@ -44,6 +44,7 @@ interface ProfileLink {
   views?: number;
   liked_by_me?: boolean;
   favorited_by_me?: boolean;
+  status_code?: number;
   username?: string;
   avatar_url?: string;
   owner_username?: string;
@@ -128,6 +129,11 @@ function normalizeProfileLink(raw: unknown, owner: ProfileUser): ProfileLink | n
     ?? owner.avatar_url
     ?? owner.avatarUrl
     ?? undefined;
+  const statusCode = typeof source.status_code === "number"
+    ? source.status_code
+    : typeof source.statusCode === "number"
+      ? source.statusCode
+      : undefined;
 
   return {
     id,
@@ -148,6 +154,7 @@ function normalizeProfileLink(raw: unknown, owner: ProfileUser): ProfileLink | n
         ? source.favoritesCount
         : 0,
     views: typeof source.views === "number" ? source.views : 0,
+    status_code: statusCode,
     liked_by_me: typeof source.liked_by_me === "boolean"
       ? source.liked_by_me
       : typeof source.likedByMe === "boolean"

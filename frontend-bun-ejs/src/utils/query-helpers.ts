@@ -43,6 +43,8 @@ export interface Link {
   views?: number;
   is_public?: boolean;
   isPublic?: boolean;
+  status_code?: number;
+  statusCode?: number;
   category_id?: number | null;
   categoryId?: number | null;
   liked_by_me?: boolean;
@@ -258,6 +260,7 @@ export function normalizeLink(raw: unknown): Link | null {
   const views = typeof link.views === "number" ? link.views : 0;
   const likesCount = typeof link.likes_count === "number" ? link.likes_count : typeof link.likesCount === "number" ? link.likesCount : 0;
   const favoritesCount = typeof link.favorites_count === "number" ? link.favorites_count : typeof link.favoritesCount === "number" ? link.favoritesCount : 0;
+  const statusCode = typeof link.status_code === "number" ? link.status_code : typeof link.statusCode === "number" ? link.statusCode : undefined;
   const createdAt = typeof link.created_at === "string" ? link.created_at : typeof link.createdAt === "string" ? link.createdAt : undefined;
   const isPublic = typeof link.is_public === "boolean" ? link.is_public : typeof link.isPublic === "boolean" ? link.isPublic : false;
   const categoryId = typeof link.category_id === "number" ? link.category_id : typeof link.categoryId === "number" ? link.categoryId : null;
@@ -286,6 +289,7 @@ export function normalizeLink(raw: unknown): Link | null {
     views,
     likes_count: likesCount,
     favorites_count: favoritesCount,
+    status_code: statusCode,
     created_at: createdAt,
     is_public: isPublic,
     category_id: categoryId,

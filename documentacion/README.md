@@ -13,7 +13,9 @@
 | [`phase06-mcp-server.md`](./phase06-mcp-server.md) | **Phase 6: MCP Server** | Arquitectura MCP, auth con API keys, herramientas expuestas |
 | [`phase06-web-skill.md`](./phase06-web-skill.md) | **Phase 6: Web Skill** | Endpoints de skill, contratos y casos de uso para agentes |
 | [`phase07-frontend-sveltekit-setup.md`](./phase07-frontend-sveltekit-setup.md) | **Phase 7: Frontend Setup** | Base SvelteKit, layouts, estado y actions iniciales |
-| [`phase08-frontend-public-pages.md`](./phase08-frontend-public-pages.md) | **Phase 8: Frontend Public Pages** | Rutas publicas, auth flows, SSR/SEO y estado actual |
+ | [`phase08-frontend-public-pages.md`](./phase08-frontend-public-pages.md) | **Phase 8: Frontend Public Pages** | Rutas publicas, auth flows, SSR/SEO y estado actual |
+ | [`phase09-router-modular-refactor.md`](./phase09-router-modular-refactor.md) | **Phase 9: Router Modular Refactor** | Refactorización del sistema de rutas a arquitectura modular por feature |
+| [`phase10-chrome-extension.md`](./phase10-chrome-extension.md) | **Phase 10: Chrome Extension** | Extensión de Chrome con Vanilla JS: auth, guardar links, búsqueda, categorías, badge counter |
 | [`api-doc.md`](./api-doc.md) | **API Contracts** | Endpoints, errores, auth y frontera frontend `services + /api/proxy` |
 
 ---
@@ -66,7 +68,7 @@
 - Detectar acoplamiento route-to-db antes de merge
 - Arrancar 4.1+ con contratos y gates ya definidos
 
-### `phase08-frontend-public-pages.md` - Frontend Public Pages (Phase 8)
+ ### `phase08-frontend-public-pages.md` - Frontend Public Pages (Phase 8)
 
 **Que incluye:**
 - Alcance implementado para Home, Explore, perfiles publicos y auth publico
@@ -78,6 +80,43 @@
 - Onboarding rapido del frontend publico actual
 - Saber que partes de Phase 8 estan cerradas y cuales quedaron como deuda
 - Implementar nuevas vistas publicas sin romper la frontera de proxy
+
+---
+
+### `phase09-router-modular-refactor.md` - Router Modular Refactor (Phase 9)
+
+**Que incluye:**
+- Refactorizacion del sistema de rutas de monolitico (193 lineas) a modular (99 lineas)
+- Arquitectura por feature: public.routes.ts, auth.routes.ts, dashboard.routes.ts, api.routes.ts
+- Tipo RouteDefinition y helper registerRoutes() con validacion de duplicados
+- 32 tests creados (unit + integration) con 100% pass rate
+- Decisiones tecnicas y lecciones aprendidas
+
+**Ideal para:**
+- Entender la arquitectura modular de rutas en frontend-bun-ejs
+- Agregar nuevas rutas siguiendo el patron establecido
+- Aprender sobre configuration-as-code pattern y incremental refactoring
+- Conocer el SDD workflow completo aplicado a una refactorizacion real
+
+### `phase10-chrome-extension.md` - Chrome Extension (Phase 10)
+
+**Qué incluye:**
+- Stack técnico elegido (Vanilla JS + HTML, Manifest V3, sin build step)
+- Alcance implementado (auth, guardar links, búsqueda, categorías, badge counter)
+- Arquitectura popup ↔ background ↔ backend con diagramas
+- Integración con URLoft API (endpoints usados, estrategia de auth con session tokens)
+- UI/UX del popup (descripción visual, flujo de usuario típico)
+- Estado actual (qué funciona, deuda técnica, issues conocidos)
+- Próximos pasos (features faltantes, mejoras planeadas)
+- Referencias técnicas (Chrome APIs usadas, patrones de código, troubleshooting)
+- Checklist de publicación en Chrome Web Store
+
+**Ideal para:**
+- Entender la arquitectura completa de la extensión de Chrome
+- Conocer el cambio de API Key a email/password (Better Auth)
+- Aprender cómo integrar una extensión de Chrome con una API REST
+- Contribuir a la extensión o agregar nuevas features
+- Publicar la extensión en Chrome Web Store
 
 ### `api-doc.md` - API Contracts y estrategia de consumo frontend
 
@@ -96,13 +135,15 @@
 
 ## 🚀 Cómo Navegar
 
-### Para desarrolladores nuevos:
-1. Empieza con [`db-layer.md`](./db-layer.md) para entender la base de datos
-2. Continua con [`phase03-authentication-layer.md`](./phase03-authentication-layer.md) para entender la capa de auth
-3. Lee [`phase07-frontend-sveltekit-setup.md`](./phase07-frontend-sveltekit-setup.md) para la base del frontend
-4. Lee [`phase08-frontend-public-pages.md`](./phase08-frontend-public-pages.md) para el estado real de paginas publicas
-5. Revisa [`api-doc.md`](./api-doc.md) antes de tocar contratos o integraciones
-6. Consulta "Troubleshooting" si encuentras errores
+ ### Para desarrolladores nuevos:
+ 1. Empieza con [`db-layer.md`](./db-layer.md) para entender la base de datos
+ 2. Continua con [`phase03-authentication-layer.md`](./phase03-authentication-layer.md) para entender la capa de auth
+ 3. Lee [`phase07-frontend-sveltekit-setup.md`](./phase07-frontend-sveltekit-setup.md) para la base del frontend
+ 4. Lee [`phase08-frontend-public-pages.md`](./phase08-frontend-public-pages.md) para el estado real de paginas publicas
+ 5. Lee [`phase09-router-modular-refactor.md`](./phase09-router-modular-refactor.md) para entender la arquitectura modular de rutas
+ 6. Lee [`phase10-chrome-extension.md`](./phase10-chrome-extension.md) para entender la extensión de Chrome
+ 7. Revisa [`api-doc.md`](./api-doc.md) antes de tocar contratos o integraciones
+ 8. Consulta "Troubleshooting" si encuentras errores
 
 ### Para contribuidores:
 1. Lee "Patrones y Best Practices" antes de hacer cambios
@@ -136,5 +177,5 @@
 
 ---
 
-**Última actualización**: 2026-03-26  
-**Versión**: 1.2.0
+ **Última actualización**: 2026-03-28
+**Versión**: 1.3.0

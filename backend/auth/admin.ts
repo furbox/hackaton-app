@@ -44,7 +44,7 @@
  */
 
 import { getDatabase } from "../db/connection.js";
-import { createAuditLog, extractRequestInfo } from "../services/audit-log.service.js";
+import { createAuditLog } from "../services/audit-log.service.js";
 import { requireAdmin, isAdmin, type Session } from "../middleware/auth/index.js";
 
 // ============================================================================
@@ -152,6 +152,8 @@ export interface ImpersonationResult {
  * @param targetUserId - ID of the user whose role will be changed
  * @param newRole - The new role to assign ("user" or "admin")
  * @param adminSession - The admin's session (for permission check and audit)
+ * @param ipAddress - IP address of the admin making the request
+ * @param userAgent - User-Agent of the admin making the request
  * @returns `true` if role was changed successfully
  * @throws Error if permissions insufficient, self-change, or invalid role
  *
@@ -160,14 +162,16 @@ export interface ImpersonationResult {
  * const adminSession = await requireAdmin(request);
  * const { ipAddress, userAgent } = extractRequestInfo(request);
  *
- * await setUserRole(targetUserId, "admin", adminSession);
+ * await setUserRole(targetUserId, "admin", adminSession, ipAddress, userAgent);
  * // Role changed, audit log created
  * ```
  */
 export async function setUserRole(
   targetUserId: number,
   newRole: UserRole,
-  adminSession: Session
+  adminSession: Session,
+  ipAddress: string,
+  userAgent: string
 ): Promise<boolean> {
   // 1. Validate admin permissions
   if (!isAdmin(adminSession)) {
@@ -201,9 +205,6 @@ export async function setUserRole(
   db.prepare("UPDATE users SET role = ? WHERE id = ?").run(newRole, targetUserId);
 
   // 7. Create audit log
-  // Note: extractRequestInfo needs a Request object. In this helper context,
-  // we don't have the original request, so we create a minimal one.
-  const { ipAddress, userAgent } = extractRequestInfo(new Request("http://localhost"));
   const adminUserId = toNumericUserId(adminSession.user.id);
   if (adminUserId === undefined) {
     throw new Error("Invalid admin user ID in session");
@@ -249,31 +250,36 @@ export async function setUserRole(
  *
  * @param params - Ban parameters (target user, reason, expiration)
  * @param adminSession - The admin's session (for permission check and audit)
+ * @param ipAddress - IP address of the admin making the request
+ * @param userAgent - User-Agent of the admin making the request
  * @returns `true` if user was banned successfully
  * @throws Error if permissions insufficient, self-ban, or attempting to ban admin
  *
  * @example
  * ```typescript
  * const adminSession = await requireAdmin(request);
+ * const { ipAddress, userAgent } = extractRequestInfo(request);
  *
  * // Permanent ban
  * await banUser({
  *   targetUserId: 123,
  *   reason: "Violation of Terms of Service",
  *   expiresAt: null
- * }, adminSession);
+ * }, adminSession, ipAddress, userAgent);
  *
  * // Temporary ban (24 hours)
  * await banUser({
  *   targetUserId: 123,
  *   reason: "Spam behavior",
  *   expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
- * }, adminSession);
+ * }, adminSession, ipAddress, userAgent);
  * ```
  */
 export async function banUser(
   params: BanUserParams,
-  adminSession: Session
+  adminSession: Session,
+  ipAddress: string,
+  userAgent: string
 ): Promise<boolean> {
   const { targetUserId, reason, expiresAt } = params;
 
@@ -318,7 +324,6 @@ export async function banUser(
   );
 
   // 6. Create audit log
-  const { ipAddress, userAgent } = extractRequestInfo(new Request("http://localhost"));
   const adminUserId = toNumericUserId(adminSession.user.id);
   if (adminUserId === undefined) {
     throw new Error("Invalid admin user ID in session");
@@ -364,20 +369,25 @@ export async function banUser(
  *
  * @param targetUserId - ID of the user to unban
  * @param adminSession - The admin's session (for permission check and audit)
+ * @param ipAddress - IP address of the admin making the request
+ * @param userAgent - User-Agent of the admin making the request
  * @returns `true` if user was unbanned successfully
  * @throws Error if permissions insufficient
  *
  * @example
  * ```typescript
  * const adminSession = await requireAdmin(request);
+ * const { ipAddress, userAgent } = extractRequestInfo(request);
  *
- * await unbanUser(123, adminSession);
+ * await unbanUser(123, adminSession, ipAddress, userAgent);
  * // User is unbanned but must log in again
  * ```
  */
 export async function unbanUser(
   targetUserId: number,
-  adminSession: Session
+  adminSession: Session,
+  ipAddress: string,
+  userAgent: string
 ): Promise<boolean> {
   // 1. Validate admin permissions
   if (!isAdmin(adminSession)) {
@@ -396,7 +406,6 @@ export async function unbanUser(
   ).run(targetUserId);
 
   // 3. Create audit log
-  const { ipAddress, userAgent } = extractRequestInfo(new Request("http://localhost"));
   const adminUserId = toNumericUserId(adminSession.user.id);
   if (adminUserId === undefined) {
     throw new Error("Invalid admin user ID in session");
@@ -446,20 +455,25 @@ export async function unbanUser(
  *
  * @param targetUserId - ID of the user to impersonate
  * @param adminSession - The admin's session (for permission check and audit)
+ * @param ipAddress - IP address of the admin making the request
+ * @param userAgent - User-Agent of the admin making the request
  * @returns The impersonation session token
  * @throws Error if permissions insufficient or user not found
  *
  * @example
  * ```typescript
  * const adminSession = await requireAdmin(request);
+ * const { ipAddress, userAgent } = extractRequestInfo(request);
  *
- * const token = await startImpersonation(123, adminSession);
+ * const token = await startImpersonation(123, adminSession, ipAddress, userAgent);
  * // Now admin can use this token to act as user 123
  * ```
  */
 export async function startImpersonation(
   targetUserId: number,
-  adminSession: Session
+  adminSession: Session,
+  ipAddress: string,
+  userAgent: string
 ): Promise<string> {
   // 1. Validate admin permissions
   if (!isAdmin(adminSession)) {
@@ -503,18 +517,14 @@ export async function startImpersonation(
   ).run(
     targetUserId,
     token,
-    "unknown", // IP address - would be extracted from real request in route layer
-    "impersonation-session", // User-Agent placeholder
+    ipAddress,
+    userAgent,
     fingerprint,
     expiresAt.toISOString(),
     adminUserId // Track which admin created this session
   );
 
   // 4. Create audit log
-  // Note: extractRequestInfo needs a Request object. In this helper context,
-  // we don't have the original request, so we create a minimal one.
-  const { ipAddress, userAgent } = extractRequestInfo(new Request("http://localhost"));
-
   await createAuditLog({
     userId: adminUserId,
     event: "impersonation_started",
@@ -545,21 +555,26 @@ export async function startImpersonation(
  * - Includes which admin ended it and which user was being impersonated
  *
  * @param impersonatedSession - The active impersonation session to terminate
+ * @param ipAddress - IP address of the request ending the impersonation
+ * @param userAgent - User-Agent of the request ending the impersonation
  * @returns `true` if impersonation was ended successfully
  * @throws Error if session is not an impersonation session
  *
  * @example
  * ```typescript
  * const session = await requireAuth(request);
+ * const { ipAddress, userAgent } = extractRequestInfo(request);
  *
  * if (session.impersonatedBy) {
- *   await endImpersonation(session);
+ *   await endImpersonation(session, ipAddress, userAgent);
  *   // Impersonation session terminated
  * }
  * ```
  */
 export async function endImpersonation(
-  impersonatedSession: Session
+  impersonatedSession: Session,
+  ipAddress: string,
+  userAgent: string
 ): Promise<boolean> {
   // 1. Validate: this is an impersonation session
   const impersonatedBy = (impersonatedSession as any).impersonatedBy;
@@ -587,7 +602,6 @@ export async function endImpersonation(
   );
 
   // 4. Create audit log
-  const { ipAddress, userAgent } = extractRequestInfo(new Request("http://localhost"));
   const targetUserId = toNumericUserId(impersonatedSession.user.id);
   if (targetUserId === undefined) {
     throw new Error("Invalid target user ID in session");

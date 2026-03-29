@@ -48,6 +48,7 @@ import {
   ResetTokenError,
 } from "../../../auth/password-reset.js";
 import { createAuditLog, extractRequestInfo } from "../../../services/audit-log.service.js";
+import { extractIP } from "../../../middleware/auth/fingerprint.js";
 import { getUserByEmail, invalidateUserSessions, updateUser } from "../../../db/queries/index.js";
 import { getDatabase } from "../../../db/connection.js";
 import { verifyEmailToken } from "../../../services/email-verification.service.js";
@@ -229,7 +230,7 @@ function mapBetterAuthError(err: unknown, context: string): Response {
     }
 
     // ── 401 — invalid credentials ──
-    if (status === 401 || status === 400) {
+    if (baCode === "INVALID_EMAIL_OR_PASSWORD" || status === 401 || status === 400) {
       return authError(401, "Invalid email or password", "INVALID_CREDENTIALS");
     }
 
@@ -250,9 +251,10 @@ function mapBetterAuthError(err: unknown, context: string): Response {
  */
 async function handleRegister(req: Request, deps: AuthDeps): Promise<Response> {
   const { ipAddress, userAgent } = extractRequestInfo(req);
+  const rateLimitIP = extractIP(req);
 
   // 1. Rate limit
-  const rateLimitResponse = applyRateLimit(ipAddress);
+  const rateLimitResponse = applyRateLimit(rateLimitIP);
   if (rateLimitResponse) return rateLimitResponse;
 
   // 2. Parse + validate body
@@ -315,9 +317,10 @@ async function handleRegister(req: Request, deps: AuthDeps): Promise<Response> {
  */
 async function handleLogin(req: Request, deps: AuthDeps): Promise<Response> {
   const { ipAddress, userAgent } = extractRequestInfo(req);
+  const rateLimitIP = extractIP(req);
 
   // 1. Rate limit
-  const rateLimitResponse = applyRateLimit(ipAddress);
+  const rateLimitResponse = applyRateLimit(rateLimitIP);
   if (rateLimitResponse) return rateLimitResponse;
 
   // 2. Parse + validate body
@@ -417,8 +420,9 @@ async function handleLogin(req: Request, deps: AuthDeps): Promise<Response> {
 
 async function handleForgotPassword(req: Request): Promise<Response> {
   const { ipAddress, userAgent } = extractRequestInfo(req);
+  const rateLimitIP = extractIP(req);
 
-  const rateLimitResponse = applyRateLimit(ipAddress);
+  const rateLimitResponse = applyRateLimit(rateLimitIP);
   if (rateLimitResponse) return rateLimitResponse;
 
   const rawBody = await parseJsonBody(req);
@@ -458,8 +462,9 @@ async function handleForgotPassword(req: Request): Promise<Response> {
 
 async function handleResetPassword(req: Request): Promise<Response> {
   const { ipAddress, userAgent } = extractRequestInfo(req);
+  const rateLimitIP = extractIP(req);
 
-  const rateLimitResponse = applyRateLimit(ipAddress);
+  const rateLimitResponse = applyRateLimit(rateLimitIP);
   if (rateLimitResponse) return rateLimitResponse;
 
   const rawBody = await parseJsonBody(req);

@@ -24,6 +24,7 @@ interface Link {
   avatar_url?: string;
   owner_username?: string;
   owner_avatar_url?: string;
+  status_code?: number;
   user?: {
     username?: string;
     avatar_url?: string;
@@ -181,6 +182,12 @@ function normalizeLink(raw: unknown): Link | null {
           : undefined,
     user: userData,
     category,
+    status_code:
+      typeof source.status_code === "number"
+        ? source.status_code
+        : typeof source.statusCode === "number"
+          ? source.statusCode
+          : undefined,
   };
 }
 

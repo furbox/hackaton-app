@@ -27,11 +27,11 @@ Todos tenemos decenas (o cientos) de links útiles repartidos entre notas, favor
 | 🔑 **API Keys** | Los usuarios generan sus propias API keys para conectar servicios externos |
 | 🤖 **Integración con IA** | MCP Server y Web Skill para conectar cualquier IA a tus links |🆗
 | 🌐 **Extensión de Chrome** | Guarda la página actual con un click o consulta tus links sin salir del navegador |🆗
-| 📸 **Link Preview** | Al pegar una URL se extraen automáticamente el título, descripción e imagen OG |
+| 📸 **Link Preview** | Al pegar una URL se extraen automáticamente el título, descripción e imagen OG | 🆗
 | 📊 **Dashboard Completo** | Panel privado para gestionar perfil, links, categorías, API keys y favoritos |🆗
 | 🔍 **Búsqueda Full-Text** | Búsqueda ultrarrápida que encuentra cualquier link al instante |🆗
-| 🛡️ **Seguridad Avanzada** | Rate limiting y protección contra abuso |
-| 📱 **PWA** | Instala URLoft como app nativa en tu celular desde el navegador |
+| 🛡️ **Seguridad Avanzada** | Rate limiting y protección contra abuso | 🆗
+| 📱 **PWA** | Instala URLoft como app nativa en tu celular desde el navegador | 🆗
 | 📥 **Importar Bookmarks** | Sube el archivo HTML de Chrome/Firefox y tus bookmarks se importan automáticamente |🆗
 
 ---

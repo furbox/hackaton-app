@@ -13,7 +13,6 @@ import { handleShortRoute } from "./routes/api/short.js";
 import { handleMcpRoute } from "./mcp/server.ts";
 import { handleSkillSearchRoute } from "./skill/search.ts";
 import { handleSkillExtractRoute } from "./skill/extract.ts";
-import { GET as testIPRoute } from "./routes/api/test-ip.js";
 import {
   setRoleHandler,
   banUserHandler,
@@ -100,11 +99,6 @@ export async function router(req: Request): Promise<Response | null> {
   if (path === "/api/skill/lookup" || path.startsWith("/api/skill/extract/")) {
     const skillExtractResponse = await handleSkillExtractRoute(req, path);
     if (skillExtractResponse !== null) return skillExtractResponse;
-  }
-
-  // Test IP extraction endpoint (for development/debugging)
-  if (path === "/api/test-ip" && req.method === "GET") {
-    return await testIPRoute(req);
   }
 
   // Admin routes: /api/admin/users/:id/...

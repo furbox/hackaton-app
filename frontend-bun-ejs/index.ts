@@ -31,6 +31,20 @@ const server = Bun.serve({
   async fetch(request) {
     const url = new URL(request.url);
 
+    // Service Worker — debe servirse desde la raíz para tener scope correcto
+    if (url.pathname === "/sw.js") {
+      const swFile = Bun.file(PUBLIC_DIR + "/sw.js");
+      if (await swFile.exists()) {
+        return new Response(swFile, {
+          headers: {
+            "Content-Type": "application/javascript",
+            "Service-Worker-Allowed": "/",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+          },
+        });
+      }
+    }
+
     // Serve static files from /public
     if (url.pathname.startsWith("/public/")) {
       const filePath = PUBLIC_DIR + url.pathname.slice("/public".length);

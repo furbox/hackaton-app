@@ -1,0 +1,67 @@
+name: Build Clean Production Branches
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-clean-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Prepare clean backend
+        run: |
+          mkdir -p /tmp/backend-clean
+          cp -r backend/* /tmp/backend-clean/
+          
+          cd /tmp/backend-clean
+          # --- EXCLUSIONES BACKEND ---
+          rm -rf node_modules/
+          rm -rf test/
+          rm -rf db/*.sqlite db/*.sqlite-wal db/*.sqlite-shm database.sqlite database.sqlite-wal database.sqlite-shm
+          rm -rf scripts/
+          rm -rf **/*.md
+          rm -f .env
+          # ---------------------------
+
+      - name: Push to prod-backend
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/backend-clean
+          publish_branch: prod-backend
+          force_orphan: true
+          commit_message: "🚀 Deploy backend limpio (bot)"
+
+  build-clean-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+
+      - name: Prepare clean frontend
+        run: |
+          mkdir -p /tmp/frontend-clean
+          cp -r frontend-bun-ejs/* /tmp/frontend-clean/
+          
+          cd /tmp/frontend-clean
+          # --- EXCLUSIONES FRONTEND ---
+          rm -rf node_modules/
+          rm -rf test/
+          rm -rf scripts/
+          rm -f *.log
+          rm -rf **/*.md
+          rm -f .env
+          # ----------------------------
+
+      - name: Push to prod-frontend
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: /tmp/frontend-clean
+          publish_branch: prod-frontend
+          force_orphan: true
+          commit_message: "🚀 Deploy frontend limpio (bot)"

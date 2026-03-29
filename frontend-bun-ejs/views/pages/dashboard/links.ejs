@@ -42,15 +42,15 @@
       <!-- Links table -->
       <div class="ui-card overflow-hidden">
         <div class="overflow-x-auto">
-          <table class="ui-table w-full text-sm">
+          <table class="ui-table w-full text-sm table-fixed">
             <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Título / URL</th>
-                <th class="hidden px-4 py-3 text-center text-xs font-medium uppercase tracking-wider sm:table-cell">Visibilidad</th>
-                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">👁</th>
-                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">❤️</th>
-                <th class="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">⭐</th>
-                <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Acciones</th>
+                <th class="w-[35%] min-w-[200px] px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Título / URL</th>
+                <th class="hidden w-[12%] min-w-[100px] px-4 py-3 text-center text-xs font-medium uppercase tracking-wider sm:table-cell">Visibilidad</th>
+                <th class="w-[8%] min-w-[60px] px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">👁</th>
+                <th class="w-[8%] min-w-[60px] px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">❤️</th>
+                <th class="w-[8%] min-w-[60px] px-4 py-3 text-center text-xs font-medium uppercase tracking-wider">⭐</th>
+                <th class="w-[29%] min-w-[280px] px-6 py-3 text-right text-xs font-medium uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -134,7 +134,7 @@
                   class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
             Cancelar
           </button>
-          <button type="submit"
+          <button type="submit" id="create-submit-button"
                   class="ui-btn-primary flex-1 px-4 py-2 text-sm font-medium">
             Guardar
           </button>
@@ -198,7 +198,7 @@
                 class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
           Cancelar
         </button>
-        <button type="submit"
+        <button type="submit" id="edit-submit-button"
                 class="ui-btn-primary flex-1 px-4 py-2 text-sm font-medium">
           Guardar cambios
         </button>
@@ -278,6 +278,7 @@ function openEditModal(link) {
       ogDescriptionInput,
       ogImageInput,
       statusNode,
+      submitButton,
     } = options;
 
     if (!urlInput || !titleInput || !descriptionInput || !ogTitleInput || !ogDescriptionInput || !ogImageInput) {
@@ -291,6 +292,7 @@ function openEditModal(link) {
     let requestToken = 0;
     let titleEditedManually = false;
     let descriptionEditedManually = false;
+    let isPreviewInProgress = false;
 
     function setOgMetadata(metadata) {
       ogTitleInput.value = metadata.title || '';
@@ -319,6 +321,11 @@ function openEditModal(link) {
       requestToken += 1;
       titleEditedManually = false;
       descriptionEditedManually = false;
+      isPreviewInProgress = false;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = submitButton.dataset.originalText || 'Guardar';
+      }
       clearOgMetadata();
       setPreviewStatus(statusNode, 'idle', '');
     }
@@ -342,6 +349,13 @@ function openEditModal(link) {
 
       const currentToken = ++requestToken;
       abortController = new AbortController();
+
+      isPreviewInProgress = true;
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.dataset.originalText = submitButton.textContent;
+        submitButton.textContent = 'Obteniendo preview...';
+      }
 
       setPreviewStatus(statusNode, 'loading', 'Obteniendo preview...');
 
@@ -424,6 +438,14 @@ function openEditModal(link) {
         abortController = null;
         clearOgMetadata();
         setPreviewStatus(statusNode, 'error', 'No se pudo obtener preview.');
+      } finally {
+        if (currentToken === requestToken) {
+          isPreviewInProgress = false;
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = submitButton.dataset.originalText || 'Guardar';
+          }
+        }
       }
     }
 
@@ -459,6 +481,7 @@ function openEditModal(link) {
     ogDescriptionInput: document.getElementById('create-ogDescription'),
     ogImageInput: document.getElementById('create-ogImage'),
     statusNode: document.getElementById('create-preview-status'),
+    submitButton: document.getElementById('create-submit-button'),
   });
 
   const editPreviewControllerInstance = createPreviewController({
@@ -469,6 +492,7 @@ function openEditModal(link) {
     ogDescriptionInput: document.getElementById('edit-ogDescription'),
     ogImageInput: document.getElementById('edit-ogImage'),
     statusNode: document.getElementById('edit-preview-status'),
+    submitButton: document.getElementById('edit-submit-button'),
   });
 
   window.__createLinkPreviewReset = createPreviewControllerInstance.reset;

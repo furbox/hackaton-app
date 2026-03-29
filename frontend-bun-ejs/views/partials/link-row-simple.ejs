@@ -28,9 +28,10 @@
 
 <tr class="ui-table-row">
   <td class="px-6 py-4">
-    <div class="mb-0.5 line-clamp-1 font-medium text-text-primary"><%= link.title %></div>
+    <div class="mb-0.5 truncate font-medium text-text-primary" title="<%= link.title %>"><%= link.title %></div>
     <a href="<%= link.url %>" target="_blank" rel="noopener noreferrer"
-       class="line-clamp-1 font-mono text-xs text-text-secondary transition-colors hover:text-accent-primary">
+       class="block truncate font-mono text-xs text-text-secondary transition-colors hover:text-accent-primary"
+       title="<%= link.url %>">
       <%= link.url %>
     </a>
     <% if (link.category && link.category.name) { %>
@@ -50,23 +51,23 @@
   <td class="px-4 py-4 text-center text-text-secondary"><%= favoritesCount %></td>
   <td class="px-6 py-4 text-right">
     <% if (showActions) { %>
-      <div class="flex items-center justify-end gap-2">
+      <div class="flex items-center justify-end gap-1.5 flex-wrap">
         <!-- Stats button -->
         <a href="/dashboard/links/<%= link.id %>"
-           class="rounded px-2 py-1 text-xs font-medium text-accent-secondary transition-colors hover:bg-accent-secondary/10">
-          📊 Stats
+           class="rounded px-2 py-1 text-xs font-medium text-accent-secondary transition-colors hover:bg-accent-secondary/10 whitespace-nowrap">
+          📊
         </a>
         <!-- Edit button -->
         <button onclick="openEditModal(<%= JSON.stringify(link) %>)"
-                class="rounded px-2 py-1 text-xs font-medium text-accent-primary transition-colors hover:bg-accent-primary/10 hover:text-cyan-300">
-          ✏️ Editar
+                class="rounded px-2 py-1 text-xs font-medium text-accent-primary transition-colors hover:bg-accent-primary/10 hover:text-cyan-300 whitespace-nowrap">
+          ✏️
         </button>
         <!-- Delete button -->
         <form method="POST" action="/dashboard/links/<%= link.id %>/delete"
               onsubmit="return confirm('¿Eliminar este link?')">
           <button type="submit"
-                  class="rounded px-2 py-1 text-xs font-medium text-error transition-colors hover:bg-error/10">
-            🗑️ Eliminar
+                  class="rounded px-2 py-1 text-xs font-medium text-error transition-colors hover:bg-error/10 whitespace-nowrap">
+            🗑️
           </button>
         </form>
       </div>

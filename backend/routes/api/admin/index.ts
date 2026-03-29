@@ -57,6 +57,7 @@ import {
   endImpersonation,
   type UserRole,
 } from "../../../auth/admin.js";
+import { extractRequestInfo } from "../../../services/audit-log.service.js";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -70,7 +71,9 @@ export interface AdminServices {
   setUserRole: (
     targetUserId: number,
     newRole: UserRole,
-    adminSession: Session
+    adminSession: Session,
+    ipAddress: string,
+    userAgent: string
   ) => Promise<boolean>;
   banUser: (
     params: {
@@ -78,14 +81,27 @@ export interface AdminServices {
       reason: string;
       expiresAt: Date | null;
     },
-    adminSession: Session
+    adminSession: Session,
+    ipAddress: string,
+    userAgent: string
   ) => Promise<boolean>;
-  unbanUser: (targetUserId: number, adminSession: Session) => Promise<boolean>;
+  unbanUser: (
+    targetUserId: number,
+    adminSession: Session,
+    ipAddress: string,
+    userAgent: string
+  ) => Promise<boolean>;
   startImpersonation: (
     targetUserId: number,
-    adminSession: Session
+    adminSession: Session,
+    ipAddress: string,
+    userAgent: string
   ) => Promise<string>;
-  endImpersonation: (impersonatedSession: Session) => Promise<boolean>;
+  endImpersonation: (
+    impersonatedSession: Session,
+    ipAddress: string,
+    userAgent: string
+  ) => Promise<boolean>;
 }
 
 /**
@@ -204,8 +220,9 @@ export async function setRoleHandler(
   }
 
   // 4. Call service layer
+  const { ipAddress, userAgent } = extractRequestInfo(request);
   try {
-    await resolvedDeps.services.setUserRole(targetUserId, body.role as UserRole, session);
+    await resolvedDeps.services.setUserRole(targetUserId, body.role as UserRole, session, ipAddress, userAgent);
 
     return Response.json(
       {
@@ -309,6 +326,7 @@ export async function banUserHandler(
   }
 
   // 5. Call service layer
+  const { ipAddress, userAgent } = extractRequestInfo(request);
   try {
     await resolvedDeps.services.banUser(
       {
@@ -316,7 +334,9 @@ export async function banUserHandler(
         reason: body.reason.trim(),
         expiresAt,
       },
-      session
+      session,
+      ipAddress,
+      userAgent
     );
 
     return Response.json(
@@ -395,8 +415,9 @@ export async function unbanUserHandler(
   const session = authResult;
 
   // 3. Call service layer
+  const { ipAddress, userAgent } = extractRequestInfo(request);
   try {
-    await resolvedDeps.services.unbanUser(targetUserId, session);
+    await resolvedDeps.services.unbanUser(targetUserId, session, ipAddress, userAgent);
 
     return Response.json(
       {
@@ -469,8 +490,9 @@ export async function startImpersonationHandler(
   const session = authResult;
 
   // 3. Call service layer
+  const { ipAddress, userAgent } = extractRequestInfo(request);
   try {
-    const sessionToken = await resolvedDeps.services.startImpersonation(targetUserId, session);
+    const sessionToken = await resolvedDeps.services.startImpersonation(targetUserId, session, ipAddress, userAgent);
 
     return Response.json(
       {
@@ -534,8 +556,9 @@ export async function endImpersonationHandler(
   }
 
   // 3. Call service layer
+  const { ipAddress, userAgent } = extractRequestInfo(request);
   try {
-    await resolvedDeps.services.endImpersonation(session);
+    await resolvedDeps.services.endImpersonation(session, ipAddress, userAgent);
     return new Response(null, { status: 204 }); // No Content
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to end impersonation";

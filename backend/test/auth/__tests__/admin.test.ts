@@ -181,7 +181,7 @@ describe("Admin Helper Functions", () => {
 
     it("should change user role from user to admin", async () => {
       // Act
-      const result = await setUserRole(regularUserId, "admin", adminSession as any);
+      const result = await setUserRole(regularUserId, "admin", adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(result).toBe(true);
@@ -200,7 +200,7 @@ describe("Admin Helper Functions", () => {
       const otherAdminId = otherAdminResult.lastInsertRowid as number;
 
       // Act
-      const result = await setUserRole(otherAdminId, "user", adminSession as any);
+      const result = await setUserRole(otherAdminId, "user", adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(result).toBe(true);
@@ -211,7 +211,7 @@ describe("Admin Helper Functions", () => {
 
     it("should create audit log with old and new roles", async () => {
       // Act
-      await setUserRole(regularUserId, "admin", adminSession as any);
+      await setUserRole(regularUserId, "admin", adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const logs = getAllAuditLogs();
@@ -229,21 +229,21 @@ describe("Admin Helper Functions", () => {
     it("should throw error when trying to change own role", async () => {
       // Act & Assert
       await expect(
-        setUserRole(adminUserId, "user", adminSession as any)
+        setUserRole(adminUserId, "user", adminSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow("Cannot change your own role");
     });
 
     it("should throw error for invalid role", async () => {
       // Act & Assert
       await expect(
-        setUserRole(regularUserId, "superadmin" as any, adminSession as any)
+        setUserRole(regularUserId, "superadmin" as any, adminSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow('Invalid role: "superadmin"');
     });
 
     it("should throw error for non-existent user", async () => {
       // Act & Assert
       await expect(
-        setUserRole(99999, "admin", adminSession as any)
+        setUserRole(99999, "admin", adminSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow("User not found: ID 99999");
     });
 
@@ -268,7 +268,7 @@ describe("Admin Helper Functions", () => {
 
       // Act & Assert
       await expect(
-        setUserRole(regularUserId, "admin", attackerSession as any)
+        setUserRole(regularUserId, "admin", attackerSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow("Insufficient permissions");
     });
   });
@@ -293,7 +293,7 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act
-      const result = await banUser(params, adminSession as any);
+      const result = await banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(result).toBe(true);
@@ -314,7 +314,7 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act
-      const result = await banUser(params, adminSession as any);
+      const result = await banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(result).toBe(true);
@@ -347,7 +347,7 @@ describe("Admin Helper Functions", () => {
         reason: "Test ban",
         expiresAt: null,
       };
-      await banUser(params, adminSession as any);
+      await banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const afterCount = getActiveSessionsCount(regularUserId);
@@ -363,7 +363,7 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act
-      await banUser(params, adminSession as any);
+      await banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const logs = getAllAuditLogs();
@@ -388,7 +388,7 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act & Assert
-      await expect(banUser(params, adminSession as any)).rejects.toThrow(
+      await expect(banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0")).rejects.toThrow(
         "Cannot ban yourself"
       );
     });
@@ -410,7 +410,7 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act & Assert
-      await expect(banUser(params, adminSession as any)).rejects.toThrow(
+      await expect(banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0")).rejects.toThrow(
         "Cannot ban admin users"
       );
     });
@@ -424,7 +424,7 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act & Assert
-      await expect(banUser(params, adminSession as any)).rejects.toThrow(
+      await expect(banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0")).rejects.toThrow(
         "User not found: ID 99999"
       );
     });
@@ -442,7 +442,7 @@ describe("Admin Helper Functions", () => {
         .run("Test ban", null, regularUserId);
 
       // Act
-      const result = await unbanUser(regularUserId, adminSession as any);
+      const result = await unbanUser(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(result).toBe(true);
@@ -460,7 +460,7 @@ describe("Admin Helper Functions", () => {
         .run("Test ban", null, regularUserId);
 
       // Act
-      await unbanUser(regularUserId, adminSession as any);
+      await unbanUser(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const logs = getAllAuditLogs();
@@ -476,7 +476,7 @@ describe("Admin Helper Functions", () => {
     it("should throw error when non-admin tries to unban", async () => {
       // Act & Assert
       await expect(
-        unbanUser(regularUserId, regularUserSession as any)
+        unbanUser(regularUserId, regularUserSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow("Insufficient permissions");
     });
   });
@@ -492,7 +492,7 @@ describe("Admin Helper Functions", () => {
 
     it("should create impersonation session for target user", async () => {
       // Act
-      const token = await startImpersonation(regularUserId, adminSession as any);
+      const token = await startImpersonation(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(token).toBeDefined();
@@ -511,7 +511,7 @@ describe("Admin Helper Functions", () => {
 
     it("should set session expiration to 1 hour", async () => {
       // Act
-      const token = await startImpersonation(regularUserId, adminSession as any);
+      const token = await startImpersonation(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const session = testDb
@@ -529,7 +529,7 @@ describe("Admin Helper Functions", () => {
 
     it("should create audit log with token prefix", async () => {
       // Act
-      const token = await startImpersonation(regularUserId, adminSession as any);
+      const token = await startImpersonation(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const logs = getAllAuditLogs();
@@ -549,14 +549,14 @@ describe("Admin Helper Functions", () => {
     it("should throw error for non-existent user", async () => {
       // Act & Assert
       await expect(
-        startImpersonation(99999, adminSession as any)
+        startImpersonation(99999, adminSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow("User not found: ID 99999");
     });
 
     it("should throw error when non-admin tries to impersonate", async () => {
       // Act & Assert
       await expect(
-        startImpersonation(adminUserId, regularUserSession as any)
+        startImpersonation(adminUserId, regularUserSession as any, "1.2.3.4", "TestAgent/1.0")
       ).rejects.toThrow("Insufficient permissions");
     });
   });
@@ -568,7 +568,7 @@ describe("Admin Helper Functions", () => {
 
     it("should terminate impersonation session", async () => {
       // Arrange: Create an impersonation session
-      const token = await startImpersonation(regularUserId, adminSession as any);
+      const token = await startImpersonation(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       const impersonationSession = {
         user: {
@@ -582,7 +582,7 @@ describe("Admin Helper Functions", () => {
       } as any;
 
       // Act
-      const result = await endImpersonation(impersonationSession);
+      const result = await endImpersonation(impersonationSession, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       expect(result).toBe(true);
@@ -596,7 +596,7 @@ describe("Admin Helper Functions", () => {
 
     it("should create audit log", async () => {
       // Arrange: Create an impersonation session
-      const token = await startImpersonation(regularUserId, adminSession as any);
+      const token = await startImpersonation(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       const impersonationSession = {
         user: {
@@ -610,7 +610,7 @@ describe("Admin Helper Functions", () => {
       } as any;
 
       // Act
-      await endImpersonation(impersonationSession);
+      await endImpersonation(impersonationSession, "1.2.3.4", "TestAgent/1.0");
 
       // Assert
       const logs = getAllAuditLogs();
@@ -636,7 +636,7 @@ describe("Admin Helper Functions", () => {
       } as any;
 
       // Act & Assert
-      await expect(endImpersonation(regularSession)).rejects.toThrow(
+      await expect(endImpersonation(regularSession, "1.2.3.4", "TestAgent/1.0")).rejects.toThrow(
         "Not an impersonation session"
       );
     });
@@ -657,12 +657,12 @@ describe("Admin Helper Functions", () => {
       };
 
       // Act: Ban user
-      await banUser(params, adminSession as any);
+      await banUser(params, adminSession as any, "1.2.3.4", "TestAgent/1.0");
       let user = getUserById(regularUserId);
       expect(user.banned).toBe(1);
 
       // Act: Unban user
-      await unbanUser(regularUserId, adminSession as any);
+      await unbanUser(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
       user = getUserById(regularUserId);
       expect(user.banned).toBe(0);
 
@@ -679,7 +679,7 @@ describe("Admin Helper Functions", () => {
       clearAuditLogs();
 
       // Act: Start impersonation
-      const token = await startImpersonation(regularUserId, adminSession as any);
+      const token = await startImpersonation(regularUserId, adminSession as any, "1.2.3.4", "TestAgent/1.0");
 
       // Verify session is active
       let session = testDb
@@ -699,7 +699,7 @@ describe("Admin Helper Functions", () => {
         impersonatedBy: adminUserId,
       } as any;
 
-      await endImpersonation(impersonationSession);
+      await endImpersonation(impersonationSession, "1.2.3.4", "TestAgent/1.0");
 
       // Verify session is inactive
       session = testDb

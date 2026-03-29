@@ -28,6 +28,8 @@ interface Link {
   views?: number;
   is_public?: boolean;
   isPublic?: boolean;
+  status_code?: number;
+  statusCode?: number;
   category_id?: number | null;
   categoryId?: number | null;
   category?: { id: number; name: string; color: string } | null;
@@ -61,6 +63,7 @@ function normalizeLink(link: Link): Link {
     is_public: isPublic,
     likes_count: link.likes_count ?? link.likesCount ?? 0,
     favorites_count: link.favorites_count ?? link.favoritesCount ?? 0,
+    status_code: link.status_code ?? link.statusCode,
   };
 }
 

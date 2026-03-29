@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "bun run index.ts",
+    "start": "bun run index.ts",
     "test": "bun test",
     "db:setup": "bun run db/setup.ts",
     "check:route-boundaries": "bun run scripts/check-route-boundaries.ts",
