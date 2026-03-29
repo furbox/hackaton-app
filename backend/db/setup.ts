@@ -58,17 +58,7 @@ async function main() {
 	console.log("🚀 Initializing database...");
 
 	try {
-		// Check if database is already initialized
-		const { isDatabaseInitialized } = await import("./migrations");
-
-		if (isDatabaseInitialized()) {
-			console.log("✅ Database already initialized");
-			console.log("   All tables and indexes exist");
-			console.log("\n💡 Tip: Delete database.sqlite to reinitialize from scratch");
-			return;
-		}
-
-		// Initialize the database schema
+		// Always initialize - this creates schema if needed AND always runs pending migrations
 		await initializeDatabase();
 
 		// Success message

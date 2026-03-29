@@ -77,7 +77,6 @@ export const authConfig = betterAuth({
       name: "username",
       emailVerified: "email_verified",
       image: "avatar_url",
-      password: "password_hash", // Better Auth hashes 'password' and stores in 'password_hash'
       createdAt: "created_at",
       updatedAt: "created_at",
     },
@@ -268,28 +267,6 @@ export const authConfig = betterAuth({
    * us to add custom behavior like storing fingerprints for session security.
    */
   databaseHooks: {
-    /**
-     * User creation hook.
-     *
-     * This hook runs before a new user is inserted into the database.
-     * We use it to ensure the password hash is included in the INSERT.
-     *
-     * Better Auth's kysely adapter sometimes doesn't include password fields
-     * when using direct database connections, so we add it explicitly here.
-     */
-    user: {
-      create: {
-        before: async (user, context) => {
-          // Ensure password_hash is included if password is provided
-          if ((user as any).password && !(user as any).password_hash) {
-            const password = (user as any).password;
-            const hash = await Bun.password.hash(password);
-            (user as any).password_hash = hash;
-          }
-          return { data: user };
-        },
-      },
-    },
     /**
      * Session creation hook.
      *
