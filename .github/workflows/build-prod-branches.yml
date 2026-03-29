@@ -27,27 +27,28 @@ jobs:
           # 3. Eliminar la propia carpeta .git para evitar anidamientos extraños
           rm -rf .git
           
-          # --- EXCLUSIONES A NIVEL RAIZ ---
-          # Borrar cosas que el VPS no necesita
-          rm -rf .agents/
-          rm -rf .atl/
-          rm -rf documentacion/
-          rm -rf extension/
-          rm -rf openspec/
-          rm -rf scripts/
-          rm -rf sdd/
-          rm -rf skills/
-          rm -rf tasks/
-          
-          # Borrar archivos innecesarios de raiz
-          find . -name "*.md" -type f -delete
-          find . -name "*.MD" -type f -delete
-          rm -f .env .env.example
-          rm -f dev-start.sh
-          rm -f skills-lock.json
-          rm -f readme_temp.txt
-          rm -f Pendientes
-          rm -f nul
+           # --- EXCLUSIONES A NIVEL RAIZ ---
+           # Borrar cosas que el VPS no necesita
+           rm -rf .agents/
+           rm -rf .atl/
+           rm -rf documentacion/
+           rm -rf extension/
+           rm -rf frontend/
+           rm -rf openspec/
+           rm -rf scripts/
+           rm -rf sdd/
+           rm -rf skills/
+           rm -rf tasks/
+           
+           # Borrar archivos innecesarios de raiz
+           find . -name "*.md" -type f -delete
+           find . -name "*.MD" -type f -delete
+           rm -f .env .env.example .gitignore .gitattributes .nojekyll
+           rm -f dev-start.sh
+           rm -f skills-lock.json
+           rm -f readme_temp.txt
+           rm -f Pendiente
+           rm -f nul
           
           # --- EXCLUSIONES BACKEND ---
           if [ -d "backend" ]; then
