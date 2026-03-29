@@ -57,6 +57,10 @@ echo "✓ PM2: $(pm2 --version)"
 # 5. CREAR DIRECTORIO DEL PROYECTO
 # =============================================================================
 echo "📁 Creando directorio del proyecto..."
+if [ -d "/home/urloft" ]; then
+  echo "⚠️  Directorio existe, limpiando..."
+  rm -rf /home/urloft
+fi
 mkdir -p /home/urloft
 cd /home/urloft
 
