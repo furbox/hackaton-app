@@ -19,8 +19,7 @@ module.exports = {
       env: {
         NODE_ENV: "production",
         HOST: "127.0.0.1",
-        PORT: 4173,
-        ORIGIN: "https://urloft.site"
+        PORT: 3001
       }
     }
   ]

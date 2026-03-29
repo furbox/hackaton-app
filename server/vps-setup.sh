@@ -113,11 +113,8 @@ EOF
 
 # Frontend .env
 cat > frontend-bun-ejs/.env << 'EOF'
-NODE_ENV=production
-HOST=127.0.0.1
-PORT=4173
-ORIGIN=https://urloft.site
-PUBLIC_BACKEND_URL=https://api.urloft.site
+PORT=3001
+URL_BACKEND=https://api.urloft.site
 EOF
 
 echo "✓ Variables de entorno creadas"
