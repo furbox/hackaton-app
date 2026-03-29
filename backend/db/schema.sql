@@ -40,7 +40,7 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT,
   avatar_url TEXT,
   bio TEXT,
   rank_id INTEGER NOT NULL DEFAULT 1,        -- Foreign key reference to ranks table (default: newbie)
