@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "urloft-backend",
-      cwd: "/var/www/urloft/backend",
+      cwd: "/home/urloft/backend",
       script: "index.ts",
       interpreter: "bun",
       env: {
@@ -13,7 +13,7 @@ module.exports = {
     },
     {
       name: "urloft-frontend",
-      cwd: "/var/www/urloft/frontend",
+      cwd: "/home/urloft/frontend-bun-ejs",
       script: "build/index.js",
       interpreter: "bun",
       env: {

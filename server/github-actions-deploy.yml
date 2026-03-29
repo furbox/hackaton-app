@@ -36,7 +36,7 @@ jobs:
             backend:
               - 'backend/**'
             frontend:
-              - 'frontend/**'
+              - 'frontend-bun-ejs/**'
             server:
               - 'server/**'
 
@@ -90,6 +90,6 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             set -e
-            cd /var/www/urloft
+            cd /home/urloft
             chmod +x ./server/deploy.sh
             ./server/deploy.sh "${{ steps.target.outputs.value }}" "${{ steps.target.outputs.branch }}"

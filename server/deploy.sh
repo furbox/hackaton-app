@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR="/var/www/urloft"
+APP_DIR="/home/urloft"
 TARGET="${1:-all}"
 BRANCH="${2:-prod}"
 
@@ -24,9 +24,9 @@ deploy_backend() {
   reload_pm2_app "urloft-backend"
 }
 
-deploy_frontend() {
-  bun install --cwd frontend --frozen-lockfile
-  bun run --cwd frontend build
+  deploy_frontend() {
+  bun install --cwd frontend-bun-ejs --frozen-lockfile
+  bun run --cwd frontend-bun-ejs build
   reload_pm2_app "urloft-frontend"
 }
 
