@@ -26,22 +26,23 @@ CREATE TABLE IF NOT EXISTS users_new (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   role TEXT DEFAULT 'user',
   banned INTEGER DEFAULT 0,
-  ban_reason TEXT,
-  ban_expires DATETIME,
+  banReason TEXT,
+  banExpires DATETIME,
   FOREIGN KEY (rank_id) REFERENCES ranks(id) ON DELETE RESTRICT
 );
 
 -- Copy data specifying all columns explicitly so it doesn't crash 
 -- if the old table has different columns
+-- NOTE: ban columns use camelCase because migration 002 added them as camelCase
 INSERT INTO users_new (
   id, username, email, password_hash, avatar_url, bio, rank_id, 
   email_verified, verification_token, verification_expires, created_at,
-  role, banned, ban_reason, ban_expires
+  role, banned, banReason, banExpires
 )
 SELECT 
   id, username, email, password_hash, avatar_url, bio, rank_id, 
   email_verified, verification_token, verification_expires, created_at,
-  role, banned, ban_reason, ban_expires
+  role, banned, banReason, banExpires
 FROM users;
 
 DROP TABLE users;
