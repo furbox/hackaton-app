@@ -12,12 +12,12 @@ import {
   getUserRankWithCounts,
   getUserById,
   type CreateUserParams,
-} from "../users.ts";
+} from "../../db/queries/users.ts";
 import {
   createLinkScoped,
   deleteLinkByOwner,
-} from "../links.ts";
-import { getDatabase, setTestDatabase } from "../../connection.ts";
+} from "../../db/queries/links.ts";
+import { getDatabase, setTestDatabase } from "../../db/connection.ts";
 
 describe("Rank System", () => {
   let testDb: Database;

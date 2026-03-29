@@ -476,7 +476,7 @@ async function _checkDuplicate(url, state, els) {
         dupCategory.textContent = link.category?.name || 'Sin categoría';
       }
       if (dupViewBtn && link.shortCode) {
-        dupViewBtn.href = `http://localhost:3000/api/s/${link.shortCode}`;
+        dupViewBtn.href = `https://api.urloft.site/api/s/${link.shortCode}`;
       } else if (dupViewBtn) {
         dupViewBtn.href = link.url || '#';
       }
