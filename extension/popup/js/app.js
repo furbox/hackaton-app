@@ -41,9 +41,10 @@ async function init() {
   showView('loading-view');
 
   try {
-    const stored = await storage.get(['apiKey', 'userEmail']);
+    const stored = await storage.get(['apiKey', 'userEmail', 'userId']);
     state.apiKey    = stored.apiKey    || null;
     state.userEmail = stored.userEmail || null;
+    state.userId    = stored.userId    || null;
 
     if (state.apiKey) {
       // Validate the stored session token is still active before showing the app.
@@ -97,6 +98,7 @@ function showAuthView(expiredMsg = null) {
       isAuthenticating = false;
       state.apiKey    = data.apiKey;
       state.userEmail = data.userEmail || null;
+      state.userId    = data.userId || null;
       showAppView();
     },
     () => {

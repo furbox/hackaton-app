@@ -463,11 +463,11 @@ a:hover { text-decoration: underline; }
   box-shadow: 0 0 0 3px rgba(99,102,241,.15);
 }
 
-.form-input--readonly {
+/* .form-input--readonly {
   background: var(--bg-tertiary);
   color: var(--text-secondary);
   cursor: default;
-}
+} */
 
 .form-textarea {
   resize: vertical;

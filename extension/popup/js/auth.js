@@ -65,11 +65,12 @@ export function initAuth(onSuccess, onError) {
       await storage.set({
         apiKey:        token,
         userEmail:     user?.email ?? email,
+        userId:        user?.id ?? null,
         lastValidated: new Date().toISOString(),
       });
 
       // 5. Notify parent
-      onSuccess({ apiKey: token, userEmail: user?.email ?? email });
+      onSuccess({ apiKey: token, userEmail: user?.email ?? email, userId: user?.id ?? null });
 
     } catch (err) {
       if (err.code === 'UNAUTHORIZED' || err.status === 401) {

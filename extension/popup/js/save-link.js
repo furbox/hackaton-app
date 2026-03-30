@@ -13,6 +13,7 @@ import { emitUnauthorized } from './app.js';
 // Track whether this tab was already initialized
 let _initialized = false;
 let _categoryDropdownCleanup = null;
+let _hasPerformedInitialCheck = false;
 
 /**
  * Initialize the save-link tab.
@@ -23,6 +24,7 @@ let _categoryDropdownCleanup = null;
 export function initSaveLink(state) {
   // Always reset so each tab activation is fresh
   _initialized = false;
+  _hasPerformedInitialCheck = false;
   _init(state);
 }
 
@@ -68,7 +70,10 @@ async function _init(state) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     currentTab = tab;
 
-    if (urlInput)   _setReadonly(urlInput,   tab.url   || '');
+    // Pre-llenar URL con la pestaña activa, pero permitir edición
+    if (urlInput && !urlInput.value) {
+      urlInput.value = tab.url || '';
+    }
     if (titleInput) titleInput.value = tab.title || '';
 
     // Step 2: Extract meta description via scripting
@@ -86,12 +91,15 @@ async function _init(state) {
       if (descInput) descInput.value = '';
     }
 
-    // Step 3: Duplicate check
-    if (tab.url) {
-      await _checkDuplicate(tab.url, state, {
-        form, dupWarning, dupTitle, dupCategory, dupViewBtn,
-      });
-    }
+    // Step 3: Duplicate check DESACTIVADO temporalmente
+    // El endpoint /api/skill/lookup no devuelve userId, no podemos verificar ownership
+    // Dejamos que el backend devuelva 409 si realmente es un duplicado
+    // if (tab.url && !_hasPerformedInitialCheck) {
+    //   await _checkDuplicate(tab.url, state, {
+    //     form, dupWarning, dupTitle, dupCategory, dupViewBtn,
+    //   });
+    //   _hasPerformedInitialCheck = true;
+    // }
   } catch (err) {
     console.warn('[URLoft] Could not read active tab:', err);
   }
@@ -159,15 +167,19 @@ async function _init(state) {
 
     try {
       const res = await createCategory({ name, color: selectedColor }, state.apiKey);
-      const newCat = res?.data?.category || res?.category || res;
+      const newCat = res?.data || res?.data?.category || res?.category || res;
 
       if (newCat?.id) {
-        // Add to select and auto-select
+        // Agregar la nueva categoría al select nativo
         const opt = document.createElement('option');
         opt.value = String(newCat.id);
         opt.textContent = newCat.name;
         catSelect?.appendChild(opt);
+
+        // Refrescar el dropdown custom con la nueva opción
         categoryDropdown.refreshOptions();
+
+        // Seleccionar la nueva categoría
         categoryDropdown.setValue(String(newCat.id));
       }
 
@@ -222,7 +234,7 @@ async function _init(state) {
 
     } catch (err) {
       if (err.status === 409) {
-        _showError(saveError, 'Ya existe este link.');
+        _showError(saveError, 'Ya tenés esta URL guardada. Si querés actualizarla, editá el link existente en "Mis Links".');
       } else {
         _handleApiError(err, saveError, 'Error al guardar el link. Intentá de nuevo.');
       }
@@ -468,10 +480,9 @@ async function _checkDuplicate(url, state, els) {
   const { form, dupWarning, dupTitle, dupCategory, dupViewBtn } = els;
   try {
     const res = await lookupLink(url, state.apiKey);
-
     const link = res?.data?.link ?? null;
 
-    if (link) {
+    if (link && link.userId === state.userId) {
       // Show duplicate warning, hide form
       if (dupTitle) {
         dupTitle.textContent = '';
@@ -497,13 +508,16 @@ async function _checkDuplicate(url, state, els) {
 }
 
 // ── Load categories ────────────────────────────────────────────────
-async function _loadCategories(state, select, categoryDropdown) {
+async function _loadCategories(state, select, categoryDropdown, preserveSelection = true) {
   if (!select) return;
   try {
     const res = await getCategories(state.apiKey);
     // Backend returns { data: CategoryWithLinksCountDTO[] }
     // data is the array directly — NOT { data: { categories: [...] } }
     const cats = Array.isArray(res?.data) ? res.data : (res?.data?.categories || []);
+
+    // Guardar el valor seleccionado actual si preserveSelection es true
+    const previousValue = preserveSelection ? select.value : null;
 
     // Clear existing non-default options
     while (select.options.length > 1) select.remove(1);
@@ -516,7 +530,11 @@ async function _loadCategories(state, select, categoryDropdown) {
     });
 
     categoryDropdown?.refreshOptions();
-    categoryDropdown?.setValue(select.value || '');
+
+    // Solo restaurar el valor anterior si se solicitó preservar la selección
+    if (preserveSelection && previousValue) {
+      categoryDropdown?.setValue(previousValue);
+    }
   } catch (err) {
     // Log for debug — categories are optional so we don't break the UI.
     console.error('[URLoft] _loadCategories error:', err?.message || err);
