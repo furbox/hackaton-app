@@ -335,8 +335,8 @@ Para mantener consistencia en nuevas features del backend usamos **Feature-First
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/tu-usuario/urloft.git
-cd urloft
+git clone https://github.com/furbox/hackaton-app.git
+cd hackaton-app
 
 # Instalar dependencias (backend + frontend)
 cd backend && bun install
@@ -455,7 +455,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para
 
 | Nombre | Rol | GitHub |
 |--------|-----|--------|
-| TBD | Full Stack Dev | [@tu-usuario](https://github.com/tu-usuario) |
+| Furbox | Full Stack Dev | [@furbox](https://github.com/furbox) |
 
 ---
 
