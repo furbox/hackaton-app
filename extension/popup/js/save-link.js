@@ -438,7 +438,13 @@ function _initCategoryDropdown({ container, select, trigger, panel, optionsList,
   panel.addEventListener('keydown', onPanelKeyDown);
   document.addEventListener('mousedown', onClickOutside);
   window.addEventListener('resize', onViewportChange);
-  window.addEventListener('scroll', onViewportChange, true);
+  window.addEventListener('scroll', (event) => {
+    // Ignorar scroll que viene del panel interno del dropdown
+    if (panel.contains(event.target)) {
+      return;
+    }
+    onViewportChange();
+  }, true);
 
   refreshOptions();
 

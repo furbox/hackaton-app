@@ -540,7 +540,7 @@ a:hover { text-decoration: underline; }
   border-radius: var(--border-radius);
   background: var(--bg-primary);
   box-shadow: var(--shadow-md);
-  max-height: 180px;
+  max-height: 280px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
