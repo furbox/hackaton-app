@@ -6,6 +6,97 @@
 
 ---
 
+## 🌐 Explorador de Links
+
+<a href="https://drive.google.com/file/d/1v0Px6umB22cb023yDIcbquA9UuG3BJ7W/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=1v0Px6umB22cb023yDIcbquA9UuG3BJ7W&sz=w800" 
+       alt="URLoft - Explorador de links públicos">
+</a>
+
+**[▶️ Ver explorador en Google Drive](https://drive.google.com/file/d/1v0Px6umB22cb023yDIcbquA9UuG3BJ7W/preview)**
+
+Explora links públicos con filtros avanzados: likes, views, favoritos, categoría y fecha.
+
+---
+
+## 🎬 Página Principal (Home)
+
+<a href="https://drive.google.com/file/d/1K9WFivCHcre_C63yrf3k20bwLH6M2mpT/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=1K9WFivCHcre_C63yrf3k20bwLH6M2mpT&sz=w800" 
+       alt="URLoft - Video completo del proyecto">
+</a>
+
+**[▶️ Ver video completo en Google Drive (42 horas de contenido)](https://drive.google.com/file/d/1K9WFivCHcre_C63yrf3k20bwLH6M2mpT/preview)**
+
+Documentación completa del proceso de desarrollo durante 6 días del hackathon.
+
+---
+
+## 🎥 Búsqueda de Links
+
+<a href="https://drive.google.com/file/d/1QL_rhu1a8bE4xU-fXQG_QjOQF5Apv21y/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=1QL_rhu1a8bE4xU-fXQG_QjOQF5Apv21y&sz=w800" 
+       alt="URLoft - Presentación del proyecto">
+</a>
+
+**[▶️ Ver presentación en Google Drive](https://drive.google.com/file/d/1QL_rhu1a8bE4xU-fXQG_QjOQF5Apv21y/preview)**
+
+Slides del proyecto con arquitectura, features y roadmap.
+
+---
+
+## 🛠️ Cómo lo Hice
+
+<a href="https://drive.google.com/file/d/1XcwHIJlreU1hXlEW183yDs3DCEZ0vOMp/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=1XcwHIJlreU1hXlEW183yDs3DCEZ0vOMp&sz=w800" 
+       alt="URLoft - Cómo lo hice">
+</a>
+
+**[▶️ Ver proceso completo en Google Drive (42 horas de contenido)](https://drive.google.com/file/d/1XcwHIJlreU1hXlEW183yDs3DCEZ0vOMp/preview)**
+
+Documentación completa del proceso de desarrollo: desde la arquitectura inicial hasta el deployment final, en 6 días de hackathon.
+
+---
+
+## 🔐 Autenticación y Login
+
+<a href="https://drive.google.com/file/d/19SyVOo5CAnmiRGJ_vYnAjdVL13AAJ2aE/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=19SyVOo5CAnmiRGJ_vYnAjdVL13AAJ2aE&sz=w800" 
+       alt="URLoft - Sistema de autenticación y login">
+</a>
+
+**[▶️ Ver autenticación en Google Drive](https://drive.google.com/file/d/19SyVOo5CAnmiRGJ_vYnAjdVL13AAJ2aE/preview)**
+
+Sistema de login con Better Auth, verificación de email, recuperación de contraseña y sesiones seguras con fingerprint.
+
+---
+
+## ➕ Crear un Nuevo Link
+
+<a href="https://drive.google.com/file/d/15SQanNdVvMi3tBVzXnJcLmBG0X0Iq-kB/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=15SQanNdVvMi3tBVzXnJcLmBG0X0Iq-kB&sz=w800" 
+       alt="URLoft - Crear un nuevo link">
+</a>
+
+**[▶️ Ver cómo crear links en Google Drive](https://drive.google.com/file/d/15SQanNdVvMi3tBVzXnJcLmBG0X0Iq-kB/preview)**
+
+Guarda cualquier URL con metadata automática (título, descripción e imagen OG), asigna categorías, controla privacidad (público/privado) y genera short links automáticamente.
+
+---
+
+## 🏷️ Gestión de Categorías
+
+<a href="https://drive.google.com/file/d/1-2Ax28Mw6gUeYhuDBZBuK8tmmVqV3Tx_/preview" target="_blank">
+  <img src="https://drive.google.com/thumbnail?id=1-2Ax28Mw6gUeYhuDBZBuK8tmmVqV3Tx_&sz=w800" 
+       alt="URLoft - Gestión de categorías">
+</a>
+
+**[▶️ Ver gestión de categorías en Google Drive](https://drive.google.com/file/d/1-2Ax28Mw6gUeYhuDBZBuK8tmmVqV3Tx_/preview)**
+
+Organiza tus links por temas con categorías personalizadas: crea categorías con nombre y color, edita o elimina categorías, y reasigna links al eliminar una categoría.
+
+---
+
 ## 🧠 ¿Qué problema resuelve?
 
 Todos tenemos decenas (o cientos) de links útiles repartidos entre notas, favoritos del navegador, chats y correos. **URLoft** centraliza todo en un solo lugar con búsqueda rápida, categorías personalizadas y la posibilidad de compartir o mantener privados tus enlaces. Además, genera short links para que compartas cualquier URL de forma limpia.

@@ -82,6 +82,117 @@
   </div>
 </section>
 
+<!-- Video Demo Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Ver URLoft en acción
+      </h2>
+      <p class="text-text-secondary">
+        Descubrí cómo URLoft resuelve el caos de tus links, sus funcionalidades principales y las ventajas que ofrece para organizar tu conocimiento digital.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <lite-youtube videoid="UvJokqRIBUo" class="w-full" style="background-image: url('https://i.ytimg.com/vi/UvJokqRIBUo/maxresdefault.jpg');"></lite-youtube>
+    </div>
+  </div>
+</section>
+
+<!-- Presentation Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Presentación del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Conocé más detalles sobre URLoft, su arquitectura, features y roadmap futuro.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <div class="relative w-full" style="padding-bottom: 56.25%;">
+        <iframe
+          src="https://docs.google.com/presentation/d/e/2PACX-1vQfad1VgyM3dCAKw21COMDt4yIUBeaWQKxOD-Byk8mdmnlgosV7wb4ouMUJMXyQS2euTJlv7-t-gpdd/pubembed?start=true&loop=true&delayms=3000"
+          frameborder="0"
+          allowfullscreen="true"
+          mozallowfullscreen="true"
+          webkitallowfullscreen="true"
+          class="absolute top-0 left-0 w-full h-full rounded-xl">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Infographics Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Recursos visuales del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Infografía y mind map con la arquitectura y diseño de URLoft. Hacé click para expandir.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Infografía -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/infografia.png" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+            <img
+              src="/public/docs/infografia.png"
+              alt="Infografía de URLoft"
+              class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            >
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Infografía del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Vista general de features y arquitectura</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Mind Map -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/NotebookLM_Mind_Map.png" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+            <img
+              src="/public/docs/NotebookLM_Mind_Map.png"
+              alt="Mind Map de URLoft"
+              class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+            >
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Mind Map del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Mapa mental generado con NotebookLM</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Featured Links -->
 <% if (featuredLinks && featuredLinks.length > 0) { %>
 <section class="bg-bg py-16 px-4">
