@@ -6,24 +6,24 @@
   "videos": [
     {
       "id": 1,
-      "videoId": "dQw4w9WgXcQ",
-      "title": "Video principal - Configuración inicial del proyecto",
-      "description": "Cómo setupear el proyecto con Bun, TypeScript y las herramientas base. Estructura de carpetas, configuración de package.json y primeros pasos. Este video se muestra grande arriba de la página.",
-      "duration": "12:34"
+      "videoId": "6GZePI03qBs",
+      "title": "Video principal - Preparación del proyecto",
+      "description": "Mirá cómo construí URLoft desde cero en el hackathon. Cada video muestra una parte del proceso, desde la arquitectura inicial hasta el deployment final.",
+      "duration": "27:25"
     },
     {
       "id": 2,
-      "videoId": "jNQXAC9IVRw",
-      "title": "Arquitectura de base de datos con SQLite",
-      "description": "Diseño del esquema de base de datos, migraciones, y configuración de FTS5 para búsqueda full-text. Modelo de datos y relaciones.",
-      "duration": "15:20"
+      "videoId": "RP0rlta99qs",
+      "title": "Dia 1 Phase01 Stack BUN + SQLite = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Aquí iniciamos el proyecto URLoft en el hackathon 2026. Espero les guste.",
+      "duration": "1:48:33"
     },
     {
       "id": 3,
-      "videoId": "9bZkp7q19f0",
-      "title": "Sistema de autenticación con Better Auth",
-      "description": "Implementación de login, registro, sesiones stateful y middleware de autenticación. Integración con SQLite y cookies seguras.",
-      "duration": "18:45"
+      "videoId": "viJ6JG17Q6c",
+      "title": "Dia 1 Phase02 Stack BUN + SQLite = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Seguimos con la implementación de urloft con un video de 1h 25 minutos de duración.",
+      "duration": "1:25:24"
     }
   ]
 }
