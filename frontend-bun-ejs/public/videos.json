@@ -1,0 +1,29 @@
+{
+  "hero": {
+    "title": "Cómo lo hice",
+    "description": "Mirá cómo construí URLoft desde cero en el hackathon. Cada video muestra una parte del proceso, desde la arquitectura inicial hasta el deployment final."
+  },
+  "videos": [
+    {
+      "id": 1,
+      "videoId": "dQw4w9WgXcQ",
+      "title": "Video principal - Configuración inicial del proyecto",
+      "description": "Cómo setupear el proyecto con Bun, TypeScript y las herramientas base. Estructura de carpetas, configuración de package.json y primeros pasos. Este video se muestra grande arriba de la página.",
+      "duration": "12:34"
+    },
+    {
+      "id": 2,
+      "videoId": "jNQXAC9IVRw",
+      "title": "Arquitectura de base de datos con SQLite",
+      "description": "Diseño del esquema de base de datos, migraciones, y configuración de FTS5 para búsqueda full-text. Modelo de datos y relaciones.",
+      "duration": "15:20"
+    },
+    {
+      "id": 3,
+      "videoId": "9bZkp7q19f0",
+      "title": "Sistema de autenticación con Better Auth",
+      "description": "Implementación de login, registro, sesiones stateful y middleware de autenticación. Integración con SQLite y cookies seguras.",
+      "duration": "18:45"
+    }
+  ]
+}

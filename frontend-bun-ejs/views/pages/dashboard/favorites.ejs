@@ -1,0 +1,197 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary">Guardados</h1>
+    <p class="mt-1 text-text-secondary">Links que guardaste</p>
+  </div>
+
+  <div id="favorites-feedback" class="hidden mb-6 rounded-lg border px-4 py-3 text-sm font-medium" role="status" aria-live="polite"></div>
+
+  <% if (loadError) { %>
+    <div class="ui-card border-error/35 px-6 py-16 text-center">
+      <p class="text-5xl mb-4">⚠️</p>
+      <p class="mb-2 text-lg font-medium text-text-primary">No pudimos cargar tus guardados</p>
+      <p class="mb-6 text-text-secondary">Reintentá en unos segundos. Si el problema sigue, actualizá la pagina.</p>
+      <a href="/dashboard/favorites"
+         class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium">
+        Reintentar
+      </a>
+    </div>
+  <% } else if (totalFavorites > 0) { %>
+    <!-- Filter Bar -->
+    <%- include('../../partials/filter-bar', { searchPlaceholder: 'Buscar guardados...', categories, query, action: '/dashboard/favorites' }) %>
+
+    <% if (favorites && favorites.length > 0) { %>
+      <div id="favorites-grid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <% favorites.forEach(function(link) { %>
+          <%- include('../../partials/link-card', { link: link, removeOnUnlike: true }) %>
+        <% }) %>
+      </div>
+
+      <div id="favorites-empty-after-unlike" class="ui-card mt-8 hidden px-6 py-16 text-center">
+        <div class="mb-6 flex justify-center">
+          <svg class="h-16 w-16 text-text-secondary/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          </svg>
+        </div>
+        <p class="mb-2 text-lg font-medium text-text-primary">No tenes guardados en esta pagina</p>
+        <p class="mb-6 text-text-secondary">Probá cambiar filtros o ir a la pagina anterior.</p>
+        <a href="<%= baseUrl %>" class="ui-btn-primary inline-flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium">
+          Actualizar resultados
+        </a>
+      </div>
+
+      <div id="favorites-pagination">
+        <%- include('../../partials/pagination', { page: query.page, totalPages: totalPages, hasNextPage: hasNextPage, baseUrl: baseUrl }) %>
+      </div>
+    <% } else { %>
+      <div class="ui-card px-6 py-16 text-center">
+        <p class="text-5xl mb-4">🔎</p>
+        <p class="mb-2 text-lg font-medium text-text-primary">No encontramos guardados con esos filtros</p>
+        <p class="mb-6 text-text-secondary">Probá limpiar la búsqueda o elegir otra categoría.</p>
+        <a
+          href="/dashboard/favorites"
+          class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium"
+        >
+          Limpiar filtros
+        </a>
+      </div>
+    <% } %>
+  <% } else { %>
+    <div class="ui-card px-6 py-20 text-center">
+      <div class="mb-6 flex justify-center">
+        <svg class="h-16 w-16 text-text-secondary/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+        </svg>
+      </div>
+      <p class="mb-2 text-lg font-medium text-text-primary">No tenes guardados todavía</p>
+      <p class="mb-6 text-text-secondary">
+        Encontrá links que te gusten en <a href="/explore" class="text-accent-primary hover:underline">Explorar</a>
+        y marcalos como guardados.
+      </p>
+      <a href="/explore"
+         class="ui-btn-primary inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium">
+        🔍 Explorar links
+      </a>
+    </div>
+  <% } %>
+
+  <script>
+    (() => {
+      const grid = document.getElementById("favorites-grid");
+      const feedback = document.getElementById("favorites-feedback");
+      const emptyAfterUnlike = document.getElementById("favorites-empty-after-unlike");
+      const pagination = document.getElementById("favorites-pagination");
+
+      if (!grid || !feedback) {
+        return;
+      }
+
+      const showFeedback = (message, isError) => {
+        feedback.classList.remove("hidden", "border-error/40", "bg-error/12", "text-error", "border-success/40", "bg-success/12", "text-success");
+
+        if (isError) {
+          feedback.classList.add("border-error/40", "bg-error/12", "text-error");
+        } else {
+          feedback.classList.add("border-success/40", "bg-success/12", "text-success");
+        }
+
+        feedback.textContent = message;
+      };
+
+        const readErrorMessage = async (response) => {
+          const fallback = "No pudimos quitar este guardado. Reintentá en unos segundos.";
+          const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+          try {
+            const payload = await response.json();
+            const message = payload?.error?.message || payload?.message || payload?.error;
+            if (typeof message === "string" && message.trim().length > 0) {
+              return message.trim();
+            }
+          } catch {}
+        }
+
+        try {
+          const text = await response.text();
+          if (typeof text === "string" && text.trim().length > 0) {
+            return text.trim();
+          }
+        } catch {}
+
+        return fallback;
+      };
+
+      const syncEmptyState = () => {
+        const cards = grid.querySelectorAll('[data-favorite-card="true"]');
+        if (cards.length > 0) {
+          return;
+        }
+
+        if (pagination) {
+          pagination.classList.add("hidden");
+        }
+
+        if (emptyAfterUnlike) {
+          emptyAfterUnlike.classList.remove("hidden");
+        }
+      };
+
+      grid.addEventListener("click", async (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) {
+          return;
+        }
+
+        const button = target.closest('button[data-favorites-remove-card="true"]');
+        if (!(button instanceof HTMLButtonElement)) {
+          return;
+        }
+
+        event.preventDefault();
+
+        const linkId = button.getAttribute("data-link-id");
+        if (!linkId || button.dataset.loading === "true") {
+          return;
+        }
+
+        button.dataset.loading = "true";
+        button.disabled = true;
+        button.classList.add("opacity-60");
+
+        try {
+          const response = await fetch(`/links/${encodeURIComponent(linkId)}/favorite`, {
+            method: "POST",
+            headers: {
+              "HX-Request": "true",
+            },
+          });
+
+          if (!response.ok) {
+            const message = await readErrorMessage(response);
+            throw new Error(message);
+          }
+
+          const card = button.closest('[data-favorite-card="true"]');
+          if (card) {
+            card.remove();
+          }
+
+          showFeedback("Guardado eliminado correctamente.", false);
+          syncEmptyState();
+        } catch (error) {
+          button.disabled = false;
+          const fallback = "No pudimos quitar este guardado. Reintentá en unos segundos.";
+          const message = error instanceof Error && error.message ? error.message : fallback;
+          showFeedback(message, true);
+        } finally {
+          button.dataset.loading = "false";
+          button.classList.remove("opacity-60");
+        }
+      });
+    })();
+  </script>
+
+</div>

@@ -1,0 +1,20 @@
+<%
+  const rawSuffix = typeof idSuffix === "string" ? idSuffix.trim() : "";
+  const safeSuffix = rawSuffix.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
+  const suffixSegment = safeSuffix.length > 0 ? `-${safeSuffix}` : "";
+  const suffixQuery = safeSuffix.length > 0 ? `?idSuffix=${encodeURIComponent(safeSuffix)}` : "";
+%>
+<button
+  id="like-<%= linkId %><%= suffixSegment %>"
+  hx-post="/links/<%= linkId %>/like<%= suffixQuery %>"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-<%= linkId %><%= suffixSegment %>"
+  aria-label="<%= liked ? 'Quitar like' : 'Dar like' %>"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         <%= liked ? 'border-error/50 bg-error/15 text-error hover:bg-error/20' : 'border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary' %>">
+  <span><%= liked ? '❤️' : '🤍' %></span>
+  <span><%= count %></span>
+  <span id="like-loading-<%= linkId %><%= suffixSegment %>" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>

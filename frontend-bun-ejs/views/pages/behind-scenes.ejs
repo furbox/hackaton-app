@@ -1,0 +1,179 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10"
+      x-data="{
+        hero: null,
+        mainVideo: null,
+        restVideos: [],
+        loading: true,
+        error: null,
+        selectedVideo: null,
+
+        async init() {
+         try {
+           const response = await fetch('/public/videos.json');
+           if (!response.ok) {
+             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+           }
+           const data = await response.json();
+
+            this.hero = data.hero || { title: 'Cómo lo hice', description: '' };
+
+            // Sort videos by id ascending
+            const sortedVideos = (data.videos || []).sort((a, b) => a.id - b.id);
+
+            // First video is the main/featured video
+            this.mainVideo = sortedVideos[0] || null;
+
+            // Rest of videos for the grid
+            this.restVideos = sortedVideos.slice(1);
+
+            this.loading = false;
+         } catch (err) {
+           console.error('Error loading videos:', err);
+           this.error = err.message || 'Error al cargar los videos';
+           this.loading = false;
+         }
+       },
+
+       openVideo(video) {
+         this.selectedVideo = video;
+       },
+
+       closeVideo() {
+         this.selectedVideo = null;
+       }
+     }">
+
+  <!-- Page header -->
+  <div class="mb-8">
+    <h1 class="mb-1 text-3xl font-bold text-text-primary" x-text="hero?.title || 'Cómo lo hice'"></h1>
+    <p class="text-text-secondary" x-text="hero?.description || ''"></p>
+  </div>
+
+  <!-- Loading state -->
+  <div x-show="loading" class="py-20 text-center">
+    <div class="inline-block w-12 h-12 border-4 border-accent-primary border-t-transparent rounded-full animate-spin"></div>
+    <p class="mt-4 text-text-secondary">Cargando videos...</p>
+  </div>
+
+  <!-- Error state -->
+  <div x-show="error" x-cloak class="py-20 text-center">
+    <div class="text-5xl mb-4">⚠️</div>
+    <p class="text-lg font-medium text-text-primary">Error al cargar los videos</p>
+    <p class="text-sm mt-2 text-text-secondary" x-text="error"></p>
+    <button @click="init()" class="mt-6 inline-block ui-btn-primary px-6 py-2">
+      Reintentar
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div x-show="!loading && !error" x-cloak>
+
+    <!-- Main/Featured video (always shows first video) -->
+    <div x-show="mainVideo" x-cloak class="mb-12">
+      <div class="ui-card overflow-hidden">
+        <div class="aspect-video w-full bg-slate-900">
+          <iframe
+            x-show="mainVideo?.videoId"
+            :src="`https://www.youtube.com/embed/${mainVideo.videoId}`"
+            class="w-full h-full"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+          </iframe>
+        </div>
+        <div class="p-6">
+          <h2 class="text-2xl font-bold text-text-primary mb-2" x-text="mainVideo?.title"></h2>
+          <p class="text-text-secondary" x-text="mainVideo?.description"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Videos grid -->
+    <div x-show="restVideos.length > 0" x-cloak>
+      <h2 class="text-2xl font-bold text-text-primary mb-6">Más videos</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <template x-for="video in restVideos" :key="video.id">
+          <div @click="openVideo(video)"
+               class="ui-card overflow-hidden cursor-pointer group hover:border-accent-primary/60 transition-all duration-200">
+            <!-- Thumbnail with play button overlay -->
+            <div class="relative aspect-video bg-slate-900 overflow-hidden">
+              <img
+                :src="`https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`"
+                :alt="video.title"
+                loading="lazy"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+              <!-- Play button overlay -->
+              <div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/50 transition-colors">
+                <div class="w-16 h-16 bg-accent-primary rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <svg class="w-8 h-8 text-slate-950 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </div>
+              </div>
+              <!-- Duration badge -->
+              <span x-show="video.duration"
+                    x-text="video.duration"
+                    class="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-white text-xs font-medium rounded"
+                    x-cloak>
+              </span>
+            </div>
+
+            <!-- Video info -->
+            <div class="p-4">
+              <h3 class="font-semibold text-text-primary mb-1 group-hover:text-accent-primary transition-colors" x-text="video.title"></h3>
+              <p class="text-sm text-text-secondary line-clamp-2" x-text="video.description"></p>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div x-show="!loading && !error && !mainVideo" x-cloak class="py-20 text-center">
+      <div class="text-5xl mb-4">🎬</div>
+      <p class="text-lg font-medium text-text-primary">No hay videos disponibles</p>
+      <p class="text-sm mt-2 text-text-secondary">Pronto estarán disponibles los videos del proceso de desarrollo.</p>
+    </div>
+
+  </div>
+
+  <!-- Video modal/overlay -->
+  <div x-show="selectedVideo" x-cloak
+       @click.self="closeVideo()"
+       @keydown.escape.window="closeVideo()"
+       class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 sm:p-6"
+       style="display: none;"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="modal-title">
+    <div class="relative w-full max-w-5xl">
+      <!-- Close button -->
+      <button @click="closeVideo()"
+              class="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors p-2"
+              aria-label="Close modal">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- Video embed -->
+      <div class="aspect-video bg-slate-900 rounded-lg overflow-hidden shadow-2xl">
+        <iframe x-show="selectedVideo?.videoId"
+               :src="`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1`"
+               class="w-full h-full"
+               frameborder="0"
+               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+               allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Video info in modal -->
+      <div class="mt-4 bg-surface rounded-lg p-4">
+        <h3 id="modal-title" class="text-xl font-bold text-text-primary" x-text="selectedVideo?.title"></h3>
+        <p class="text-text-secondary mt-1" x-text="selectedVideo?.description"></p>
+      </div>
+    </div>
+  </div>
+
+</div>

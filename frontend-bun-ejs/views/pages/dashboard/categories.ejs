@@ -1,0 +1,123 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary">Categorías</h1>
+    <p class="mt-1 text-text-secondary">Organizá tus links con categorías y colores</p>
+  </div>
+
+  <!-- Create form -->
+  <div class="ui-card p-6 mb-8">
+    <h2 class="mb-4 text-base font-semibold text-text-primary">Nueva categoría</h2>
+    <form method="POST" action="/dashboard/categories/create"
+          class="flex flex-col sm:flex-row gap-3">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <input type="text" name="name" required placeholder="Nombre de la categoría"
+             class="ui-input flex-1" />
+      <div class="flex items-center gap-2">
+        <label class="text-sm text-text-secondary whitespace-nowrap">Color:</label>
+        <input type="color" name="color" value="#6366f1"
+               class="h-10 w-10 cursor-pointer rounded-lg border border-border bg-slate-900 p-0.5" />
+      </div>
+      <button type="submit"
+              class="ui-btn-primary whitespace-nowrap px-5 py-2 text-sm font-medium">
+        + Crear
+      </button>
+    </form>
+  </div>
+
+  <!-- Categories list -->
+  <div class="ui-card overflow-hidden">
+
+    <% if (categories && categories.length > 0) { %>
+      <ul class="divide-y divide-border">
+        <% categories.forEach(function(cat) { %>
+          <li class="px-6 py-4 flex items-center gap-4">
+
+            <!-- Color badge -->
+            <span class="w-5 h-5 rounded-full flex-shrink-0 border border-white shadow-sm"
+                  style="background-color: <%= cat.color || '#6366f1' %>"></span>
+
+            <!-- Name + count -->
+            <div class="flex-1 min-w-0">
+              <p class="font-medium text-text-primary"><%= cat.name %></p>
+              <% if (typeof cat.link_count !== 'undefined') { %>
+                <p class="text-xs text-text-secondary">
+                  <%= cat.link_count %> link<%= cat.link_count !== 1 ? 's' : '' %>
+                </p>
+              <% } %>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button onclick="openEditCat(<%= cat.id %>, '<%= cat.name.replace(/'/g, "\\'") %>', '<%= cat.color %>')"
+                      class="rounded px-2 py-1 text-xs font-medium text-accent-primary transition-colors hover:bg-accent-primary/10 hover:text-cyan-300">
+                ✏️ Editar
+              </button>
+              <form method="POST" action="/dashboard/categories/<%= cat.id %>/delete"
+                    onsubmit="return confirm('¿Eliminar esta categoría?')">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+                <button type="submit"
+                        class="rounded px-2 py-1 text-xs font-medium text-error transition-colors hover:bg-error/10">
+                  🗑️ Eliminar
+                </button>
+              </form>
+            </div>
+
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <div class="px-6 py-16 text-center">
+        <p class="text-5xl mb-4">🏷️</p>
+        <p class="mb-2 text-lg font-medium text-text-primary">No tenés categorías todavía</p>
+        <p class="text-text-secondary">Creá una categoría para organizar tus links</p>
+      </div>
+    <% } %>
+  </div>
+
+</div>
+
+<!-- Edit Category Modal -->
+<div id="edit-cat-modal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+  <div class="ui-card w-full max-w-sm p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-text-primary">Editar categoría</h2>
+      <button onclick="document.getElementById('edit-cat-modal').classList.add('hidden')"
+              class="text-xl leading-none text-text-secondary hover:text-text-primary">&times;</button>
+    </div>
+    <form id="edit-cat-form" method="POST" action="" class="space-y-4">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+      <div>
+        <label class="mb-1 block text-sm font-medium text-text-secondary">Nombre</label>
+        <input type="text" id="edit-cat-name" name="name" required
+               class="ui-input" />
+      </div>
+      <div class="flex items-center gap-3">
+        <label class="text-sm font-medium text-text-secondary">Color:</label>
+        <input type="color" id="edit-cat-color" name="color"
+               class="h-10 w-10 cursor-pointer rounded-lg border border-border bg-slate-900 p-0.5" />
+      </div>
+      <div class="flex gap-3 pt-1">
+        <button type="button"
+                onclick="document.getElementById('edit-cat-modal').classList.add('hidden')"
+                class="ui-btn-secondary flex-1 px-4 py-2 text-sm font-medium">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="ui-btn-primary flex-1 px-4 py-2 text-sm font-medium">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openEditCat(id, name, color) {
+  document.getElementById('edit-cat-form').action = '/dashboard/categories/' + id + '/edit';
+  document.getElementById('edit-cat-name').value = name;
+  document.getElementById('edit-cat-color').value = color || '#6366f1';
+  document.getElementById('edit-cat-modal').classList.remove('hidden');
+}
+</script>
