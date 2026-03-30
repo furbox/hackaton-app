@@ -48,7 +48,9 @@ export type CategoryWithLinksCountDTO = CategoryDTO & {
   linksCount: number;
 };
 
-export type GetCategoriesOutput = CategoryWithLinksCountDTO[];
+export type GetCategoriesOutput = {
+  items: CategoryWithLinksCountDTO[];
+};
 
 function ok<T>(data: T): Phase4ServiceResult<T> {
   return { ok: true, data };
@@ -149,12 +151,12 @@ export function getCategories(
   try {
     const rows = getCategoriesByUser(actor.userId);
 
-    return ok(
-      rows.map((row) => ({
+    return ok({
+      items: rows.map((row) => ({
         ...toCategoryDTO(row),
         linksCount: row.links_count,
-      }))
-    );
+      })),
+    });
   } catch {
     return fail("INTERNAL", "Failed to load categories");
   }

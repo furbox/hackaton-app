@@ -232,7 +232,14 @@ export async function handleCategoriesRoute(
       return actorResult.response;
     }
 
-    return responseFromService(resolvedDeps.getCategories(actorResult.actor));
+    const result = resolvedDeps.getCategories(actorResult.actor);
+    if (!result.ok) {
+      const mapped = mapPhase4ServiceError(result.error);
+      return Response.json(mapped.body, { status: mapped.status });
+    }
+
+    // Unwrap items para mantener compatibilidad con frontend que espera array directo
+    return Response.json({ data: result.data.items }, { status: 200 });
   }
 
   // POST /api/categories - Create new category
