@@ -1,28 +1,10 @@
 import { getCategories } from "../../services/categories.service.ts";
-import type { Phase4ServiceResult } from "../../contracts/service-error.ts";
 import type { MCPToolContext, MCPToolDefinition } from "../types.ts";
-import { MCPInternalError, MCPInvalidParamsError } from "./links.ts";
+import { MCPInvalidParamsError } from "./links.ts";
+import { unwrapServiceResult } from "./shared.ts";
 
 export interface CategoriesToolDeps {
   getCategories: typeof getCategories;
-}
-
-function unwrapServiceResult<T>(result: Phase4ServiceResult<T>): T {
-  if (result.ok) {
-    return result.data;
-  }
-
-  if (result.error.code === "VALIDATION_ERROR") {
-    throw new MCPInvalidParamsError(result.error.message, {
-      serviceCode: result.error.code,
-      ...(result.error.details ? { details: result.error.details } : {}),
-    });
-  }
-
-  throw new MCPInternalError(result.error.message, {
-    serviceCode: result.error.code,
-    ...(result.error.details ? { details: result.error.details } : {}),
-  });
 }
 
 function assertNoInput(input: unknown): void {

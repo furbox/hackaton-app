@@ -14,6 +14,7 @@ import {
 import { verifyApiKey as serviceVerifyApiKey } from "../services/api-keys.service.ts";
 import { extractRequestInfo } from "../services/audit-log.service.ts";
 import { createMcpToolsRegistry } from "./tools/index.ts";
+import { isRecord } from "./tools/shared.ts";
 
 type JsonObject = Record<string, unknown>;
 const MCP_PROTOCOL_VERSION = "2024-11-05";
@@ -81,10 +82,6 @@ function successResponse<TResult>(id: MCPRequestId, result: TResult): Response {
 
 function notificationResponse(): Response {
   return new Response(null, { status: 204 });
-}
-
-function isRecord(value: unknown): value is JsonObject {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 function isValidRequestId(id: unknown): id is MCPRequestId {
@@ -320,10 +317,13 @@ function parseToolCallParams(params: JsonObject):
     };
   }
 
+  // MCP spec 2024-11-05: el campo se llama "arguments", no "input"
+  // Fallback a "input" para retrocompatibilidad con clientes custom
+  const input = params.arguments !== undefined ? params.arguments : params.input;
   return {
     ok: true,
     name,
-    input: params.input,
+    input,
   };
 }
 
@@ -503,6 +503,16 @@ export async function handleMcpRoute(
           JSONRPC_ERROR_CODES.INVALID_PARAMS,
           error.message,
           400,
+          error.data
+        );
+      }
+
+      if (isToolError(error) && error.code === MCP_ERROR_CODES.FORBIDDEN) {
+        return errorResponse(
+          parsed.id,
+          MCP_ERROR_CODES.FORBIDDEN,
+          error.message,
+          403,
           error.data
         );
       }

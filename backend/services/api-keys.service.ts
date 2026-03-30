@@ -25,6 +25,7 @@ import {
   getApiKeysByUser as dbGetApiKeysByUser,
   getApiKeyOwnerById,
   getActiveApiKeyByHash,
+  touchApiKeyLastUsedAt,
   insertApiKey,
   revokeApiKey as dbRevokeApiKey,
   type ApiKey as DbApiKey,
@@ -394,6 +395,13 @@ export async function verifyApiKey(rawKey: string): Promise<Phase4ServiceResult<
 
     if (keyRecord.expires_at !== null && Date.parse(keyRecord.expires_at) <= Date.now()) {
       return fail("UNAUTHORIZED", "API key expired");
+    }
+
+    // Update last_used_at timestamp (fire-and-forget — must not block auth flow)
+    try {
+      touchApiKeyLastUsedAt(keyRecord.id);
+    } catch {
+      // Non-critical: failure to update last_used_at must not reject a valid key
     }
 
     return ok({

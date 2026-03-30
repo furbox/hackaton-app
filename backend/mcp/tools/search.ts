@@ -1,13 +1,10 @@
 import { getLinks } from "../../services/links.service.ts";
 import type { MCPToolContext, MCPToolDefinition } from "../types.ts";
 import { MCPInternalError, MCPInvalidParamsError } from "./links.ts";
+import { isRecord } from "./shared.ts";
 
 export interface SearchToolDeps {
   getLinks: typeof getLinks;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
 function parsePositiveInt(value: unknown, field: string): number {

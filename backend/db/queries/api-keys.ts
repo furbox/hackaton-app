@@ -107,6 +107,10 @@ const getActiveApiKeyByHashStmt = () => getDb().prepare(`
   LIMIT 1
 `);
 
+const updateApiKeyLastUsedAtStmt = () => getDb().prepare(`
+  UPDATE api_keys SET last_used_at = CURRENT_TIMESTAMP WHERE id = ?
+`);
+
 // ============================================================================
 // API KEY QUERIES
 // ============================================================================
@@ -220,4 +224,17 @@ export function revokeApiKey(keyId: number, ownerUserId: number): ApiKeyMutation
 export function getActiveApiKeyByHash(keyHash: string): ActiveApiKeyRecord | null {
   const stmt = getActiveApiKeyByHashStmt();
   return stmt.get(keyHash) as ActiveApiKeyRecord | null;
+}
+
+/**
+ * Updates the `last_used_at` timestamp for an API key.
+ *
+ * Called after successful bearer-key verification so the UI can show
+ * when each key was last used.
+ *
+ * @param keyId - API key's primary key ID
+ */
+export function touchApiKeyLastUsedAt(keyId: number): void {
+  const stmt = updateApiKeyLastUsedAtStmt();
+  stmt.run(keyId);
 }

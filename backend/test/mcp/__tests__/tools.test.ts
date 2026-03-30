@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { createCategoriesTools } from "../../../mcp/tools/categories.ts";
 import {
   createLinksTools,
+  MCPForbiddenError,
   MCPInternalError,
   MCPInvalidParamsError,
 } from "../../../mcp/tools/links.ts";
@@ -18,8 +19,18 @@ const context = {
 
 describe("MCP links tools", () => {
   test("create_link validates required fields", () => {
-    const tools = createLinksTools();
+    const tools = createLinksTools({
+      createLink: () => ({
+        ok: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "url, title and shortCode are required",
+        },
+      }),
+    });
 
+    // shortCode is optional in the MCP schema but still required by the service
+    // when not provided. The service returns a VALIDATION_ERROR → MCPInvalidParamsError.
     expect(() => tools.create_link.handler({ url: "https://example.com", title: "Example" }, context)).toThrow(
       MCPInvalidParamsError
     );
@@ -58,7 +69,7 @@ describe("MCP links tools", () => {
           },
         }
       )
-    ).toThrow(MCPInternalError);
+    ).toThrow(MCPForbiddenError);
   });
 
   test("get_links forwards optional filters to service", () => {

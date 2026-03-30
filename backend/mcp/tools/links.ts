@@ -8,26 +8,18 @@ import {
   type GetLinksInput,
   type UpdateLinkInput,
 } from "../../services/links.service.ts";
-import type { Phase4ServiceResult } from "../../contracts/service-error.ts";
-import type { MCPToolContext, MCPToolDefinition } from "../types.ts";
+import {
+  MCPForbiddenError,
+  MCPInternalError,
+  MCPInvalidParamsError,
+  type MCPToolContext,
+  type MCPToolDefinition,
+} from "../types.ts";
+import { isRecord, unwrapServiceResult } from "./shared.ts";
 
-export class MCPInvalidParamsError extends Error {
-  readonly code = -32602;
-
-  constructor(message: string, readonly data?: Record<string, unknown>) {
-    super(message);
-    this.name = "MCPInvalidParamsError";
-  }
-}
-
-export class MCPInternalError extends Error {
-  readonly code = -32603;
-
-  constructor(message: string, readonly data?: Record<string, unknown>) {
-    super(message);
-    this.name = "MCPInternalError";
-  }
-}
+// Re-export error classes so existing consumers (tests, categories.ts, search.ts)
+// can continue importing them from this module without breaking changes.
+export { MCPForbiddenError, MCPInternalError, MCPInvalidParamsError };
 
 type LinkActor = { userId: number };
 
@@ -39,19 +31,16 @@ export interface LinksToolDeps {
   deleteLink: typeof deleteLink;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === "object" && !Array.isArray(value);
-}
-
 function readActor(context: MCPToolContext): LinkActor {
   return { userId: context.actor.userId };
 }
 
 function requireWritePermission(context: MCPToolContext): void {
   if (context.actor.permissions !== "read+write") {
-    throw new MCPInternalError("Write permission required", {
-      serviceCode: "FORBIDDEN",
-    });
+    throw new MCPForbiddenError(
+      "Forbidden: this API key does not have write permission",
+      { requiredPermission: "read+write" }
+    );
   }
 }
 
@@ -143,14 +132,17 @@ function parseCreateLinkInput(input: unknown): CreateLinkInput {
     throw new MCPInvalidParamsError("Invalid params: input must be an object");
   }
 
+  const shortCode = parseOptionalString(input.shortCode, "shortCode");
+
   return {
     url: parseRequiredString(input.url, "url"),
     title: parseRequiredString(input.title, "title"),
-    shortCode: parseRequiredString(input.shortCode, "shortCode"),
+    // shortCode omitido cuando no se provee — el servicio debe generarlo
+    ...(shortCode !== undefined ? { shortCode } : {}),
     description: parseOptionalString(input.description, "description"),
     isPublic: parseOptionalBoolean(input.isPublic, "isPublic"),
     categoryId: parseOptionalNullablePositiveInt(input.categoryId, "categoryId"),
-  };
+  } as CreateLinkInput;
 }
 
 function parseGetLinkInput(input: unknown): { id: number } {
@@ -218,24 +210,6 @@ function parseDeleteLinkInput(input: unknown): { id: number } {
   };
 }
 
-function unwrapServiceResult<T>(result: Phase4ServiceResult<T>): T {
-  if (result.ok) {
-    return result.data;
-  }
-
-  if (result.error.code === "VALIDATION_ERROR") {
-    throw new MCPInvalidParamsError(result.error.message, {
-      serviceCode: result.error.code,
-      ...(result.error.details ? { details: result.error.details } : {}),
-    });
-  }
-
-  throw new MCPInternalError(result.error.message, {
-    serviceCode: result.error.code,
-    ...(result.error.details ? { details: result.error.details } : {}),
-  });
-}
-
 export function createLinksTools(
   deps: Partial<LinksToolDeps> = {}
 ): Record<string, MCPToolDefinition> {
@@ -254,7 +228,7 @@ export function createLinksTools(
       description: "Create a new link owned by the authenticated user",
       inputSchema: {
         type: "object",
-        required: ["url", "title", "shortCode"],
+        required: ["url", "title"],
         additionalProperties: false,
         properties: {
           url: { type: "string" },

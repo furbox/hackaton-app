@@ -53,7 +53,7 @@ export interface CreateLinkInput {
   ogTitle?: string | null;
   ogDescription?: string | null;
   ogImage?: string | null;
-  shortCode: string;
+  shortCode?: string;
   isPublic?: boolean;
   categoryId?: number | null;
 }
@@ -306,6 +306,17 @@ function isAuthenticatedActor(actor: ServiceActor): actor is NonNullable<Service
   return actor !== null;
 }
 
+const SHORT_CODE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const SHORT_CODE_LENGTH = 8;
+
+function generateShortCode(): string {
+  let result = "";
+  for (let i = 0; i < SHORT_CODE_LENGTH; i++) {
+    result += SHORT_CODE_CHARS[Math.floor(Math.random() * SHORT_CODE_CHARS.length)];
+  }
+  return result;
+}
+
 function validateUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
@@ -403,10 +414,10 @@ export function createLink(
 
   const url = input.url?.trim();
   const title = input.title?.trim();
-  const shortCode = input.shortCode?.trim();
+  const shortCode = input.shortCode?.trim() || generateShortCode();
 
-  if (!url || !title || !shortCode) {
-    return fail("VALIDATION_ERROR", "url, title and shortCode are required");
+  if (!url || !title) {
+    return fail("VALIDATION_ERROR", "url and title are required");
   }
 
   if (!validateUrl(url)) {
