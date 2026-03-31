@@ -40,6 +40,9 @@ export async function behindScenesController(
   return renderPage("behind-scenes", {
     data: {
       title: "Cómo lo hice",
+      pageTitle: "Cómo lo hice - URLoft",
+      pageDescription: "El proceso de construcción de URLoft en vivo: videos del hackathon midudev 2026 con cada decisión técnica, desde el stack hasta el deploy.",
+      canonicalUrl: "https://urloft.site/como-lo-hice",
       user,
       flash,
       hero,

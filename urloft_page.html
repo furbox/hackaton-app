@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Guardá, organizá y encontrá cualquier enlace en segundos. URLoft es tu biblioteca inteligente de links con búsqueda full-text, categorías, privacidad granular e integración con IA." />
+  <link rel="canonical" href="https://urloft.site/" />
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/icons/icon-16.png" />
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/icons/icon-48.png" />
+  <link rel="apple-touch-icon" sizes="128x128" href="/public/icons/icon-128.png" />
+  <meta property="og:title" content="URLoft — Buscador de Links Inteligente" />
+  <meta property="og:description" content="Guardá, organizá y encontrá cualquier enlace en segundos. URLoft es tu biblioteca inteligente de links con búsqueda full-text, categorías, privacidad granular e integración con IA." />
+  <meta property="og:image" content="https://urloft.site/public/logo-urloft.png" />
+  <meta property="og:url" content="https://urloft.site/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="URLoft — Buscador de Links Inteligente" />
+  <meta name="twitter:description" content="Guardá, organizá y encontrá cualquier enlace en segundos. URLoft es tu biblioteca inteligente de links con búsqueda full-text, categorías, privacidad granular e integración con IA." />
+  <meta name="twitter:image" content="https://urloft.site/public/logo-urloft.png" />
+  <title>URLoft — Buscador de Links Inteligente - URLoft</title>
+
+  <!-- Tailwind CSS -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="/public/styles.css">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/public/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="URLoft">
+  <link rel="apple-touch-icon" href="/public/icons/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.warn('SW registration failed:', err));
+      });
+    }
+  </script>
+
+  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebSite","@id":"https://urloft.site/#website","url":"https://urloft.site/","name":"URLoft","description":"Tu biblioteca inteligente de links","inLanguage":"es","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://urloft.site/explore?q={search_term_string}"},"query-input":"required name=search_term_string"}},{"@context":"https://schema.org","@type":"Organization","@id":"https://urloft.site/#organization","name":"URLoft","url":"https://urloft.site/","logo":{"@type":"ImageObject","url":"https://urloft.site/public/logo-urloft.png"},"description":"URLoft es un gestor de enlaces con superpoderes. Centralizá, organizá y compartí tus links con búsqueda full-text, privacidad granular e integración con IA."},{"@context":"https://schema.org","@type":"SoftwareApplication","@id":"https://urloft.site/#app","name":"URLoft","url":"https://urloft.site/","description":"Gestor inteligente de links con búsqueda full-text, categorías, privacidad pública/privada, extensión de Chrome, PWA e integración con IA vía MCP Server.","applicationCategory":"ProductivityApplication","operatingSystem":"Web, Chrome","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}]</script>
+
+</head>
+<body class="min-h-full flex flex-col">
+
+  <!-- Flash messages -->
+
+
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 border-b border-border bg-surface/85 backdrop-blur" x-data="{ mobileMenuOpen: false }">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Brand -->
+      <a href="/" class="flex items-center" aria-label="URLoft">
+        <img
+          src="/public/logo-urloft.png"
+          alt="URLoft logo"
+          class="h-9 w-auto object-contain object-center"
+        />
+      </a>
+
+      <!-- Desktop Nav links -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="/" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Home
+        </a>
+        <a href="/explore" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Explore
+        </a>
+        <a href="/como-lo-hice" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Cómo lo hice
+        </a>
+        <a href="/tecnologia" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Tecnología
+        </a>
+      </div>
+
+      <!-- Desktop Auth area -->
+      <div class="hidden md:flex items-center gap-3">
+
+          <!-- Guest: show Login + Register -->
+          <a href="/auth/login"
+             class="text-text-secondary hover:text-text-primary font-medium text-sm transition-colors hidden sm:block">
+            Iniciar sesión
+          </a>
+          <a href="/auth/register"
+             class="rounded-lg bg-accent-primary px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-300">
+            Registrarse
+          </a>
+
+      </div>
+
+      <!-- Mobile menu button -->
+      <button
+        @click="mobileMenuOpen = !mobileMenuOpen"
+        class="md:hidden p-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary transition-colors"
+        aria-label="Toggle menu">
+        <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Mobile menu dropdown -->
+  <div x-show="mobileMenuOpen"
+       @click.away="mobileMenuOpen = false"
+       x-transition:enter="transition ease-out duration-200"
+       x-transition:enter-start="opacity-0 -translate-y-2"
+       x-transition:enter-end="opacity-100 translate-y-0"
+       x-transition:leave="transition ease-in duration-150"
+       x-transition:leave-start="opacity-100 translate-y-0"
+       x-transition:leave-end="opacity-0 -translate-y-2"
+       class="md:hidden border-t border-border bg-surface shadow-xl shadow-black/30"
+       style="display: none;">
+    <div class="px-4 py-3 space-y-2">
+      <!-- Nav links -->
+      <a href="/"
+         class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+        Home
+      </a>
+      <a href="/explore"
+         class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+        Explore
+      </a>
+      <a href="/como-lo-hice"
+         class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+         Cómo lo hice
+      </a>
+      <a href="/tecnologia"
+         class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+        Tecnología
+      </a>
+
+      <hr class="my-2 border-border">
+
+
+        <!-- Guest: Login + Register -->
+        <a href="/auth/login"
+           class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+          Iniciar sesión
+        </a>
+        <a href="/auth/register"
+           class="block px-3 py-2 rounded-lg bg-accent-primary hover:bg-cyan-300 text-center font-semibold text-slate-950 transition-colors">
+          Registrarse
+        </a>
+
+    </div>
+  </div>
+</nav>
+
+
+  <!-- Main content -->
+  <main class="flex-1">
+    <!-- Hero Section -->
+<section class="bg-gradient-to-br from-bg via-surface to-slate-950 py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+
+    <!-- Badge -->
+    <div class="mb-8 inline-flex items-center gap-2 rounded-full bg-accent-primary/15 px-4 py-1.5 text-sm font-medium text-accent-primary">
+      <span>✨</span>
+      <span>Hackathon 2026 midudev</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="mb-6 text-4xl font-extrabold leading-tight text-text-primary sm:text-5xl lg:text-6xl">
+      Tu biblioteca inteligente de links
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-text-secondary sm:text-xl">
+      Guarda, organiza y encontra cualquier enlace en segundos. Todo en un solo lugar: desde links del dia a dia hasta recursos clave para tu equipo.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register"
+         class="ui-btn-primary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Empezar gratis
+      </a>
+      <a href="/explore"
+          class="ui-btn-secondary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Explorar links públicos
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Problem + Solution -->
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <article class="ui-card p-6 sm:p-8">
+        <p class="mb-3 inline-flex rounded-full bg-warning/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-warning">
+          Problema
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Tus links están por todos lados</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          Notas rápidas, chats, favoritos del navegador y docs sueltos. Cuando necesitas algo importante,
+          perdés tiempo buscando en cinco lugares distintos.
+        </p>
+      </article>
+
+      <article class="ui-card p-6 sm:p-8 border-accent-primary/40">
+        <p class="mb-3 inline-flex rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-success">
+          Solución URLoft
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Una sola biblioteca, con control total</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          URLoft centraliza todos tus enlaces, permite búsqueda full-text real y te deja decidir si cada link
+          es público o privado según el contexto.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section (real data) -->
+<section class="border-y border-border bg-surface py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center text-white">
+      <div>
+        <div class="text-4xl font-extrabold mb-1">3</div>
+        <div class="font-medium text-text-secondary">Usuarios</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1">51</div>
+        <div class="font-medium text-text-secondary">Links guardados</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1">36</div>
+        <div class="font-medium text-text-secondary">Categorias</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Video Demo Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Ver URLoft en acción
+      </h2>
+      <p class="text-text-secondary">
+        Descubrí cómo URLoft resuelve el caos de tus links, sus funcionalidades principales y las ventajas que ofrece para organizar tu conocimiento digital.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <lite-youtube videoid="UvJokqRIBUo" width="1280" height="720" class="w-full aspect-video" style="background-image: url('https://i.ytimg.com/vi/UvJokqRIBUo/maxresdefault.jpg');"></lite-youtube>
+    </div>
+  </div>
+</section>
+
+<!-- Presentation Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Presentación del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Conocé más detalles sobre URLoft, su arquitectura, features y roadmap futuro.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <div class="relative w-full" style="padding-bottom: 56.25%;">
+        <iframe
+          src="https://docs.google.com/presentation/d/e/2PACX-1vQfad1VgyM3dCAKw21COMDt4yIUBeaWQKxOD-Byk8mdmnlgosV7wb4ouMUJMXyQS2euTJlv7-t-gpdd/pubembed?start=true&loop=true&delayms=3000"
+          frameborder="0"
+          allowfullscreen="true"
+          mozallowfullscreen="true"
+          webkitallowfullscreen="true"
+          class="absolute top-0 left-0 w-full h-full rounded-xl">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Infographics Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Recursos visuales del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Infografía y mind map con la arquitectura y diseño de URLoft. Hacé click para expandir.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Infografía -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/infografia.webp" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+             <img
+               src="/public/docs/infografia.webp"
+               alt="Infografía de URLoft"
+               width="1200"
+               height="800"
+               class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+               loading="lazy"
+             >
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Infografía del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Vista general de features y arquitectura</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Mind Map -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/NotebookLM_Mind_Map.png" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+             <img
+               src="/public/docs/NotebookLM_Mind_Map.png"
+               alt="Mind Map de URLoft"
+               width="1200"
+               height="800"
+               class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+               loading="lazy"
+             >
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Mind Map del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Mapa mental generado con NotebookLM</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Links -->
+
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-bold text-text-primary">Links destacados</h2>
+      <a href="/explore" class="text-sm font-medium text-accent-primary transition-colors hover:text-cyan-300">
+        Ver todos →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+
+
+<article
+  id="favorite-card-15"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/jjqbmr8a" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+
+           <img src="https://www.google.com/s2/favicons?domain=mail.proton.me&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+
+
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/jjqbmr8a" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="Proton Mail">
+        Proton Mail
+      </a>
+
+
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-15" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>7</span>
+      </span>
+
+<button
+  id="like-15"
+  hx-post="/links/15/like"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-15"
+  aria-label="Dar like"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>1</span>
+  <span id="like-loading-15" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+
+<span id="fav-15">
+  <button
+    hx-post="/links/15/favorite"
+    hx-target="#fav-15"
+    hx-swap="outerHTML"
+    hx-trigger="click"
+    hx-indicator="#fav-loading-15"
+    aria-label="Guardar"
+    class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1"
+  >
+
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+
+    <span>1</span>
+    <span id="fav-loading-15" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+
+
+
+<article
+  id="favorite-card-1"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/nebay21a" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+
+           <img src="https://www.google.com/s2/favicons?domain=urloft.site&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+
+
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-red-500 text-[10px] font-bold text-white shadow-lg" title="Status: 404">
+           ✕
+         </div>
+
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/nebay21a" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="URLoft">
+        URLoft
+      </a>
+
+
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-1" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>7</span>
+      </span>
+
+<button
+  id="like-1"
+  hx-post="/links/1/like"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-1"
+  aria-label="Dar like"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>1</span>
+  <span id="like-loading-1" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+
+<span id="fav-1">
+  <button
+    hx-post="/links/1/favorite"
+    hx-target="#fav-1"
+    hx-swap="outerHTML"
+    hx-trigger="click"
+    hx-indicator="#fav-loading-1"
+    aria-label="Guardar"
+    class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1"
+  >
+
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+
+    <span>2</span>
+    <span id="fav-loading-1" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+
+
+
+<article
+  id="favorite-card-52"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/github-com-schniz-fnm" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+
+           <img src="https://www.google.com/s2/favicons?domain=github.com&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+
+
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/github-com-schniz-fnm" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="Node.js version manager">
+        Node.js version manager
+      </a>
+
+
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-52" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>2</span>
+      </span>
+
+<button
+  id="like-52"
+  hx-post="/links/52/like"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-52"
+  aria-label="Dar like"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-52" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+
+<span id="fav-52">
+  <button
+    hx-post="/links/52/favorite"
+    hx-target="#fav-52"
+    hx-swap="outerHTML"
+    hx-trigger="click"
+    hx-indicator="#fav-loading-52"
+    aria-label="Guardar"
+    class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1"
+  >
+
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+
+    <span>0</span>
+    <span id="fav-loading-52" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+
+
+
+<article
+  id="favorite-card-51"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/pythontutor-com" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+
+           <img src="https://www.google.com/s2/favicons?domain=pythontutor.com&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+
+
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/pythontutor-com" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="Python Tutor - Python Online Compiler with Visual AI Help">
+        Python Tutor - Python Online Compiler with Visual AI Help
+      </a>
+
+
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-51" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>2</span>
+      </span>
+
+<button
+  id="like-51"
+  hx-post="/links/51/like"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-51"
+  aria-label="Dar like"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-51" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+
+<span id="fav-51">
+  <button
+    hx-post="/links/51/favorite"
+    hx-target="#fav-51"
+    hx-swap="outerHTML"
+    hx-trigger="click"
+    hx-indicator="#fav-loading-51"
+    aria-label="Guardar"
+    class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1"
+  >
+
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+
+    <span>0</span>
+    <span id="fav-loading-51" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+
+
+
+<article
+  id="favorite-card-50"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/github-com-mcp" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+
+           <img src="https://www.google.com/s2/favicons?domain=github.com&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+
+
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/github-com-mcp" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="MCP Registry">
+        MCP Registry
+      </a>
+
+
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-50" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>2</span>
+      </span>
+
+<button
+  id="like-50"
+  hx-post="/links/50/like"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-50"
+  aria-label="Dar like"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-50" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+
+<span id="fav-50">
+  <button
+    hx-post="/links/50/favorite"
+    hx-target="#fav-50"
+    hx-swap="outerHTML"
+    hx-trigger="click"
+    hx-indicator="#fav-loading-50"
+    aria-label="Guardar"
+    class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1"
+  >
+
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+
+    <span>0</span>
+    <span id="fav-loading-50" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+
+
+
+<article
+  id="favorite-card-49"
+  data-favorite-card="true"
+  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/ipquery-io" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+
+           <img src="https://www.google.com/s2/favicons?domain=ipquery.io&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
+
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+
+
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/ipquery-io" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="ipquery - IP Intelligence Infrastructure">
+        ipquery - IP Intelligence Infrastructure
+      </a>
+
+
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-49" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span>3</span>
+      </span>
+
+<button
+  id="like-49"
+  hx-post="/links/49/like"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-trigger="click"
+  hx-indicator="#like-loading-49"
+  aria-label="Dar like"
+  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-49" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+
+<span id="fav-49">
+  <button
+    hx-post="/links/49/favorite"
+    hx-target="#fav-49"
+    hx-swap="outerHTML"
+    hx-trigger="click"
+    hx-indicator="#fav-loading-49"
+    aria-label="Guardar"
+    class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1"
+  >
+
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+      </svg>
+
+    <span>0</span>
+    <span id="fav-loading-49" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+
+    </div>
+  </div>
+</section>
+
+
+<!-- Features Section -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">
+      Features principales para ganar velocidad
+    </h2>
+    <p class="mx-auto mb-16 max-w-xl text-center text-text-secondary">
+      Todo lo necesario para guardar, encontrar y activar conocimiento sin friccion.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔗</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Guardado inteligente + short links</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Guarda cualquier URL con metadata automática y compartila con enlaces cortos listos para usar.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔍</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Búsqueda full-text con filtros</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Encuentra al instante por título, descripción o contenido, filtrando por categoría y popularidad.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📁</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Categorías, favoritos e importación</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Ordena por temas, marca favoritos y migra tus bookmarks de navegador en minutos.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Privacidad público/privado</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Decide qué compartís con la comunidad y qué queda solo para tu espacio interno.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🌐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Descubrimiento social</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Explora perfiles, likes y vistas para detectar rápido lo más valioso de la comunidad.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📱</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Productividad diaria</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Dashboard web, extension de Chrome y experiencia PWA para capturar links desde cualquier contexto.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Chrome Extension -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+    <article class="ui-card p-6 lg:col-span-2">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-accent-primary">Extension Chrome</p>
+      <h2 class="mb-3 text-2xl font-bold text-text-primary">Guarda links sin salir de la página donde estás</h2>
+      <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+        Con un click capturas URL, título y contexto. Ideal para research, curación de contenido y trabajo diario
+        en equipo durante el hackathon.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Manifest V3</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Popup rapido</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Flujo 1 click</span>
+      </div>
+    </article>
+    <article class="ui-card p-6">
+      <h3 class="mb-3 text-lg font-bold text-text-primary">Por qué suma</h3>
+      <ul class="space-y-2 text-sm text-text-secondary">
+        <li>Reduce fricción al capturar referencias.</li>
+        <li>Evita perder links entre pestañas abiertas.</li>
+        <li>Acelera la carga de conocimiento compartido.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- AI Integration -->
+<section class="py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Integración con IA</h2>
+    <p class="mx-auto mb-10 max-w-2xl text-center text-text-secondary">
+      URLoft se conecta con asistentes para operar tus links desde lenguaje natural, sin inventar workflows nuevos.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">MCP Server</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Expone herramientas para crear, listar, actualizar y buscar links autenticados via API key.
+        </p>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">Web Skill</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Endpoints de search, lookup y extract para que una IA consulte tu biblioteca con contexto util.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Security -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Seguridad de base, no parche</h2>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Better Auth</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Sesiones seguras</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Revocacion inmediata</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Rate limiting</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Audit log</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technology -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Tecnología completa, sin complejidad innecesaria</h2>
+    <p class="mx-auto mb-12 max-w-3xl text-center text-text-secondary">
+      Stack del producto URLoft pensado para shipping rápido: backend robusto, datos embebidos y ecosistema listo para web, extensión e integraciones IA.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Core tecnico</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Backend:</span> Bun + TypeScript.</li>
+          <li><span class="text-text-primary font-semibold">Data:</span> SQLite + FTS5 para bús**queda full-text.</li>
+          <li><span class="text-text-primary font-semibold">Auth:</span> Better Auth con sesiones stateful.</li>
+          <li><span class="text-text-primary font-semibold">Workers:</span> procesos asíncronos para tareas pesadas.</li>
+        </ul>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Ecosistema de producto</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Sitio actual:</span> esta home esta renderizada con Bun + EJS.</li>
+          <li><span class="text-text-primary font-semibold">Canales:</span> extensión Chrome + PWA instalable.</li>
+          <li><span class="text-text-primary font-semibold">IA:</span> MCP Server y Web Skill para search/lookup/extract.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="mt-8 text-center text-lg font-semibold text-accent-primary">
+      Menos complejidad operativa, más velocidad de producto.
+    </p>
+  </div>
+</section>
+
+<!-- Use Cases -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-8 text-center text-3xl font-bold text-text-primary">Casos de uso reales</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Guardar recursos</h3>
+        <p class="text-sm text-text-secondary">Centraliza docs, tutoriales y herramientas en una sola base consultable.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Curar colecciones</h3>
+        <p class="text-sm text-text-secondary">Arma colecciones publicas por tema para compartir conocimiento de valor.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Links privados</h3>
+        <p class="text-sm text-text-secondary">Maneja enlaces internos del equipo sin exponer informacion sensible.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Integracion IA</h3>
+        <p class="text-sm text-text-secondary">Permite que asistentes consulten y operen tu biblioteca con permisos claros.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+      <h2 class="mb-4 text-3xl sm:text-4xl font-extrabold text-text-primary">
+        Convertí tus links en una biblioteca útil para todo tu equipo
+      </h2>
+      <p class="mx-auto mb-10 max-w-2xl text-text-secondary">
+        Dejá de perder tiempo buscando. Empezá a construir un sistema de conocimiento reutilizable desde hoy.
+      </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register" class="ui-btn-primary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Crear cuenta</a>
+      <a href="/explore" class="ui-btn-secondary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Explorar</a>
+    </div>
+  </div>
+</section>
+
+  </main>
+
+  <!-- Footer -->
+  <!-- Footer -->
+<footer class="mt-16 border-t border-border bg-surface/70 py-8">
+  <div class="w-full">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-center gap-6 text-center w-full">
+      <!-- Logo y Copy -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-center" aria-label="URLoft">
+          <img
+            src="/public/logo-urloft.png"
+            alt="URLoft logo"
+            class="h-8 w-auto object-contain object-center"
+            width=&#34;32&#34; height=&#34;32&#34;
+          />
+        </div>
+        <p class="text-xs text-text-secondary">
+          Hecho con ❤️ para el <span class="text-accent-primary font-semibold">Hackathon 2026 midudev</span>. &copy; 2026 URLoft.
+        </p>
+      </div>
+
+      <!-- Links - Inline on desktop -->
+      <nav class="flex flex-wrap items-center gap-x-6 gap-y-2" aria-label="Footer navigation">
+        <a href="/sobre" class="group flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent-primary transition-all duration-200">
+          <span class="w-1 h-1 rounded-full bg-text-secondary group-hover:bg-accent-primary group-hover:scale-125 transition-all duration-200"></span>
+          Sobre
+        </a>
+        <a href="/privacidad" class="group flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent-primary transition-all duration-200">
+          <span class="w-1 h-1 rounded-full bg-text-secondary group-hover:bg-accent-primary group-hover:scale-125 transition-all duration-200"></span>
+          Privacidad
+        </a>
+        <a href="/terminos" class="group flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent-primary transition-all duration-200">
+          <span class="w-1 h-1 rounded-full bg-text-secondary group-hover:bg-accent-primary group-hover:scale-125 transition-all duration-200"></span>
+          Términos
+        </a>
+        <a href="/sitemap.xml" class="group flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent-primary transition-all duration-200" target="_blank" rel="noopener noreferrer">
+          <span class="w-1 h-1 rounded-full bg-text-secondary group-hover:bg-accent-primary group-hover:scale-125 transition-all duration-200"></span>
+          Sitemap
+          <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="12" height="12">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
+      </nav>
+
+      <!-- Social -->
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/furbox" class="group flex items-center justify-center w-9 h-9 rounded-full bg-surface border border-border hover:border-accent-primary hover:text-accent-primary text-text-secondary transition-all duration-200 hover:scale-105" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+          <span class="sr-only">GitHub</span>
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  </div>
+</footer>
+
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+  <!-- Lite YouTube (YouTube embed ligero) -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script>
+
+  <!-- HTMX -->
+  <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+
+  <!-- GLightbox (Lightbox para imágenes) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"></script>
+
+  <!-- Inicializar GLightbox -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const lightbox = GLightbox({
+        selector: '.glightbox',
+        openEffect: 'zoom',
+        closeEffect: 'fade',
+        width: '1200px',
+        height: 'auto',
+        zoomable: true,
+        draggable: true,
+      });
+    });
+  </script>
+</body>
+</html>

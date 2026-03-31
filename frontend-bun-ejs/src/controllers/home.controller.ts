@@ -143,7 +143,8 @@ export async function homeController(request: Request): Promise<Response> {
 
   return renderPage("home", {
     data: {
-      title: "URLoft — Buscador de Links Inteligente",
+      title: "Buscador de Links Inteligente",
+      pageTitle: "URLoft — Buscador de Links Inteligente",
       pageDescription: "Guardá, organizá y encontrá cualquier enlace en segundos. URLoft es tu biblioteca inteligente de links con búsqueda full-text, categorías, privacidad granular e integración con IA.",
       canonicalUrl: "https://urloft.site/",
       ogImage: "https://urloft.site/public/logo-urloft.png",
@@ -173,9 +174,15 @@ export async function homeController(request: Request): Promise<Response> {
           "url": "https://urloft.site/",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://urloft.site/public/logo-urloft.png"
+            "url": "https://urloft.site/public/logo-urloft.png",
+            "width": 512,
+            "height": 512
           },
-          "description": "URLoft es un gestor de enlaces con superpoderes. Centralizá, organizá y compartí tus links con búsqueda full-text, privacidad granular e integración con IA."
+          "description": "URLoft es un gestor de enlaces con superpoderes. Centralizá, organizá y compartí tus links con búsqueda full-text, privacidad granular e integración con IA.",
+          "sameAs": [
+            "https://github.com/furbox",
+            "https://twitter.com/furbox"
+          ]
         },
         {
           "@context": "https://schema.org",
@@ -185,11 +192,12 @@ export async function homeController(request: Request): Promise<Response> {
           "url": "https://urloft.site/",
           "description": "Gestor inteligente de links con búsqueda full-text, categorías, privacidad pública/privada, extensión de Chrome, PWA e integración con IA vía MCP Server.",
           "applicationCategory": "ProductivityApplication",
-          "operatingSystem": "Web, Chrome",
+          "operatingSystem": ["Web Browser", "Chrome"],
           "offers": {
             "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
+            "price": 0,
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/OnlineOnly"
           }
         }
       ]),

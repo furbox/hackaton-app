@@ -25,6 +25,38 @@ const PUBLIC_DIR = import.meta.dir + "/public";
 const portFromEnv = Number.parseInt(process.env.PORT ?? "3001", 10);
 const port = Number.isFinite(portFromEnv) ? portFromEnv : 3001;
 
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "SAMEORIGIN",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  ...(IS_PRODUCTION && {
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "Content-Security-Policy":
+      "default-src 'self'; " +
+      "script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; " +
+      "style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; " +
+      "img-src 'self' www.google.com i.ytimg.com data: blob:; " +
+      "frame-src www.youtube.com docs.google.com; " +
+      "connect-src 'self'; " +
+      "font-src 'self' cdn.jsdelivr.net; " +
+      "worker-src 'self'",
+  }),
+};
+
+function withSecurityHeaders(response: Response): Response {
+  const headers = new Headers(response.headers);
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    headers.set(key, value);
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 const server = Bun.serve({
   port,
 
@@ -44,13 +76,13 @@ const server = Bun.serve({
             ? "application/xml"
             : "text/plain";
 
-        return new Response(file, {
+        return withSecurityHeaders(new Response(file, {
           headers: {
             "Content-Type": contentType,
             ...(url.pathname === "/sw.js" && { "Service-Worker-Allowed": "/" }),
             "Cache-Control": "no-cache, no-store, must-revalidate",
           },
-        });
+        }));
       }
     }
 
@@ -67,7 +99,7 @@ const server = Bun.serve({
     }
 
     // Route all other requests through the router
-    return handleRequest(request);
+    return withSecurityHeaders(await handleRequest(request));
   },
 
   error(error) {
