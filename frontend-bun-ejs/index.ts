@@ -35,11 +35,11 @@ const SECURITY_HEADERS: Record<string, string> = {
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
     "Content-Security-Policy":
       "default-src 'self'; " +
-      "script-src 'self' cdn.jsdelivr.net 'unsafe-inline'; " +
+      "script-src 'self' cdn.jsdelivr.net static.cloudflareinsights.com 'unsafe-inline' 'unsafe-eval'; " +
       "style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; " +
       "img-src 'self' www.google.com i.ytimg.com data: blob:; " +
       "frame-src www.youtube.com docs.google.com; " +
-      "connect-src 'self'; " +
+      "connect-src 'self' static.cloudflareinsights.com; " +
       "font-src 'self' cdn.jsdelivr.net; " +
       "worker-src 'self'",
   }),
