@@ -33,15 +33,8 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
   ...(IS_PRODUCTION && {
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-    "Content-Security-Policy":
-      "default-src 'self'; " +
-      "script-src 'self' cdn.jsdelivr.net static.cloudflareinsights.com 'unsafe-inline' 'unsafe-eval'; " +
-      "style-src 'self' cdn.jsdelivr.net 'unsafe-inline'; " +
-      "img-src 'self' www.google.com i.ytimg.com data: blob:; " +
-      "frame-src www.youtube.com docs.google.com; " +
-      "connect-src 'self' static.cloudflareinsights.com; " +
-      "font-src 'self' cdn.jsdelivr.net; " +
-      "worker-src 'self'",
+    // CSP manejado por Cloudflare - no duplicar aquí para evitar conflictos
+    // Cloudflare inyecta su propio CSP que permite Alpine.js y analytics
   }),
 };
 
