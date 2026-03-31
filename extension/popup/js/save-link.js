@@ -20,15 +20,16 @@ let _hasPerformedInitialCheck = false;
  * Safe to call multiple times — re-runs on each tab activation.
  *
  * @param {{ apiKey: string|null, userEmail: string|null }} state
+ * @param {{ url?: string, title?: string, description?: string } | null} preloadedData - Optional preloaded data from scanner
  */
-export function initSaveLink(state) {
+export function initSaveLink(state, preloadedData = null) {
   // Always reset so each tab activation is fresh
   _initialized = false;
   _hasPerformedInitialCheck = false;
-  _init(state);
+  _init(state, preloadedData);
 }
 
-async function _init(state) {
+async function _init(state, preloadedData = null) {
   if (_initialized) return;
   _initialized = true;
 
@@ -64,44 +65,59 @@ async function _init(state) {
   if (newCatForm) newCatForm.classList.add('hidden');
   _hideError(saveError);
 
-  // Step 1: Get active tab metadata
+  // Step 0: Check for preloaded data from scanner
+  if (preloadedData?.url) {
+    urlInput.value = preloadedData.url;
+  }
+  if (preloadedData?.title) {
+    titleInput.value = preloadedData.title;
+  }
+  if (preloadedData?.description) {
+    descInput.value = preloadedData.description;
+  }
+
+  // Step 1: Get active tab metadata (only if no preloaded data)
   let currentTab = null;
-  try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    currentTab = tab;
-
-    // Pre-llenar URL con la pestaña activa, pero permitir edición
-    if (urlInput && !urlInput.value) {
-      urlInput.value = tab.url || '';
-    }
-    if (titleInput) titleInput.value = tab.title || '';
-
-    // Step 2: Extract meta description via scripting
+  if (!preloadedData?.url) {
     try {
-      const results = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => {
-          const meta = document.querySelector('meta[name="description"]');
-          return meta?.getAttribute('content') ?? '';
-        },
-      });
-      if (descInput) descInput.value = results?.[0]?.result || '';
-    } catch {
-      // Restricted page (chrome://, extensions, etc.) — silently ignore
-      if (descInput) descInput.value = '';
-    }
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      currentTab = tab;
 
-    // Step 3: Duplicate check DESACTIVADO temporalmente
-    // El endpoint /api/skill/lookup no devuelve userId, no podemos verificar ownership
-    // Dejamos que el backend devuelva 409 si realmente es un duplicado
-    // if (tab.url && !_hasPerformedInitialCheck) {
-    //   await _checkDuplicate(tab.url, state, {
-    //     form, dupWarning, dupTitle, dupCategory, dupViewBtn,
-    //   });
-    //   _hasPerformedInitialCheck = true;
-    // }
-  } catch (err) {
-    console.warn('[URLoft] Could not read active tab:', err);
+      // Pre-llenar URL con la pestaña activa, pero permitir edición
+      if (urlInput && !urlInput.value) {
+        urlInput.value = tab.url || '';
+      }
+      if (titleInput && !titleInput.value) {
+        titleInput.value = tab.title || '';
+      }
+
+      // Step 2: Extract meta description via scripting
+      try {
+        const results = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: () => {
+            const meta = document.querySelector('meta[name="description"]');
+            return meta?.getAttribute('content') ?? '';
+          },
+        });
+        if (descInput) descInput.value = results?.[0]?.result || '';
+      } catch {
+        // Restricted page (chrome://, extensions, etc.) — silently ignore
+        if (descInput) descInput.value = '';
+      }
+
+      // Step 3: Duplicate check DESACTIVADO temporalmente
+      // El endpoint /api/skill/lookup no devuelve userId, no podemos verificar ownership
+      // Dejamos que el backend devuelva 409 si realmente es un duplicado
+      // if (tab.url && !_hasPerformedInitialCheck) {
+      //   await _checkDuplicate(tab.url, state, {
+      //     form, dupWarning, dupTitle, dupCategory, dupViewBtn,
+      //   });
+      //   _hasPerformedInitialCheck = true;
+      // }
+    } catch (err) {
+      console.warn('[URLoft] Could not read active tab:', err);
+    }
   }
 
   // Step 4: Load categories

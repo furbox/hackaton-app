@@ -10,6 +10,7 @@ import { initSaveLink } from './save-link.js';
 import { initSearch } from './search.js';
 import { showToast } from './utils.js';
 import { getCategories } from './api.js';
+import { initScannerToggle } from '../../features/scanner/popup-handler.js';
 
 // ── Global app state ───────────────────────────────────────────────
 export const state = {
@@ -124,6 +125,12 @@ function showAppView() {
   // Initialize runtime settings
   _initApiBaseUrlSettings();
 
+  // Initialize website button
+  _bindWebsiteButton();
+
+  // Initialize scanner toggle ( AFTER existing UI)
+  initScannerToggle(state);
+
   // Initialize the active tab content
   _activateTab(state.currentTab);
 }
@@ -161,7 +168,16 @@ function _activateTab(tabName) {
 
   // Initialize the tab's module
   if (tabName === 'save') {
-    initSaveLink(state);
+    // Check for preloaded data from scanner
+    storage.get(['scannerPreloadedData']).then((data) => {
+      const preloaded = data.scannerPreloadedData || null;
+      initSaveLink(state, preloaded);
+
+      // Clear the preloaded data after using it
+      if (preloaded) {
+        storage.set({ scannerPreloadedData: null });
+      }
+    });
   } else if (tabName === 'search') {
     initSearch(state);
   }
@@ -176,6 +192,24 @@ function _bindLogout() {
     if (!confirm('¿Cerrar sesión?')) return;
     await _clearSession();
     showAuthView();
+  });
+}
+
+// ── Website button ───────────────────────────────────────────────────
+function _bindWebsiteButton() {
+  const btn = document.getElementById('website-btn');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    if (typeof chrome !== 'undefined' && chrome.tabs) {
+      // Open in new tab
+      await chrome.tabs.create({ url: 'https://urloft.site' });
+      // Close the popup
+      window.close();
+    } else {
+      // Fallback for testing
+      window.open('https://urloft.site', '_blank');
+    }
   });
 }
 
