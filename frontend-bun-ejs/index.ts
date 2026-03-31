@@ -31,14 +31,23 @@ const server = Bun.serve({
   async fetch(request) {
     const url = new URL(request.url);
 
-    // Service Worker — debe servirse desde la raíz para tener scope correcto
-    if (url.pathname === "/sw.js") {
-      const swFile = Bun.file(PUBLIC_DIR + "/sw.js");
-      if (await swFile.exists()) {
-        return new Response(swFile, {
+    // Root level SEO and PWA files
+    const rootFiles = ["/sw.js", "/robots.txt", "/sitemap.xml", "/llms.txt"];
+    if (rootFiles.includes(url.pathname)) {
+      const fileName = url.pathname.slice(1);
+      const file = Bun.file(PUBLIC_DIR + "/" + fileName);
+      if (await file.exists()) {
+        const contentType =
+          url.pathname === "/sw.js"
+            ? "application/javascript"
+            : url.pathname === "/sitemap.xml"
+            ? "application/xml"
+            : "text/plain";
+
+        return new Response(file, {
           headers: {
-            "Content-Type": "application/javascript",
-            "Service-Worker-Allowed": "/",
+            "Content-Type": contentType,
+            ...(url.pathname === "/sw.js" && { "Service-Worker-Allowed": "/" }),
             "Cache-Control": "no-cache, no-store, must-revalidate",
           },
         });

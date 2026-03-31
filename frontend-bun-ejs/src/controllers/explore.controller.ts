@@ -257,7 +257,11 @@ export async function exploreController(
 
   return renderPage("explore", {
     data: {
-      title: "Explorar",
+      title: "Explorar Links Públicos",
+      pageDescription: "Descubrí links públicos guardados por la comunidad URLoft. Buscá por categoría, popularidad o texto completo entre cientos de recursos curados.",
+      canonicalUrl: "https://urloft.site/explore",
+      ogImage: "https://urloft.site/public/logo-urloft.png",
+      noindex: false,
       user,
       flash,
       links,

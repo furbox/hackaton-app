@@ -46,44 +46,33 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
 // ── Scanner Handlers ────────────────────────────────────────────────
 /**
  * Enable the scanner feature on the active tab.
- * Injects content scripts, tracks the active tab, and starts the scanner UI.
+ * Injects content scripts, tracks the active tab, and starts the scanner.
  */
-async function _handleEnableScanner(sendResponse) {
+async function _handleEnableScanner() {
   try {
     // Get the active tab in the current window
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab?.id) {
-      sendResponse({ ok: false, error: 'No active tab found' });
-      return;
+      return { ok: false, error: 'No active tab found' };
     }
 
     // Cannot inject into restricted pages (chrome://, about:, etc.)
     if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('about:'))) {
-      sendResponse({ ok: false, error: 'Cannot run scanner on this page' });
-      return;
+      return { ok: false, error: 'Cannot run scanner on this page' };
     }
 
-    // Inject content script and styles
+    // Inject content script
     try {
       // Inject JavaScript
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ['features/scanner/scanner.js']
       });
-
-      // Inject CSS (MUST use insertCSS, not executeScript)
-      const cssUrl = chrome.runtime.getURL('features/scanner/scanner.css');
-      const cssResponse = await fetch(cssUrl);
-      const cssText = await cssResponse.text();
-      await chrome.scripting.insertCSS({
-        target: { tabId: tab.id },
-        css: cssText
-      });
+      // V2 REMOVAL: No longer injecting CSS as UI is now in the popup tab
     } catch (injectError) {
-      console.error('[URLoft] Failed to inject scanner:', injectError);
-      sendResponse({ ok: false, error: injectError.message });
-      return;
+      console.error('[URLoft] Failed to inject scanner script:', injectError);
+      return { ok: false, error: injectError.message };
     }
 
     // Track this tab as having scanner active
@@ -94,7 +83,7 @@ async function _handleEnableScanner(sendResponse) {
       await _setStorage({ scannerActiveTabs: activeTabs });
     }
 
-    // Send message to content script to start scanner UI
+    // Send message to content script to start scanning
     try {
       await chrome.tabs.sendMessage(tab.id, { action: 'startScanner' });
     } catch (msgError) {
@@ -107,24 +96,23 @@ async function _handleEnableScanner(sendResponse) {
       }
     }
 
-    sendResponse({ ok: true, tabId: tab.id });
+    return { ok: true, tabId: tab.id };
   } catch (error) {
     console.error('[URLoft] Error enabling scanner:', error);
-    sendResponse({ ok: false, error: error.message });
+    return { ok: false, error: error.message };
   }
 }
 
 /**
  * Disable the scanner feature on the active tab.
- * Stops the scanner UI and removes tab from tracking.
+ * Stops the scanner and removes tab from tracking.
  */
-async function _handleDisableScanner(sendResponse) {
+async function _handleDisableScanner() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
     if (!tab?.id) {
-      sendResponse({ ok: false, error: 'No active tab found' });
-      return;
+      return { ok: false, error: 'No active tab found' };
     }
 
     // Remove from active tabs tracking
@@ -140,24 +128,23 @@ async function _handleDisableScanner(sendResponse) {
       console.debug('[URLoft] Content script not reachable for stop:', msgError.message);
     }
 
-    sendResponse({ ok: true });
+    return { ok: true };
   } catch (error) {
     console.error('[URLoft] Error disabling scanner:', error);
-    sendResponse({ ok: false, error: error.message });
+    return { ok: false, error: error.message };
   }
 }
 
 /**
- * Handle a link clicked in the scanner overlay.
+ * Handle a link clicked in the scanner.
  * Saves the URL/title to storage and opens the extension popup.
  */
-async function _handleLinkClicked(message, sendResponse) {
+async function _handleLinkClicked(message) {
   try {
     const { url, title } = message.data || {};
 
     if (!url) {
-      sendResponse({ ok: false, error: 'Missing URL in message data' });
-      return;
+      return { ok: false, error: 'Missing URL in message data' };
     }
 
     // Save preloaded data for the popup to use
@@ -174,34 +161,47 @@ async function _handleLinkClicked(message, sendResponse) {
       // Still return ok since data is saved
     }
 
-    sendResponse({ ok: true });
+    return { ok: true };
   } catch (error) {
     console.error('[URLoft] Error handling link click:', error);
-    sendResponse({ ok: false, error: error.message });
+    return { ok: false, error: error.message };
   }
 }
 
 // ── Message listener ───────────────────────────────────────────────
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'UPDATE_BADGE') {
-    updateBadge().then(() => sendResponse({ ok: true }));
-    return true; // keep port open for async response
-  }
+  // Use a self-executing async function to handle async logic properly
+  // and return true to keep the message port open.
+  const handleMessage = async () => {
+    let response;
+    try {
+      if (message.type === 'UPDATE_BADGE') {
+        await updateBadge();
+        response = { ok: true };
+      } else if (message.action === 'enableScanner') {
+        response = await _handleEnableScanner();
+      } else if (message.action === 'disableScanner') {
+        response = await _handleDisableScanner();
+      } else if (message.action === 'linkClicked') {
+        response = await _handleLinkClicked(message);
+      } else {
+        // Not a message we handle
+        return;
+      }
+      sendResponse(response);
+    } catch (error) {
+      console.error('[URLoft] Error in message listener:', error);
+      sendResponse({ ok: false, error: error.message });
+    }
+  };
 
-  // Scanner feature handlers (Phase 1-3)
-  if (message.action === 'enableScanner') {
-    _handleEnableScanner(sendResponse);
-    return true; // async response
-  }
+  // Only return true if we matched a handler
+  const handledActions = ['UPDATE_BADGE', 'enableScanner', 'disableScanner', 'linkClicked'];
+  const isHandled = handledActions.includes(message.type) || handledActions.includes(message.action);
 
-  if (message.action === 'disableScanner') {
-    _handleDisableScanner(sendResponse);
-    return true; // async response
-  }
-
-  if (message.action === 'linkClicked') {
-    _handleLinkClicked(message, sendResponse);
-    return true; // async response
+  if (isHandled) {
+    handleMessage();
+    return true; // Keep message channel open
   }
 });
 

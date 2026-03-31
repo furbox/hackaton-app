@@ -15,7 +15,7 @@ export async function registerGetController(
 ): Promise<Response> {
   const flash = getFlash(request);
   return renderPage("auth/register", {
-    data: { title: "Crear cuenta", user: null, flash },
+    data: { title: "Crear cuenta", user: null, flash, noindex: true },
   });
 }
 

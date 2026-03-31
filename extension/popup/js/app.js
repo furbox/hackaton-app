@@ -8,15 +8,16 @@ import * as storage from './storage.js';
 import { initAuth } from './auth.js';
 import { initSaveLink } from './save-link.js';
 import { initSearch } from './search.js';
+import { initScannerTab, updateScannedLinks } from '../../features/scanner-tab/scanner-tab.js';
 import { showToast } from './utils.js';
 import { getCategories } from './api.js';
-import { initScannerToggle } from '../../features/scanner/popup-handler.js';
 
 // ── Global app state ───────────────────────────────────────────────
 export const state = {
   apiKey: null,
   userEmail: null,
   currentTab: 'save',
+  scannedLinks: [],
 };
 
 /**
@@ -128,9 +129,6 @@ function showAppView() {
   // Initialize website button
   _bindWebsiteButton();
 
-  // Initialize scanner toggle ( AFTER existing UI)
-  initScannerToggle(state);
-
   // Initialize the active tab content
   _activateTab(state.currentTab);
 }
@@ -180,6 +178,8 @@ function _activateTab(tabName) {
     });
   } else if (tabName === 'search') {
     initSearch(state);
+  } else if (tabName === 'scanner') {
+    initScannerTab(state);
   }
 }
 
@@ -298,6 +298,31 @@ window.addEventListener('urloft:unauthorized', async (e) => {
   await _clearSession();
   showAuthView(e.detail?.message || 'Tu sesión expiró. Volvé a iniciar sesión.');
   showToast('Sesión expirada. Volvé a conectarte.', 'warning');
+});
+
+// ── Scanner Messaging ──────────────────────────────────────────────
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'linksFound' || message.action === 'newLinks') {
+    const incomingLinks = message.data?.links || [];
+    
+    if (message.action === 'linksFound') {
+      // Full reset for initial scan
+      state.scannedLinks = incomingLinks;
+    } else {
+      // Append only unique links for updates
+      const existingUrls = new Set(state.scannedLinks.map(l => l.url));
+      const uniqueNewLinks = incomingLinks.filter(l => !existingUrls.has(l.url));
+      if (uniqueNewLinks.length > 0) {
+        state.scannedLinks = [...state.scannedLinks, ...uniqueNewLinks];
+      }
+    }
+    
+    // Update the Scanner tab UI if it's currently loaded
+    updateScannedLinks();
+    
+    if (sendResponse) sendResponse({ success: true });
+  }
+  return true;
 });
 
 // ── Start ──────────────────────────────────────────────────────────

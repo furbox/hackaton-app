@@ -45,7 +45,7 @@ export async function loginGetController(
   const flash = getFlash(request);
 
   return renderPage("auth/login", {
-    data: { title: "Iniciar sesión", user: null, flash },
+    data: { title: "Iniciar sesión", user: null, flash, noindex: true },
   });
 }
 

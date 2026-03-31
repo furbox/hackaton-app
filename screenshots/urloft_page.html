@@ -1,0 +1,2788 @@
+<!DOCTYPE html><html lang="es" class="h-full"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="URLoft — Tu gestor de enlaces con superpoderes">
+  <link rel="icon" type="image/png" sizes="16x16" href="/public/icons/icon-16.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/public/icons/icon-48.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="/public/icons/icon-128.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="URLoft">
+  <meta property="og:description" content="URLoft — Tu gestor de enlaces con superpoderes">
+  <meta property="og:image" content="/public/logo-urloft.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="URLoft">
+  <meta name="twitter:description" content="URLoft — Tu gestor de enlaces con superpoderes">
+  <meta name="twitter:image" content="/public/logo-urloft.png">
+  <title>Home - URLoft</title>
+
+  <!-- Tailwind CSS Browser v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script><style>/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
+    --color-red-500: oklch(63.7% 0.237 25.331);
+    --color-emerald-500: oklch(69.6% 0.17 162.48);
+    --color-cyan-300: oklch(86.5% 0.127 207.078);
+    --color-slate-900: oklch(20.8% 0.042 265.755);
+    --color-slate-950: oklch(12.9% 0.042 264.695);
+    --color-black: #000;
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --container-xl: 36rem;
+    --container-2xl: 42rem;
+    --container-3xl: 48rem;
+    --container-4xl: 56rem;
+    --container-6xl: 72rem;
+    --container-7xl: 80rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-base: 1rem;
+    --text-base--line-height: calc(1.5 / 1);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --text-4xl: 2.25rem;
+    --text-4xl--line-height: calc(2.5 / 2.25);
+    --text-5xl: 3rem;
+    --text-5xl--line-height: 1;
+    --text-6xl: 3.75rem;
+    --text-6xl--line-height: 1;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrabold: 800;
+    --tracking-tight: -0.025em;
+    --tracking-wide: 0.025em;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-relaxed: 1.625;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --drop-shadow-lg: 0 4px 4px rgb(0 0 0 / 0.15);
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+    --color-bg: #0E1116;
+    --color-surface: #151A22;
+    --color-border: #2A3342;
+    --color-text-primary: #E6ECF2;
+    --color-text-secondary: #A5B0BF;
+    --color-accent-primary: #4CC9F0;
+    --color-success: #3ECF8E;
+    --color-warning: #F4B740;
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji');
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type='button'], [type='reset'], [type='submit']), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden='until-found'])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .absolute {
+    position: absolute;
+  }
+  .relative {
+    position: relative;
+  }
+  .sticky {
+    position: sticky;
+  }
+  .inset-0 {
+    inset: calc(var(--spacing) * 0);
+  }
+  .-top-1\.5 {
+    top: calc(var(--spacing) * -1.5);
+  }
+  .top-0 {
+    top: calc(var(--spacing) * 0);
+  }
+  .-right-1\.5 {
+    right: calc(var(--spacing) * -1.5);
+  }
+  .left-0 {
+    left: calc(var(--spacing) * 0);
+  }
+  .z-10 {
+    z-index: 10;
+  }
+  .z-50 {
+    z-index: 50;
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .my-2 {
+    margin-block: calc(var(--spacing) * 2);
+  }
+  .mt-1 {
+    margin-top: calc(var(--spacing) * 1);
+  }
+  .mt-4 {
+    margin-top: calc(var(--spacing) * 4);
+  }
+  .mt-6 {
+    margin-top: calc(var(--spacing) * 6);
+  }
+  .mt-8 {
+    margin-top: calc(var(--spacing) * 8);
+  }
+  .mt-16 {
+    margin-top: calc(var(--spacing) * 16);
+  }
+  .mb-1 {
+    margin-bottom: calc(var(--spacing) * 1);
+  }
+  .mb-2 {
+    margin-bottom: calc(var(--spacing) * 2);
+  }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
+  }
+  .mb-6 {
+    margin-bottom: calc(var(--spacing) * 6);
+  }
+  .mb-8 {
+    margin-bottom: calc(var(--spacing) * 8);
+  }
+  .mb-10 {
+    margin-bottom: calc(var(--spacing) * 10);
+  }
+  .mb-12 {
+    margin-bottom: calc(var(--spacing) * 12);
+  }
+  .mb-16 {
+    margin-bottom: calc(var(--spacing) * 16);
+  }
+  .\[display\:-webkit-box\] {
+    display: -webkit-box;
+  }
+  .block {
+    display: block;
+  }
+  .flex {
+    display: flex;
+  }
+  .grid {
+    display: grid;
+  }
+  .hidden {
+    display: none;
+  }
+  .inline-flex {
+    display: inline-flex;
+  }
+  .h-3\.5 {
+    height: calc(var(--spacing) * 3.5);
+  }
+  .h-4 {
+    height: calc(var(--spacing) * 4);
+  }
+  .h-6 {
+    height: calc(var(--spacing) * 6);
+  }
+  .h-9 {
+    height: calc(var(--spacing) * 9);
+  }
+  .h-12 {
+    height: calc(var(--spacing) * 12);
+  }
+  .h-16 {
+    height: calc(var(--spacing) * 16);
+  }
+  .h-auto {
+    height: auto;
+  }
+  .h-full {
+    height: 100%;
+  }
+  .max-h-\[400px\] {
+    max-height: 400px;
+  }
+  .min-h-full {
+    min-height: 100%;
+  }
+  .w-3\.5 {
+    width: calc(var(--spacing) * 3.5);
+  }
+  .w-4 {
+    width: calc(var(--spacing) * 4);
+  }
+  .w-6 {
+    width: calc(var(--spacing) * 6);
+  }
+  .w-9 {
+    width: calc(var(--spacing) * 9);
+  }
+  .w-12 {
+    width: calc(var(--spacing) * 12);
+  }
+  .w-16 {
+    width: calc(var(--spacing) * 16);
+  }
+  .w-auto {
+    width: auto;
+  }
+  .w-full {
+    width: 100%;
+  }
+  .max-w-2xl {
+    max-width: var(--container-2xl);
+  }
+  .max-w-3xl {
+    max-width: var(--container-3xl);
+  }
+  .max-w-4xl {
+    max-width: var(--container-4xl);
+  }
+  .max-w-6xl {
+    max-width: var(--container-6xl);
+  }
+  .max-w-7xl {
+    max-width: var(--container-7xl);
+  }
+  .max-w-xl {
+    max-width: var(--container-xl);
+  }
+  .min-w-0 {
+    min-width: calc(var(--spacing) * 0);
+  }
+  .flex-1 {
+    flex: 1;
+  }
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .items-stretch {
+    align-items: stretch;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .gap-1\.5 {
+    gap: calc(var(--spacing) * 1.5);
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .gap-2\.5 {
+    gap: calc(var(--spacing) * 2.5);
+  }
+  .gap-3 {
+    gap: calc(var(--spacing) * 3);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
+  }
+  .gap-6 {
+    gap: calc(var(--spacing) * 6);
+  }
+  .gap-8 {
+    gap: calc(var(--spacing) * 8);
+  }
+  .space-y-2 {
+    :where(& > :not(:last-child)) {
+      --tw-space-y-reverse: 0;
+      margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
+      margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
+    }
+  }
+  .overflow-hidden {
+    overflow: hidden;
+  }
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
+  .rounded-2xl {
+    border-radius: var(--radius-2xl);
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  .rounded-md {
+    border-radius: var(--radius-md);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .border-2 {
+    border-style: var(--tw-border-style);
+    border-width: 2px;
+  }
+  .border-y {
+    border-block-style: var(--tw-border-style);
+    border-block-width: 1px;
+  }
+  .border-t {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 1px;
+  }
+  .border-b {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+  }
+  .border-accent-primary\/40 {
+    border-color: color-mix(in srgb, #4CC9F0 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-accent-primary) 40%, transparent);
+    }
+  }
+  .border-border {
+    border-color: var(--color-border);
+  }
+  .border-border\/80 {
+    border-color: color-mix(in srgb, #2A3342 80%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-border) 80%, transparent);
+    }
+  }
+  .border-border\/90 {
+    border-color: color-mix(in srgb, #2A3342 90%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-border) 90%, transparent);
+    }
+  }
+  .border-slate-900 {
+    border-color: var(--color-slate-900);
+  }
+  .bg-accent-primary {
+    background-color: var(--color-accent-primary);
+  }
+  .bg-accent-primary\/15 {
+    background-color: color-mix(in srgb, #4CC9F0 15%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-accent-primary) 15%, transparent);
+    }
+  }
+  .bg-bg {
+    background-color: var(--color-bg);
+  }
+  .bg-black\/0 {
+    background-color: color-mix(in srgb, #000 0%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-black) 0%, transparent);
+    }
+  }
+  .bg-emerald-500 {
+    background-color: var(--color-emerald-500);
+  }
+  .bg-red-500 {
+    background-color: var(--color-red-500);
+  }
+  .bg-slate-900\/35 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 35%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 35%, transparent);
+    }
+  }
+  .bg-slate-900\/45 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 45%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 45%, transparent);
+    }
+  }
+  .bg-slate-900\/50 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 50%, transparent);
+    }
+  }
+  .bg-slate-900\/60 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 60%, transparent);
+    }
+  }
+  .bg-slate-900\/70 {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 70%, transparent);
+    }
+  }
+  .bg-success\/15 {
+    background-color: color-mix(in srgb, #3ECF8E 15%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-success) 15%, transparent);
+    }
+  }
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+  .bg-surface\/60 {
+    background-color: color-mix(in srgb, #151A22 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface) 60%, transparent);
+    }
+  }
+  .bg-surface\/70 {
+    background-color: color-mix(in srgb, #151A22 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface) 70%, transparent);
+    }
+  }
+  .bg-surface\/85 {
+    background-color: color-mix(in srgb, #151A22 85%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface) 85%, transparent);
+    }
+  }
+  .bg-surface\/95 {
+    background-color: color-mix(in srgb, #151A22 95%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-surface) 95%, transparent);
+    }
+  }
+  .bg-warning\/15 {
+    background-color: color-mix(in srgb, #F4B740 15%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-warning) 15%, transparent);
+    }
+  }
+  .bg-gradient-to-br {
+    --tw-gradient-position: to bottom right in oklab;
+    background-image: linear-gradient(var(--tw-gradient-stops));
+  }
+  .from-bg {
+    --tw-gradient-from: var(--color-bg);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .via-surface {
+    --tw-gradient-via: var(--color-surface);
+    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-via-stops);
+  }
+  .to-slate-950 {
+    --tw-gradient-to: var(--color-slate-950);
+    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
+  }
+  .object-contain {
+    object-fit: contain;
+  }
+  .object-center {
+    object-position: center;
+  }
+  .p-1\.5 {
+    padding: calc(var(--spacing) * 1.5);
+  }
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
+  }
+  .p-4 {
+    padding: calc(var(--spacing) * 4);
+  }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
+  .p-6 {
+    padding: calc(var(--spacing) * 6);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+  .px-4 {
+    padding-inline: calc(var(--spacing) * 4);
+  }
+  .px-8 {
+    padding-inline: calc(var(--spacing) * 8);
+  }
+  .py-1 {
+    padding-block: calc(var(--spacing) * 1);
+  }
+  .py-1\.5 {
+    padding-block: calc(var(--spacing) * 1.5);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
+  }
+  .py-3\.5 {
+    padding-block: calc(var(--spacing) * 3.5);
+  }
+  .py-8 {
+    padding-block: calc(var(--spacing) * 8);
+  }
+  .py-16 {
+    padding-block: calc(var(--spacing) * 16);
+  }
+  .py-20 {
+    padding-block: calc(var(--spacing) * 20);
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
+  }
+  .text-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .text-4xl {
+    font-size: var(--text-4xl);
+    line-height: var(--tw-leading, var(--text-4xl--line-height));
+  }
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
+  }
+  .text-xs {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-\[10px\] {
+    font-size: 10px;
+  }
+  .leading-relaxed {
+    --tw-leading: var(--leading-relaxed);
+    line-height: var(--leading-relaxed);
+  }
+  .leading-snug {
+    --tw-leading: var(--leading-snug);
+    line-height: var(--leading-snug);
+  }
+  .leading-tight {
+    --tw-leading: var(--leading-tight);
+    line-height: var(--leading-tight);
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .font-extrabold {
+    --tw-font-weight: var(--font-weight-extrabold);
+    font-weight: var(--font-weight-extrabold);
+  }
+  .font-medium {
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+  }
+  .font-semibold {
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+  }
+  .tracking-tight {
+    --tw-tracking: var(--tracking-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+  .tracking-wide {
+    --tw-tracking: var(--tracking-wide);
+    letter-spacing: var(--tracking-wide);
+  }
+  .text-accent-primary {
+    color: var(--color-accent-primary);
+  }
+  .text-slate-950 {
+    color: var(--color-slate-950);
+  }
+  .text-success {
+    color: var(--color-success);
+  }
+  .text-text-primary {
+    color: var(--color-text-primary);
+  }
+  .text-text-secondary {
+    color: var(--color-text-secondary);
+  }
+  .text-text-secondary\/70 {
+    color: color-mix(in srgb, #A5B0BF 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-text-secondary) 70%, transparent);
+    }
+  }
+  .text-text-secondary\/90 {
+    color: color-mix(in srgb, #A5B0BF 90%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-text-secondary) 90%, transparent);
+    }
+  }
+  .text-text-secondary\/95 {
+    color: color-mix(in srgb, #A5B0BF 95%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-text-secondary) 95%, transparent);
+    }
+  }
+  .text-warning {
+    color: var(--color-warning);
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+  .uppercase {
+    text-transform: uppercase;
+  }
+  .opacity-0 {
+    opacity: 0%;
+  }
+  .shadow-\[0_10px_30px_-16px_rgba\(0\,0\,0\,0\.85\)\] {
+    --tw-shadow: 0 10px 30px -16px var(--tw-shadow-color, rgba(0,0,0,0.85));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-lg {
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-md {
+    --tw-shadow: 0 4px 6px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 2px 4px -2px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-xl {
+    --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .ring-1 {
+    --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-black\/30 {
+    --tw-shadow-color: color-mix(in srgb, #000 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-black) 30%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
+  .shadow-black\/35 {
+    --tw-shadow-color: color-mix(in srgb, #000 35%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-black) 35%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
+  .ring-white\/5 {
+    --tw-ring-color: color-mix(in srgb, #fff 5%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-ring-color: color-mix(in oklab, var(--color-white) 5%, transparent);
+    }
+  }
+  .drop-shadow-lg {
+    --tw-drop-shadow-size: drop-shadow(0 4px 4px var(--tw-drop-shadow-color, rgb(0 0 0 / 0.15)));
+    --tw-drop-shadow: drop-shadow(var(--drop-shadow-lg));
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
+  .backdrop-blur {
+    --tw-backdrop-blur: blur(8px);
+    -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+    backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  }
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-colors {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-opacity {
+    transition-property: opacity;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-shadow {
+    transition-property: box-shadow;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .transition-transform {
+    transition-property: transform, translate, scale, rotate;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .duration-200 {
+    --tw-duration: 200ms;
+    transition-duration: 200ms;
+  }
+  .duration-300 {
+    --tw-duration: 300ms;
+    transition-duration: 300ms;
+  }
+  .\[-webkit-box-orient\:vertical\] {
+    -webkit-box-orient: vertical;
+  }
+  .\[-webkit-line-clamp\:2\] {
+    -webkit-line-clamp: 2;
+  }
+  .group-hover\:scale-105 {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        --tw-scale-x: 105%;
+        --tw-scale-y: 105%;
+        --tw-scale-z: 105%;
+        scale: var(--tw-scale-x) var(--tw-scale-y);
+      }
+    }
+  }
+  .group-hover\:bg-black\/20 {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #000 20%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-black) 20%, transparent);
+        }
+      }
+    }
+  }
+  .group-hover\:opacity-100 {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        opacity: 100%;
+      }
+    }
+  }
+  .hover\:-translate-y-0\.5 {
+    &:hover {
+      @media (hover: hover) {
+        --tw-translate-y: calc(var(--spacing) * -0.5);
+        translate: var(--tw-translate-x) var(--tw-translate-y);
+      }
+    }
+  }
+  .hover\:border-accent-primary\/40 {
+    &:hover {
+      @media (hover: hover) {
+        border-color: color-mix(in srgb, #4CC9F0 40%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(in oklab, var(--color-accent-primary) 40%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-cyan-300 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-cyan-300);
+      }
+    }
+  }
+  .hover\:bg-slate-900\/80 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 80%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-slate-900) 80%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-surface {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-surface);
+      }
+    }
+  }
+  .hover\:text-accent-primary {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-accent-primary);
+      }
+    }
+  }
+  .hover\:text-cyan-300 {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-cyan-300);
+      }
+    }
+  }
+  .hover\:text-text-primary {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-text-primary);
+      }
+    }
+  }
+  .hover\:shadow-\[0_18px_40px_-18px_rgba\(0\,0\,0\,0\.95\)\] {
+    &:hover {
+      @media (hover: hover) {
+        --tw-shadow: 0 18px 40px -18px var(--tw-shadow-color, rgba(0,0,0,0.95));
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+    }
+  }
+  .hover\:shadow-xl {
+    &:hover {
+      @media (hover: hover) {
+        --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 8px 10px -6px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+        box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+      }
+    }
+  }
+  .hover\:shadow-black\/30 {
+    &:hover {
+      @media (hover: hover) {
+        --tw-shadow-color: color-mix(in srgb, #000 30%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-black) 30%, transparent) var(--tw-shadow-alpha), transparent);
+        }
+      }
+    }
+  }
+  .focus\:ring-2 {
+    &:focus {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+  }
+  .focus\:ring-accent-primary {
+    &:focus {
+      --tw-ring-color: var(--color-accent-primary);
+    }
+  }
+  .focus\:ring-offset-1 {
+    &:focus {
+      --tw-ring-offset-width: 1px;
+      --tw-ring-offset-shadow: var(--tw-ring-inset,) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    }
+  }
+  .focus\:outline-none {
+    &:focus {
+      --tw-outline-style: none;
+      outline-style: none;
+    }
+  }
+  .sm\:block {
+    @media (width >= 40rem) {
+      display: block;
+    }
+  }
+  .sm\:w-auto {
+    @media (width >= 40rem) {
+      width: auto;
+    }
+  }
+  .sm\:grid-cols-2 {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .sm\:grid-cols-3 {
+    @media (width >= 40rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .sm\:flex-row {
+    @media (width >= 40rem) {
+      flex-direction: row;
+    }
+  }
+  .sm\:items-stretch {
+    @media (width >= 40rem) {
+      align-items: stretch;
+    }
+  }
+  .sm\:p-8 {
+    @media (width >= 40rem) {
+      padding: calc(var(--spacing) * 8);
+    }
+  }
+  .sm\:px-6 {
+    @media (width >= 40rem) {
+      padding-inline: calc(var(--spacing) * 6);
+    }
+  }
+  .sm\:text-4xl {
+    @media (width >= 40rem) {
+      font-size: var(--text-4xl);
+      line-height: var(--tw-leading, var(--text-4xl--line-height));
+    }
+  }
+  .sm\:text-5xl {
+    @media (width >= 40rem) {
+      font-size: var(--text-5xl);
+      line-height: var(--tw-leading, var(--text-5xl--line-height));
+    }
+  }
+  .sm\:text-base {
+    @media (width >= 40rem) {
+      font-size: var(--text-base);
+      line-height: var(--tw-leading, var(--text-base--line-height));
+    }
+  }
+  .sm\:text-lg {
+    @media (width >= 40rem) {
+      font-size: var(--text-lg);
+      line-height: var(--tw-leading, var(--text-lg--line-height));
+    }
+  }
+  .sm\:text-xl {
+    @media (width >= 40rem) {
+      font-size: var(--text-xl);
+      line-height: var(--tw-leading, var(--text-xl--line-height));
+    }
+  }
+  .md\:flex {
+    @media (width >= 48rem) {
+      display: flex;
+    }
+  }
+  .md\:hidden {
+    @media (width >= 48rem) {
+      display: none;
+    }
+  }
+  .md\:grid-cols-2 {
+    @media (width >= 48rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .lg\:col-span-2 {
+    @media (width >= 64rem) {
+      grid-column: span 2 / span 2;
+    }
+  }
+  .lg\:grid-cols-2 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .lg\:grid-cols-3 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .lg\:grid-cols-4 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .lg\:grid-cols-5 {
+    @media (width >= 64rem) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  .lg\:px-8 {
+    @media (width >= 64rem) {
+      padding-inline: calc(var(--spacing) * 8);
+    }
+  }
+  .lg\:text-6xl {
+    @media (width >= 64rem) {
+      font-size: var(--text-6xl);
+      line-height: var(--tw-leading, var(--text-6xl--line-height));
+    }
+  }
+}
+@layer base {
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a {
+    color: var(--color-accent-primary);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  a:hover {
+    color: var(--color-cyan-300);
+  }
+  *:focus-visible {
+    outline: 2px solid #4CC9F0;
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: #4CC9F033;
+    color: #E6ECF2;
+  }
+}
+@layer components {
+  .ui-card {
+    border-radius: var(--radius-2xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-border);
+    background-color: var(--color-surface);
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    --tw-shadow-color: color-mix(in srgb, #000 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-black) 20%, transparent) var(--tw-shadow-alpha), transparent);
+    }
+  }
+  .ui-input {
+    width: 100%;
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-border);
+    background-color: color-mix(in srgb, oklch(12.9% 0.042 264.695) 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-950) 30%, transparent);
+    }
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-text-primary);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &::placeholder {
+      color: color-mix(in srgb, #A5B0BF 70%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, var(--color-text-secondary) 70%, transparent);
+      }
+    }
+    &:focus {
+      border-color: var(--color-accent-primary);
+    }
+  }
+  .ui-select {
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-border);
+    background-color: color-mix(in srgb, oklch(12.9% 0.042 264.695) 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-950) 30%, transparent);
+    }
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-text-primary);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &:focus {
+      border-color: var(--color-accent-primary);
+    }
+  }
+  .ui-textarea {
+    width: 100%;
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-border);
+    background-color: color-mix(in srgb, oklch(12.9% 0.042 264.695) 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-950) 30%, transparent);
+    }
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-text-primary);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &::placeholder {
+      color: color-mix(in srgb, #A5B0BF 70%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, var(--color-text-secondary) 70%, transparent);
+      }
+    }
+    &:focus {
+      border-color: var(--color-accent-primary);
+    }
+  }
+  .ui-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    background-color: var(--color-accent-primary);
+    padding-inline: calc(var(--spacing) * 5);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-font-weight: var(--font-weight-semibold);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-slate-950);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-cyan-300);
+      }
+    }
+  }
+  .ui-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-border);
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 50%, transparent);
+    }
+    padding-inline: calc(var(--spacing) * 5);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &:hover {
+      @media (hover: hover) {
+        border-color: color-mix(in srgb, #4CC9F0 60%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(in oklab, var(--color-accent-primary) 60%, transparent);
+        }
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-slate-900);
+      }
+    }
+  }
+  .ui-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-border);
+    background-color: transparent;
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &:hover {
+      @media (hover: hover) {
+        border-color: color-mix(in srgb, #4CC9F0 50%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          border-color: color-mix(in oklab, var(--color-accent-primary) 50%, transparent);
+        }
+      }
+    }
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-text-primary);
+      }
+    }
+  }
+  .ui-table thead {
+    background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-slate-900) 60%, transparent);
+    }
+  }
+  .ui-table thead th {
+    color: var(--color-text-secondary);
+  }
+  .ui-table tbody {
+    :where(& > :not(:last-child)) {
+      --tw-divide-y-reverse: 0;
+      border-bottom-style: var(--tw-border-style);
+      border-top-style: var(--tw-border-style);
+      border-top-width: calc(1px * var(--tw-divide-y-reverse));
+      border-bottom-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+    }
+    :where(& > :not(:last-child)) {
+      border-color: var(--color-border);
+    }
+  }
+  .ui-table-row {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, oklch(20.8% 0.042 265.755) 40%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-slate-900) 40%, transparent);
+        }
+      }
+    }
+  }
+}
+@property --tw-space-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-gradient-position {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-via {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-to {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #0000;
+}
+@property --tw-gradient-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-via-stops {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-gradient-from-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@property --tw-gradient-via-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --tw-gradient-to-position {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-tracking {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-drop-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-drop-shadow-size {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-scale-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-translate-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-translate-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-translate-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-divide-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-space-y-reverse: 0;
+      --tw-border-style: solid;
+      --tw-gradient-position: initial;
+      --tw-gradient-from: #0000;
+      --tw-gradient-via: #0000;
+      --tw-gradient-to: #0000;
+      --tw-gradient-stops: initial;
+      --tw-gradient-via-stops: initial;
+      --tw-gradient-from-position: 0%;
+      --tw-gradient-via-position: 50%;
+      --tw-gradient-to-position: 100%;
+      --tw-leading: initial;
+      --tw-font-weight: initial;
+      --tw-tracking: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-blur: initial;
+      --tw-brightness: initial;
+      --tw-contrast: initial;
+      --tw-grayscale: initial;
+      --tw-hue-rotate: initial;
+      --tw-invert: initial;
+      --tw-opacity: initial;
+      --tw-saturate: initial;
+      --tw-sepia: initial;
+      --tw-drop-shadow: initial;
+      --tw-drop-shadow-color: initial;
+      --tw-drop-shadow-alpha: 100%;
+      --tw-drop-shadow-size: initial;
+      --tw-backdrop-blur: initial;
+      --tw-backdrop-brightness: initial;
+      --tw-backdrop-contrast: initial;
+      --tw-backdrop-grayscale: initial;
+      --tw-backdrop-hue-rotate: initial;
+      --tw-backdrop-invert: initial;
+      --tw-backdrop-opacity: initial;
+      --tw-backdrop-saturate: initial;
+      --tw-backdrop-sepia: initial;
+      --tw-duration: initial;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-scale-z: 1;
+      --tw-translate-x: 0;
+      --tw-translate-y: 0;
+      --tw-translate-z: 0;
+      --tw-divide-y-reverse: 0;
+    }
+  }
+}
+</style>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: #0E1116;
+      --color-surface: #151A22;
+      --color-border: #2A3342;
+      --color-text-primary: #E6ECF2;
+      --color-text-secondary: #A5B0BF;
+      --color-accent-primary: #4CC9F0;
+      --color-accent-secondary: #8B74FF;
+      --color-success: #3ECF8E;
+      --color-warning: #F4B740;
+      --color-error: #FF6B6B;
+    }
+
+    @layer base {
+      body {
+        @apply antialiased bg-bg text-text-primary;
+      }
+
+      a {
+        @apply text-accent-primary transition-colors;
+      }
+
+      a:hover {
+        @apply text-cyan-300;
+      }
+
+      *:focus-visible {
+        outline: 2px solid #4CC9F0;
+        outline-offset: 2px;
+      }
+
+      ::selection {
+        background: #4CC9F033;
+        color: #E6ECF2;
+      }
+    }
+
+    @layer components {
+      .ui-card {
+        @apply rounded-2xl border border-border bg-surface shadow-lg shadow-black/20;
+      }
+
+      .ui-input {
+        @apply w-full rounded-xl border border-border bg-slate-950/30 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/70 transition-colors focus:border-accent-primary;
+      }
+
+      .ui-select {
+        @apply rounded-xl border border-border bg-slate-950/30 px-4 py-2.5 text-sm text-text-primary transition-colors focus:border-accent-primary;
+      }
+
+      .ui-textarea {
+        @apply w-full rounded-xl border border-border bg-slate-950/30 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/70 transition-colors focus:border-accent-primary;
+      }
+
+      .ui-btn-primary {
+        @apply inline-flex items-center justify-center rounded-xl bg-accent-primary px-5 py-2.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-300;
+      }
+
+      .ui-btn-secondary {
+        @apply inline-flex items-center justify-center rounded-xl border border-border bg-slate-900/50 px-5 py-2.5 text-sm font-medium text-text-primary transition-colors hover:border-accent-primary/60 hover:bg-slate-900;
+      }
+
+      .ui-btn-ghost {
+        @apply inline-flex items-center justify-center rounded-xl border border-border bg-transparent px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:text-text-primary hover:border-accent-primary/50;
+      }
+
+      .ui-table thead {
+        @apply bg-slate-900/60;
+      }
+
+      .ui-table thead th {
+        @apply text-text-secondary;
+      }
+
+      .ui-table tbody {
+        @apply divide-y divide-border;
+      }
+
+      .ui-table-row {
+        @apply transition-colors hover:bg-slate-900/40;
+      }
+    }
+  </style>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/public/manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="URLoft">
+  <link rel="apple-touch-icon" href="/public/icons/icon-192.png">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.warn('SW registration failed:', err));
+      });
+    }
+  </script>
+<style>.htmx-indicator{opacity:0;visibility: hidden} .htmx-request .htmx-indicator, .htmx-request.htmx-indicator{opacity:1;visibility: visible;transition: opacity 200ms ease-in}</style></head>
+<body class="min-h-full flex flex-col">
+
+  <!-- Flash messages -->
+  
+
+
+  <!-- Navigation -->
+  <nav class="sticky top-0 z-50 border-b border-border bg-surface/85 backdrop-blur" x-data="{ mobileMenuOpen: false }">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Brand -->
+      <a href="/" class="flex items-center" aria-label="URLoft">
+        <img src="/public/logo-urloft.png" alt="URLoft logo" class="h-9 w-auto object-contain object-center">
+      </a>
+
+      <!-- Desktop Nav links -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="/" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Home
+        </a>
+        <a href="/explore" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Explore
+        </a>
+        <a href="/como-lo-hice" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Cómo lo hice
+        </a>
+        <a href="/tecnologia" class="text-text-secondary hover:text-text-primary font-medium transition-colors">
+          Tecnología
+        </a>
+      </div>
+
+      <!-- Desktop Auth area -->
+      <div class="hidden md:flex items-center gap-3">
+        
+          <!-- Guest: show Login + Register -->
+          <a href="/auth/login" class="text-text-secondary hover:text-text-primary font-medium text-sm transition-colors hidden sm:block">
+            Iniciar sesión
+          </a>
+          <a href="/auth/register" class="rounded-lg bg-accent-primary px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-300">
+            Registrarse
+          </a>
+        
+      </div>
+
+      <!-- Mobile menu button -->
+      <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary transition-colors" aria-label="Toggle menu">
+        <svg x-show="!mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <svg x-show="mobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Mobile menu dropdown -->
+  <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2" class="md:hidden border-t border-border bg-surface shadow-xl shadow-black/30" style="display: none;">
+    <div class="px-4 py-3 space-y-2">
+      <!-- Nav links -->
+      <a href="/" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+        Home
+      </a>
+      <a href="/explore" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+        Explore
+      </a>
+      <a href="/como-lo-hice" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+         Cómo lo hice
+      </a>
+      <a href="/tecnologia" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+        Tecnología
+      </a>
+
+      <hr class="my-2 border-border">
+
+      
+        <!-- Guest: Login + Register -->
+        <a href="/auth/login" class="block px-3 py-2 rounded-lg text-text-secondary hover:bg-slate-900/80 hover:text-text-primary font-medium transition-colors">
+          Iniciar sesión
+        </a>
+        <a href="/auth/register" class="block px-3 py-2 rounded-lg bg-accent-primary hover:bg-cyan-300 text-center font-semibold text-slate-950 transition-colors">
+          Registrarse
+        </a>
+      
+    </div>
+  </div>
+</nav>
+
+
+  <!-- Main content -->
+  <main class="flex-1">
+    <!-- Hero Section -->
+<section class="bg-gradient-to-br from-bg via-surface to-slate-950 py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+
+    <!-- Badge -->
+    <div class="mb-8 inline-flex items-center gap-2 rounded-full bg-accent-primary/15 px-4 py-1.5 text-sm font-medium text-accent-primary">
+      <span>✨</span>
+      <span>Hackathon 2026 midudev</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="mb-6 text-4xl font-extrabold leading-tight text-text-primary sm:text-5xl lg:text-6xl">
+      Tu biblioteca inteligente de links
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-text-secondary sm:text-xl">
+      Guarda, organiza y encontra cualquier enlace en segundos. Todo en un solo lugar: desde links del dia a dia hasta recursos clave para tu equipo.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register" class="ui-btn-primary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Empezar gratis
+      </a>
+      <a href="/explore" class="ui-btn-secondary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Explorar links publicos
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Problem + Solution -->
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <article class="ui-card p-6 sm:p-8">
+        <p class="mb-3 inline-flex rounded-full bg-warning/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-warning">
+          Problema
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Tus links estan por todos lados</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          Notas rapidas, chats, favoritos del navegador y docs sueltos. Cuando necesitas algo importante,
+          perdes tiempo buscando en cinco lugares distintos.
+        </p>
+      </article>
+
+      <article class="ui-card p-6 sm:p-8 border-accent-primary/40">
+        <p class="mb-3 inline-flex rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-success">
+          Solucion URLoft
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Una sola biblioteca, con control total</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          URLoft centraliza todos tus enlaces, permite busqueda full-text real y te deja decidir si cada link
+          es publico o privado segun el contexto.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section (real data) -->
+<section class="border-y border-border bg-surface py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center text-white">
+      <div>
+        <div class="text-4xl font-extrabold mb-1">3</div>
+        <div class="font-medium text-text-secondary">Usuarios</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1">51</div>
+        <div class="font-medium text-text-secondary">Links guardados</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1">36</div>
+        <div class="font-medium text-text-secondary">Categorias</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Video Demo Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Ver URLoft en acción
+      </h2>
+      <p class="text-text-secondary">
+        Descubrí cómo URLoft resuelve el caos de tus links, sus funcionalidades principales y las ventajas que ofrece para organizar tu conocimiento digital.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <lite-youtube videoid="UvJokqRIBUo" class="w-full" style="background-image: url('https://i.ytimg.com/vi/UvJokqRIBUo/maxresdefault.jpg');" title="Play: Video"><noscript>
+<iframe credentialless frameborder="0" title="Video"
+  referrerpolicy="strict-origin-when-cross-origin"
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
+  src="https://www.youtube.com/embed/UvJokqRIBUo?autoplay=1&start=0&null"
+></iframe></noscript></lite-youtube>
+    </div>
+  </div>
+</section>
+
+<!-- Presentation Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Presentación del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Conocé más detalles sobre URLoft, su arquitectura, features y roadmap futuro.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <div class="relative w-full" style="padding-bottom: 56.25%;">
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQfad1VgyM3dCAKw21COMDt4yIUBeaWQKxOD-Byk8mdmnlgosV7wb4ouMUJMXyQS2euTJlv7-t-gpdd/pubembed?start=true&amp;loop=true&amp;delayms=3000" frameborder="0" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true" class="absolute top-0 left-0 w-full h-full rounded-xl">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Infographics Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Recursos visuales del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Infografía y mind map con la arquitectura y diseño de URLoft. Hacé click para expandir.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Infografía -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/infografia.png" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+            <img src="/public/docs/infografia.png" alt="Infografía de URLoft" class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Infografía del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Vista general de features y arquitectura</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Mind Map -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/NotebookLM_Mind_Map.png" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+            <img src="/public/docs/NotebookLM_Mind_Map.png" alt="Mind Map de URLoft" class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Mind Map del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Mapa mental generado con NotebookLM</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Links -->
+
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-bold text-text-primary">Links destacados</h2>
+      <a href="/explore" class="text-sm font-medium text-accent-primary transition-colors hover:text-cyan-300">
+        Ver todos →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+        
+
+<article id="favorite-card-15" data-favorite-card="true" class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/jjqbmr8a" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+        
+           <img src="https://www.google.com/s2/favicons?domain=mail.proton.me&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy">
+         
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+       
+         
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+       
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/jjqbmr8a" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="Proton Mail">
+        Proton Mail
+      </a>
+
+      
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-15" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span>7</span>
+      </span>
+      
+<button id="like-15" hx-post="/links/15/like" hx-target="this" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#like-loading-15" aria-label="Dar like" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>1</span>
+  <span id="like-loading-15" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+      
+<span id="fav-15">
+  <button hx-post="/links/15/favorite" hx-target="#fav-15" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#fav-loading-15" aria-label="Guardar" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1">
+    
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    
+    <span>1</span>
+    <span id="fav-loading-15" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+      
+        
+
+<article id="favorite-card-1" data-favorite-card="true" class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/nebay21a" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+        
+           <img src="https://www.google.com/s2/favicons?domain=urloft.site&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy">
+         
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+       
+         
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-red-500 text-[10px] font-bold text-white shadow-lg" title="Status: 404">
+           ✕
+         </div>
+       
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/nebay21a" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="URLoft">
+        URLoft
+      </a>
+
+      
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-1" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span>7</span>
+      </span>
+      
+<button id="like-1" hx-post="/links/1/like" hx-target="this" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#like-loading-1" aria-label="Dar like" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>1</span>
+  <span id="like-loading-1" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+      
+<span id="fav-1">
+  <button hx-post="/links/1/favorite" hx-target="#fav-1" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#fav-loading-1" aria-label="Guardar" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1">
+    
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    
+    <span>2</span>
+    <span id="fav-loading-1" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+      
+        
+
+<article id="favorite-card-52" data-favorite-card="true" class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/github-com-schniz-fnm" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+        
+           <img src="https://www.google.com/s2/favicons?domain=github.com&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy">
+         
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+       
+         
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+       
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/github-com-schniz-fnm" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="Node.js version manager">
+        Node.js version manager
+      </a>
+
+      
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-52" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span>1</span>
+      </span>
+      
+<button id="like-52" hx-post="/links/52/like" hx-target="this" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#like-loading-52" aria-label="Dar like" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-52" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+      
+<span id="fav-52">
+  <button hx-post="/links/52/favorite" hx-target="#fav-52" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#fav-loading-52" aria-label="Guardar" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1">
+    
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    
+    <span>0</span>
+    <span id="fav-loading-52" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+      
+        
+
+<article id="favorite-card-51" data-favorite-card="true" class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/pythontutor-com" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+        
+           <img src="https://www.google.com/s2/favicons?domain=pythontutor.com&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy">
+         
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+       
+         
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+       
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/pythontutor-com" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="Python Tutor - Python Online Compiler with Visual AI Help">
+        Python Tutor - Python Online Compiler with Visual AI Help
+      </a>
+
+      
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-51" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span>1</span>
+      </span>
+      
+<button id="like-51" hx-post="/links/51/like" hx-target="this" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#like-loading-51" aria-label="Dar like" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-51" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+      
+<span id="fav-51">
+  <button hx-post="/links/51/favorite" hx-target="#fav-51" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#fav-loading-51" aria-label="Guardar" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1">
+    
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    
+    <span>0</span>
+    <span id="fav-loading-51" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+      
+        
+
+<article id="favorite-card-50" data-favorite-card="true" class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/github-com-mcp" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+        
+           <img src="https://www.google.com/s2/favicons?domain=github.com&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy">
+         
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+       
+         
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+       
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/github-com-mcp" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="MCP Registry">
+        MCP Registry
+      </a>
+
+      
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-50" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span>1</span>
+      </span>
+      
+<button id="like-50" hx-post="/links/50/like" hx-target="this" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#like-loading-50" aria-label="Dar like" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-50" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+      
+<span id="fav-50">
+  <button hx-post="/links/50/favorite" hx-target="#fav-50" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#fav-loading-50" aria-label="Guardar" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1">
+    
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    
+    <span>0</span>
+    <span id="fav-loading-50" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+      
+        
+
+<article id="favorite-card-49" data-favorite-card="true" class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
+    <div class="relative inline-flex shrink-0">
+      <a href="/s/ipquery-io" class="relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5" target="_blank" rel="noopener noreferrer">
+        
+           <img src="https://www.google.com/s2/favicons?domain=ipquery.io&amp;sz=128" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy">
+         
+       </a>
+
+        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
+       
+         
+         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-emerald-500 text-[10px] font-bold text-white shadow-lg" title="Status: 200">
+           ✓
+         </div>
+       
+     </div>
+
+    <div class="min-w-0 flex-1">
+      <a href="/s/ipquery-io" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="ipquery - IP Intelligence Infrastructure">
+        ipquery - IP Intelligence Infrastructure
+      </a>
+
+      
+    </div>
+
+  </div>
+
+  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+    <div id="social-stats-49" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
+      <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        <span>1</span>
+      </span>
+      
+<button id="like-49" hx-post="/links/49/like" hx-target="this" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#like-loading-49" aria-label="Dar like" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+         border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary">
+  <span>🤍</span>
+  <span>0</span>
+  <span id="like-loading-49" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+</button>
+
+      
+<span id="fav-49">
+  <button hx-post="/links/49/favorite" hx-target="#fav-49" hx-swap="outerHTML" hx-trigger="click" hx-indicator="#fav-loading-49" aria-label="Guardar" class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
+           border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1">
+    
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+      </svg>
+    
+    <span>0</span>
+    <span id="fav-loading-49" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  </button>
+</span>
+
+    </div>
+  </div>
+</article>
+
+      
+    </div>
+  </div>
+</section>
+
+
+<!-- Features Section -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">
+      Features principales para ganar velocidad
+    </h2>
+    <p class="mx-auto mb-16 max-w-xl text-center text-text-secondary">
+      Todo lo necesario para guardar, encontrar y activar conocimiento sin friccion.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔗</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Guardado inteligente + short links</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Guarda cualquier URL con metadata automatica y compartila con enlaces cortos listos para usar.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔍</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Busqueda full-text con filtros</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Encuentra al instante por titulo, descripcion o contenido, filtrando por categoria y popularidad.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📁</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Categorias, favoritos e importacion</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Ordena por temas, marca favoritos y migra tus bookmarks de navegador en minutos.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Privacidad publico/privado</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Decide que compartis con la comunidad y que queda solo para tu espacio interno.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🌐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Descubrimiento social</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Explora perfiles, likes y vistas para detectar rapido lo mas valioso de la comunidad.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📱</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Productividad diaria</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Dashboard web, extension de Chrome y experiencia PWA para capturar links desde cualquier contexto.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Chrome Extension -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+    <article class="ui-card p-6 lg:col-span-2">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-accent-primary">Extension Chrome</p>
+      <h2 class="mb-3 text-2xl font-bold text-text-primary">Guarda links sin salir de la pagina donde estas</h2>
+      <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+        Con un click capturas URL, titulo y contexto. Ideal para research, curacion de contenido y trabajo diario
+        en equipo durante el hackathon.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Manifest V3</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Popup rapido</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Flujo 1 click</span>
+      </div>
+    </article>
+    <article class="ui-card p-6">
+      <h3 class="mb-3 text-lg font-bold text-text-primary">Por que suma</h3>
+      <ul class="space-y-2 text-sm text-text-secondary">
+        <li>Reduce friccion al capturar referencias.</li>
+        <li>Evita perder links entre pestanas abiertas.</li>
+        <li>Acelera la carga de conocimiento compartido.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- AI Integration -->
+<section class="py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Integracion con IA</h2>
+    <p class="mx-auto mb-10 max-w-2xl text-center text-text-secondary">
+      URLoft se conecta con asistentes para operar tus links desde lenguaje natural, sin inventar workflows nuevos.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">MCP Server</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Expone herramientas para crear, listar, actualizar y buscar links autenticados via API key.
+        </p>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">Web Skill</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Endpoints de search, lookup y extract para que una IA consulte tu biblioteca con contexto util.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Security -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Seguridad de base, no parche</h2>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Better Auth</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Sesiones seguras</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Revocacion inmediata</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Rate limiting</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Audit log</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technology -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Tecnologia completa, sin complejidad innecesaria</h2>
+    <p class="mx-auto mb-12 max-w-3xl text-center text-text-secondary">
+      Stack del producto URLoft pensado para shipping rapido: backend robusto, datos embebidos y ecosistema listo para web, extension e integraciones IA.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Core tecnico</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Backend:</span> Bun + TypeScript.</li>
+          <li><span class="text-text-primary font-semibold">Data:</span> SQLite + FTS5 para busqueda full-text.</li>
+          <li><span class="text-text-primary font-semibold">Auth:</span> Better Auth con sesiones stateful.</li>
+          <li><span class="text-text-primary font-semibold">Workers:</span> procesos asincronos para tareas pesadas.</li>
+        </ul>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Ecosistema de producto</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Sitio actual:</span> esta home esta renderizada con Bun + EJS.</li>
+          <li><span class="text-text-primary font-semibold">Canales:</span> extension Chrome + PWA instalable.</li>
+          <li><span class="text-text-primary font-semibold">IA:</span> MCP Server y Web Skill para search/lookup/extract.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="mt-8 text-center text-lg font-semibold text-accent-primary">
+      Menos complejidad operativa, mas velocidad de producto.
+    </p>
+  </div>
+</section>
+
+<!-- Use Cases -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-8 text-center text-3xl font-bold text-text-primary">Casos de uso reales</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Guardar recursos</h3>
+        <p class="text-sm text-text-secondary">Centraliza docs, tutoriales y herramientas en una sola base consultable.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Curar colecciones</h3>
+        <p class="text-sm text-text-secondary">Arma colecciones publicas por tema para compartir conocimiento de valor.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Links privados</h3>
+        <p class="text-sm text-text-secondary">Maneja enlaces internos del equipo sin exponer informacion sensible.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Integracion IA</h3>
+        <p class="text-sm text-text-secondary">Permite que asistentes consulten y operen tu biblioteca con permisos claros.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <h2 class="mb-4 text-3xl sm:text-4xl font-extrabold text-text-primary">
+      Converti tus links en una biblioteca util para todo tu equipo
+    </h2>
+    <p class="mx-auto mb-10 max-w-2xl text-text-secondary">
+      Deja de perder tiempo buscando. Empieza a construir un sistema de conocimiento reusable desde hoy.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register" class="ui-btn-primary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Crear cuenta</a>
+      <a href="/explore" class="ui-btn-secondary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Explorar</a>
+    </div>
+  </div>
+</section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-16 border-t border-border bg-surface/70 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center" aria-label="URLoft">
+          <img src="/public/logo-urloft.png" alt="URLoft logo" class="h-9 w-auto object-contain object-center">
+        </div>
+        <p class="text-sm text-text-secondary">
+          Hecho con ❤️ para el Hackathon 2026 midudev
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Alpine.js -->
+  <script defer="" src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+  <!-- Lite YouTube (YouTube embed ligero) -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script>
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.8"></script>
+
+  <!-- GLightbox (Lightbox para imágenes) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/js/glightbox.min.js"></script>
+
+  <!-- Inicializar GLightbox -->
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const lightbox = GLightbox({
+        selector: '.glightbox',
+        openEffect: 'zoom',
+        closeEffect: 'fade',
+        width: '1200px',
+        height: 'auto',
+        zoomable: true,
+        draggable: true,
+      });
+    });
+  </script>
+<script defer="" src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon="{&quot;version&quot;:&quot;2024.11.0&quot;,&quot;token&quot;:&quot;66cb70f7427d4add97afbfa371140216&quot;,&quot;r&quot;:1,&quot;server_timing&quot;:{&quot;name&quot;:{&quot;cfCacheStatus&quot;:true,&quot;cfEdge&quot;:true,&quot;cfExtPri&quot;:true,&quot;cfL4&quot;:true,&quot;cfOrigin&quot;:true,&quot;cfSpeedBrain&quot;:true},&quot;location_startswith&quot;:null}}" crossorigin="anonymous"></script>
+
+
+</body></html>

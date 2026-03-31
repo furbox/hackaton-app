@@ -143,7 +143,56 @@ export async function homeController(request: Request): Promise<Response> {
 
   return renderPage("home", {
     data: {
-      title: "Home",
+      title: "URLoft — Buscador de Links Inteligente",
+      pageDescription: "Guardá, organizá y encontrá cualquier enlace en segundos. URLoft es tu biblioteca inteligente de links con búsqueda full-text, categorías, privacidad granular e integración con IA.",
+      canonicalUrl: "https://urloft.site/",
+      ogImage: "https://urloft.site/public/logo-urloft.png",
+      jsonld: JSON.stringify([
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://urloft.site/#website",
+          "url": "https://urloft.site/",
+          "name": "URLoft",
+          "description": "Tu biblioteca inteligente de links",
+          "inLanguage": "es",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://urloft.site/explore?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "@id": "https://urloft.site/#organization",
+          "name": "URLoft",
+          "url": "https://urloft.site/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://urloft.site/public/logo-urloft.png"
+          },
+          "description": "URLoft es un gestor de enlaces con superpoderes. Centralizá, organizá y compartí tus links con búsqueda full-text, privacidad granular e integración con IA."
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://urloft.site/#app",
+          "name": "URLoft",
+          "url": "https://urloft.site/",
+          "description": "Gestor inteligente de links con búsqueda full-text, categorías, privacidad pública/privada, extensión de Chrome, PWA e integración con IA vía MCP Server.",
+          "applicationCategory": "ProductivityApplication",
+          "operatingSystem": "Web, Chrome",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        }
+      ]),
       user,
       flash,
       stats,

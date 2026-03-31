@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URLoft - Guarda tus links</title>
   <link rel="stylesheet" href="../css/popup.css">
+  <link rel="stylesheet" href="../../features/scanner-tab/scanner-tab.css">
 </head>
 <body>
   <div id="app">
@@ -94,19 +95,6 @@
           <button type="button" id="reset-api-url-btn" class="btn btn--ghost btn--sm">Reset</button>
         </div>
         <p id="api-url-status" class="settings-status" hidden></p>
-
-        <div class="settings-divider"></div>
-
-        <div class="scanner-toggle-wrapper">
-          <label class="form-checkbox form-checkbox--scanner">
-            <input type="checkbox" id="scanner-toggle">
-            <span class="scanner-toggle__label">
-              <span class="scanner-toggle__icon">🔍</span>
-              <span class="scanner-toggle__text">Scanner de links</span>
-            </span>
-          </label>
-          <p class="scanner-toggle__hint" id="scanner-status">Activá para detectar links en la página</p>
-        </div>
       </section>
 
       <!-- Tab Navigation -->
@@ -116,6 +104,9 @@
         </button>
         <button class="nav-tab" data-tab="search" role="tab" aria-selected="false">
           🔍 Mis Links
+        </button>
+        <button class="nav-tab" data-tab="scanner" role="tab" aria-selected="false">
+          🔗 Scanner
         </button>
       </nav>
 
@@ -305,7 +296,25 @@
 
         </div><!-- /search-tab -->
 
-      </main>
+        <!-- Scanner Tab -->
+        <div id="scanner-tab" class="tab-content hidden" role="tabpanel">
+          <div class="scanner-header">
+            <span class="scanner-header__icon">🔍</span>
+            <h2 class="scanner-header__title">Links de la página</h2>
+            <span class="scanner-header__count" id="scanner-count">0 links</span>
+          </div>
+
+          <div class="scanner-content">
+            <div id="scanner-list" class="scanner-list"></div>
+            <div id="scanner-empty" class="scanner-empty">
+              <p class="scanner-empty__icon">🔍</p>
+              <p class="scanner-empty__text">No se encontraron links</p>
+              <p class="scanner-empty__hint">Navegá por la página para detectar links automáticamente</p>
+            </div>
+          </div>
+        </div><!-- /scanner-tab -->
+
+       </main>
     </div><!-- /app-view -->
 
   </div><!-- /app -->

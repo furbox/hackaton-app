@@ -1,440 +1,209 @@
 /**
- * URLoft Scanner - Content Script
+ * URLoft Scanner - Content Script (Scanner V2)
  *
- * Injects clickable icons next to links on the page when activated.
- * This file is loaded dynamically via chrome.scripting.executeScript
- * when the user enables the scanner toggle.
- *
- * Phase 2: Core Implementation
- * Phase 4: Performance & Edge Cases
- *   - Task 4.1: IntersectionObserver for lazy loading (50px threshold)
- *   - Task 4.2: Strict protocol validation (http/https only)
- *   - Task 4.3: Complete cleanup logic (observers, DOM state, memory)
- *   - Task 4.4: MutationObserver for SPA navigation (500ms debounce)
+ * Scans for <a> elements on the page and sends them to the popup/background.
+ * No UI elements are injected into the page.
  */
 
-console.log('[URLoft Scanner] Content script loaded');
-
-// =============================================================================
-// STATE
-// =============================================================================
-
-let isScannerActive = false;
-let scannedElements = new Set(); // Track scanned elements to avoid duplicates
-let intersectionObserver = null; // IntersectionObserver for lazy loading
-let mutationObserver = null; // MutationObserver for SPA navigation
-let mutationDebounceTimer = null; // Debounce timer for rapid DOM changes
-const MAX_LINKS = 50; // Performance limit
-const LAZY_LOAD_THRESHOLD = 50; // px before entering viewport
-const MUTATION_DEBOUNCE_MS = 150; // ms to debounce DOM changes
-
-// =============================================================================
-// LINK FINDING ALGORITHM (Task 2.1 + Task 4.2: Enhanced Protocol Validation)
-// =============================================================================
+console.log('[URLoft Scanner] Content script V2 loaded');
 
 /**
- * Check if a URL has a valid HTTP/HTTPS protocol
- * @param {string} url - The URL to check
- * @returns {boolean}
+ * GUARD: Prevent multiple injections and listeners
+ * This ensures the state (allKnownLinks) persists for the page session
+ * even if the popup is closed and reopened (which triggers re-injection).
  */
-function isValidHttpUrl(url) {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch {
-    return false;
+if (typeof window.urloftScannerInjected === 'undefined') {
+  window.urloftScannerInjected = true;
+
+  // =============================================================================
+  // STATE
+  // =============================================================================
+
+  let isScannerActive = false;
+  let mutationObserver = null;
+  let mutationDebounceTimer = null;
+  const allKnownLinks = []; // Store all unique links found in this session
+  const allKnownUrls = new Set(); // Fast lookup for uniqueness
+  const MAX_LINKS = 10000; // Large limit as per instructions
+  const MUTATION_DEBOUNCE_MS = 500; // ms to debounce DOM changes
+
+  // =============================================================================
+  // LINK FINDING ALGORITHM
+  // =============================================================================
+
+  /**
+   * Check if a URL has a valid HTTP/HTTPS protocol
+   */
+  function isValidHttpUrl(url) {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
-}
 
-/**
- * Find all valid links on the page with strict protocol validation
- * @returns {Array<{element: HTMLAnchorElement, url: string, title: string}>}
- */
-function findLinks() {
-  const links = [];
-  const linkElements = document.querySelectorAll('a[href]');
-  const ignoredProtocols = [
-    'javascript:', 'mailto:', 'tel:', 'data:', 'blob:', 'file:',
-    'chrome://', 'about:', 'edge://', 'opera://', 'brave://', 'vivaldi://',
-    'ws://', 'wss://'
-  ];
+  /**
+   * Find all valid links on the page that haven't been discovered yet
+   * Updates the global state (allKnownLinks, allKnownUrls)
+   * Returns ONLY the newly discovered link objects for messaging
+   */
+  function findLinks() {
+    const newLinks = [];
+    const linkElements = document.querySelectorAll('a[href]');
+    const seenInThisPass = new Set(); // To avoid duplicates in the same DOM pass
 
-  let skippedCount = 0;
+    for (const link of linkElements) {
+      // Safety limit to avoid browser hangs on extremely dense pages
+      if (allKnownUrls.size >= MAX_LINKS) break;
 
-  for (const link of linkElements) {
-    // Performance limit
-    if (links.length >= MAX_LINKS) break;
+      const url = link.href;
+      
+      // Skip if:
+      // 1. Not http/https
+      // 2. Already seen in this pass (duplicated on page)
+      // 3. Already known from previous scans in this session
+      if (!isValidHttpUrl(url) || seenInThisPass.has(url) || allKnownUrls.has(url)) continue;
 
-    const url = link.href;
-    const title = link.textContent.trim() || link.title || link.getAttribute('aria-label') || 'Untitled';
-
-    // Task 4.2: Strict protocol validation - only allow http/https
-    const shouldIgnore = ignoredProtocols.some(protocol => url.toLowerCase().startsWith(protocol));
-    if (shouldIgnore) {
-      skippedCount++;
-      console.log(`[URLoft Scanner] Skipped non-HTTP link: ${url.substring(0, 50)}...`);
-      continue;
+      const title = link.textContent.trim() || link.title || link.getAttribute('aria-label') || 'Untitled';
+      const linkObj = { url, title };
+      
+      newLinks.push(linkObj);
+      seenInThisPass.add(url);
+      
+      // Track globally for this page session
+      allKnownUrls.add(url);
+      allKnownLinks.push(linkObj);
     }
 
-    // Additional check: ensure the URL is valid HTTP/HTTPS
-    if (!isValidHttpUrl(url)) {
-      skippedCount++;
-      console.log(`[URLoft Scanner] Skipped invalid HTTP link: ${url.substring(0, 50)}...`);
-      continue;
+    if (newLinks.length > 0) {
+      console.log(`[URLoft Scanner] Discovered ${newLinks.length} new valid links (Total: ${allKnownLinks.length})`);
     }
-
-    // Skip if already scanned (avoid duplicates)
-    if (scannedElements.has(link)) continue;
-
-    links.push({
-      element: link,
-      url: url,
-      title: title
-    });
-
-    scannedElements.add(link);
+    return newLinks;
   }
 
-  console.log(`[URLoft Scanner] Found ${links.length} valid HTTP/HTTPS links (skipped ${skippedCount} invalid links)`);
-  return links;
-}
+  // =============================================================================
+  // MESSAGING
+  // =============================================================================
 
-// =============================================================================
-// ICON INJECTION LOGIC (Task 2.2 + Task 4.1: Lazy Loading with IntersectionObserver)
-// =============================================================================
+  /**
+   * Send found links to the popup/background
+   */
+  function sendLinks(links, type = 'linksFound') {
+    if (links.length === 0) return;
 
-/**
- * Create scanner icon element
- * @param {string} url - The link URL
- * @param {string} title - The link title
- * @returns {HTMLElement}
- */
-function createScannerIcon(url, title) {
-  const icon = document.createElement('div');
-  icon.className = 'url-scanner-icon';
-  icon.setAttribute('data-url', url);
-  icon.setAttribute('data-title', title);
-
-  // Create SVG icon (bookmark/save icon)
-  icon.innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-    </svg>
-  `;
-
-  return icon;
-}
-
-/**
- * Inject scanner icon next to a link
- * @param {HTMLAnchorElement} linkElement
- * @param {string} url
- * @param {string} title
- */
-function injectIcon(linkElement, url, title) {
-  // Skip if icon already exists
-  if (linkElement.querySelector('.url-scanner-icon')) return;
-
-  const icon = createScannerIcon(url, title);
-
-  // Make sure the link can have absolute positioned children
-  const position = window.getComputedStyle(linkElement).position;
-  if (position === 'static') {
-    linkElement.style.position = 'relative';
-  }
-
-  linkElement.appendChild(icon);
-}
-
-/**
- * Task 4.1: Setup IntersectionObserver for lazy loading
- * Only inject icons when links are visible or about to enter viewport
- */
-function setupIntersectionObserver() {
-  // Disconnect existing observer if any
-  if (intersectionObserver) {
-    intersectionObserver.disconnect();
-  }
-
-  // Create observer with 50px threshold before entering viewport
-  intersectionObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const link = entry.target;
-          const url = link.href;
-          const title = link.textContent.trim() || link.title || link.getAttribute('aria-label') || 'Untitled';
-
-          // Inject icon now that link is visible
-          injectIcon(link, url, title);
-
-          // Stop observing this link (icon already injected)
-          intersectionObserver.unobserve(link);
-        }
-      });
-    },
-    {
-      rootMargin: `${LAZY_LOAD_THRESHOLD}px`, // Load 50px before entering viewport
-      threshold: 0
-    }
-  );
-
-  console.log('[URLoft Scanner] IntersectionObserver initialized for lazy loading');
-}
-
-/**
- * Task 4.1: Observe links for lazy loading
- * @param {Array<{element: HTMLAnchorElement, url: string, title: string}>} links
- */
-function observeLinks(links) {
-  if (!intersectionObserver) {
-    setupIntersectionObserver();
-  }
-
-  links.forEach(({ element }) => {
-    intersectionObserver.observe(element);
-  });
-
-  console.log(`[URLoft Scanner] Observing ${links.length} links for lazy loading`);
-}
-
-/**
- * Task 4.1: Inject icons on all found links (using lazy loading)
- * @param {Array<{element: HTMLAnchorElement, url: string, title: string}>} links
- */
-function injectIcons(links) {
-  // Use lazy loading with IntersectionObserver
-  observeLinks(links);
-
-  // Immediately inject icons for links already in viewport
-  links.forEach(({ element, url, title }) => {
-    const rect = element.getBoundingClientRect();
-    const isInViewport = rect.top < window.innerHeight + LAZY_LOAD_THRESHOLD &&
-                        rect.bottom > -LAZY_LOAD_THRESHOLD;
-
-    if (isInViewport) {
-      injectIcon(element, url, title);
-      intersectionObserver.unobserve(element);
-    }
-  });
-
-  console.log(`[URLoft Scanner] Lazy loading enabled for ${links.length} links`);
-}
-
-// =============================================================================
-// CLICK HANDLER & MESSAGING (Task 2.3)
-// =============================================================================
-
-/**
- * Setup click handlers for all scanner icons
- */
-function setupClickHandlers() {
-  // Use event delegation for better performance
-  document.addEventListener('click', (event) => {
-    const icon = event.target.closest('.url-scanner-icon');
-    if (!icon) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const url = icon.getAttribute('data-url');
-    const title = icon.getAttribute('data-title');
-
-    console.log(`[URLoft Scanner] Link clicked: ${title} - ${url}`);
-
-    // Send message to background script
     chrome.runtime.sendMessage({
-      action: 'linkClicked',
-      data: { url, title }
+      action: type,
+      data: { links }
     }).catch((error) => {
-      console.error('[URLoft Scanner] Failed to send message:', error);
+      // This is common if the popup is closed
+      console.debug('[URLoft Scanner] Failed to send links (port closed):', error.message);
     });
-
-    // Visual feedback
-    icon.style.transform = 'scale(0.9)';
-    setTimeout(() => {
-      icon.style.transform = 'scale(1)';
-    }, 100);
-  }, true); // Use capture phase to ensure we get the event first
-}
-
-// =============================================================================
-// MAIN SCANNER FUNCTIONS
-// =============================================================================
-
-/**
- * Task 4.4: Setup MutationObserver for SPA navigation
- * Detects dynamically added links and re-scans them
- */
-function setupMutationObserver() {
-  // Disconnect existing observer if any
-  if (mutationObserver) {
-    mutationObserver.disconnect();
   }
 
-  mutationObserver = new MutationObserver((mutations) => {
-    // Task 4.4: Debounce rapid DOM changes (500ms)
+  // =============================================================================
+  // OBSERVERS
+  // =============================================================================
+
+  /**
+   * Setup MutationObserver for infinite scroll/dynamic content
+   */
+  function setupMutationObserver() {
+    if (mutationObserver) mutationObserver.disconnect();
+
+    mutationObserver = new MutationObserver((mutations) => {
+      if (mutationDebounceTimer) clearTimeout(mutationDebounceTimer);
+
+      mutationDebounceTimer = setTimeout(() => {
+        // Check if any mutations added new anchor elements
+        const hasAddedNodes = mutations.some(mutation => {
+          return Array.from(mutation.addedNodes).some(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              return node.tagName === 'A' || node.querySelectorAll?.('a[href]').length > 0;
+            }
+            return false;
+          });
+        });
+
+        if (hasAddedNodes) {
+          // Only call findLinks() if we suspect there are new anchor elements
+          const newLinks = findLinks();
+          if (newLinks.length > 0) {
+            sendLinks(newLinks, 'newLinks');
+          }
+        }
+      }, MUTATION_DEBOUNCE_MS);
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  // =============================================================================
+  // MAIN FUNCTIONS
+  // =============================================================================
+
+  function startScanner() {
+    if (!isScannerActive) {
+      console.log('[URLoft Scanner] Starting scanner...');
+      isScannerActive = true;
+      setupMutationObserver();
+    }
+
+    // Perform a scan to pick up any new links since the last scan
+    findLinks();
+
+    // Send the FULL list of known links to the popup (repopulates state if reopened)
+    sendLinks(allKnownLinks, 'linksFound');
+  }
+
+  function stopScanner() {
+    if (!isScannerActive) return;
+
+    console.log('[URLoft Scanner] Stopping scanner...');
+    isScannerActive = false;
+
+    if (mutationObserver) {
+      mutationObserver.disconnect();
+      mutationObserver = null;
+    }
+
     if (mutationDebounceTimer) {
       clearTimeout(mutationDebounceTimer);
+      mutationDebounceTimer = null;
     }
-
-    mutationDebounceTimer = setTimeout(() => {
-      // Check if any mutations added new anchor elements
-      const hasNewLinks = mutations.some(mutation => {
-        return Array.from(mutation.addedNodes).some(node => {
-          // Check if the added node is a link or contains links
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            return node.tagName === 'A' || node.querySelectorAll?.('a[href]').length > 0;
-          }
-          return false;
-        });
-      });
-
-      if (hasNewLinks) {
-        console.log('[URLoft Scanner] Detected new links via MutationObserver, re-scanning...');
-        const newLinks = findLinks();
-        injectIcons(newLinks);
-      }
-    }, MUTATION_DEBOUNCE_MS);
-  });
-
-  // Observe the entire document for changes
-  mutationObserver.observe(document.body, {
-    childList: true,    // Watch for added/removed children
-    subtree: true       // Watch all descendants
-  });
-
-  console.log('[URLoft Scanner] MutationObserver initialized for SPA navigation');
-}
-
-/**
- * Start the scanner - find links and inject icons
- */
-function startScanner() {
-  if (isScannerActive) {
-    console.log('[URLoft Scanner] Already active');
-    return;
   }
 
-  console.log('[URLoft Scanner] Starting...');
-  isScannerActive = true;
+  // =============================================================================
+  // MESSAGE LISTENER
+  // =============================================================================
 
-  // Find and inject icons
-  const links = findLinks();
-  injectIcons(links);
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    switch (message.action) {
+      case 'startScanner':
+        startScanner();
+        sendResponse({ success: true, active: true });
+        break;
 
-  // Setup click handlers (only once)
-  if (!window.__scannerClickHandlersSetup) {
-    setupClickHandlers();
-    window.__scannerClickHandlersSetup = true;
-  }
+      case 'stopScanner':
+        stopScanner();
+        sendResponse({ success: true, active: false });
+        break;
 
-  // Task 4.1: Setup IntersectionObserver for lazy loading
-  setupIntersectionObserver();
+      case 'getScannerStatus':
+        sendResponse({ success: true, active: isScannerActive });
+        break;
 
-  // Task 4.4: Setup MutationObserver for SPA navigation
-  setupMutationObserver();
-}
-
-/**
- * Task 4.3: Stop the scanner with complete cleanup
- * Removes all icons, disconnects observers, and resets DOM state
- */
-function stopScanner() {
-  if (!isScannerActive) return;
-
-  console.log('[URLoft Scanner] Stopping...');
-  isScannerActive = false;
-
-  // Remove all icons
-  const icons = document.querySelectorAll('.url-scanner-icon');
-  icons.forEach(icon => icon.remove());
-
-  // Reset position: relative on links (Task 4.3: Reset DOM modifications)
-  const links = document.querySelectorAll('a[href]');
-  links.forEach(link => {
-    // Only reset if we added position: relative
-    if (link.style.position === 'relative') {
-      link.style.position = '';
+      default:
+        sendResponse({ success: false, error: 'Unknown action' });
     }
+    return true;
   });
 
-  // Task 4.3: Disconnect IntersectionObserver
-  if (intersectionObserver) {
-    intersectionObserver.disconnect();
-    intersectionObserver = null;
-    console.log('[URLoft Scanner] IntersectionObserver disconnected');
-  }
-
-  // Task 4.3: Disconnect MutationObserver
-  if (mutationObserver) {
-    mutationObserver.disconnect();
-    mutationObserver = null;
-    console.log('[URLoft Scanner] MutationObserver disconnected');
-  }
-
-  // Task 4.3: Clear debounce timer
-  if (mutationDebounceTimer) {
-    clearTimeout(mutationDebounceTimer);
-    mutationDebounceTimer = null;
-  }
-
-  // Clear scanned elements cache
-  scannedElements.clear();
-
-  console.log(`[URLoft Scanner] Removed ${icons.length} icons and completed cleanup`);
+  console.log('[URLoft Scanner] Content script ready');
+} else {
+  console.log('[URLoft Scanner] Content script already active for this tab');
 }
 
-/**
- * Toggle scanner on/off
- */
-function toggleScanner() {
-  if (isScannerActive) {
-    stopScanner();
-  } else {
-    startScanner();
-  }
-  return isScannerActive;
-}
-
-// =============================================================================
-// MESSAGE LISTENER - Control from background/popup
-// =============================================================================
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('[URLoft Scanner] Received message:', message.action);
-
-  switch (message.action) {
-    case 'startScanner':
-      startScanner();
-      sendResponse({ success: true, active: true });
-      break;
-
-    case 'stopScanner':
-      stopScanner();
-      sendResponse({ success: true, active: false });
-      break;
-
-    case 'toggleScanner':
-      const active = toggleScanner();
-      sendResponse({ success: true, active });
-      break;
-
-    case 'getScannerStatus':
-      sendResponse({ success: true, active: isScannerActive });
-      break;
-
-    default:
-      sendResponse({ success: false, error: 'Unknown action' });
-  }
-
-  return true; // Keep message channel open for async response
-});
-
-// =============================================================================
-// INITIALIZATION
-// =============================================================================
-
-// Auto-start if scanner was active before page reload
-// (This state would be persisted in chrome.storage.local)
-console.log('[URLoft Scanner] Ready. Waiting for activation command...');
