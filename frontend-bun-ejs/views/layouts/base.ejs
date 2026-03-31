@@ -90,5 +90,11 @@
       });
     });
   </script>
+
+  <!-- Cloudflare Web Analytics -->
+  <% if (typeof cloudflareAnalyticsToken !== 'undefined' && cloudflareAnalyticsToken) { %>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "<%= cloudflareAnalyticsToken %>"}'></script>
+  <% } %>
 </body>
 </html>

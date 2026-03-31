@@ -27,7 +27,12 @@ export async function renderPage(
     const layoutPath = path.join(VIEWS_DIR, "layouts", `${layout}.ejs`);
     const fullHtml = await ejs.renderFile(
       layoutPath,
-      { ...data, body: pageHtml }
+      {
+        ...data,
+        body: pageHtml,
+        // Add Cloudflare Analytics token from env if available
+        cloudflareAnalyticsToken: process.env.CLOUDFLARE_ANALYTICS_TOKEN || null,
+      }
     );
 
     return new Response(fullHtml, {
