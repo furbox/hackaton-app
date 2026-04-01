@@ -11,13 +11,13 @@
 | Capa | Tecnología |
 |------|-----------|
 | **Runtime** | [Bun](https://bun.sh) — JavaScript runtime ultra rápido |
-| **Frontend** | [Svelte](https://svelte.dev) — framework reactivo y ligero |
+| **Frontend** | [EJS](https://ejs.co) — Motor de plantillas renderizado por Bun (SSR) |
 | **Base de Datos** | [SQLite](https://sqlite.org) — embebida, cero config + FTS5 para búsqueda full-text |
 | **Email** | [Resend](https://resend.com) — API moderna para emails transaccionales |
-| **Auth** | [Better Auth](https://better-auth.com) — Framework-agnostic auth with native SQLite & SvelteKit support |
+| **Auth** | [Better Auth](https://better-auth.com) — Framework-agnostic auth with native SQLite support |
 | **Seguridad** | Rate limiting inteligente por IP y por API key |
 | **IA Integrations** | MCP Server + Web Skill — conecta cualquier IA a tus links |
-| **Extensión** | Chrome Extension (Manifest V3) + Svelte popup |
+| **Extensión** | Chrome Extension (Manifest V3) + HTML/JS popup |
 | **PWA** | Service Worker + Web App Manifest — instalable en móvil |
 | **Lenguaje** | TypeScript |
 
@@ -28,11 +28,11 @@
   - `bun:sqlite` para acceso a la base de datos de forma síncrona y con altísimo rendimiento.
   - `Bun.password` para el hasheo seguro de contraseñas (Argon2id/Bcrypt) de forma nativa, sin requerir librerías externas.
   - `Web Workers` (`new Worker()`) soportados nativamente por Bun para ejecutar background jobs (Health Checker, Reader Mode, Wayback Machine) sin bloquear el hilo principal.
-- **Svelte (y SvelteKit)** actúa como un compilador que genera vanilla JS optimizado, eliminando el overhead del Virtual DOM para lograr el máximo rendimiento y bundles ultra pequeños. El proyecto aprovecha sus capacidades nativas para mantenerse fiel a la filosofía "zero-overhead" y "no-bloat":
-  - **Svelte 5 "Runes"** (`$state`, `$derived`) para una reactividad granular, eliminando la necesidad de librerías de manejo de estado externas (como Redux).
-  - **Actions nativas** (`use:action`) y transiciones/animaciones integradas para manejar comportamientos de UI complejos (como Drag & Drop) sin recurrir a dependencias pesadas.
-  - **SvelteKit** provee enrutamiento basado en archivos (file-based routing) y soporte impecable para PWA out-of-the-box.
-- **Better Auth** es nuestra solución de autenticación porque soporta SQLite de forma nativa (integración directa con `bun:sqlite`, sin adapter adicional), se integra perfectamente con SvelteKit sin dependencias de framework, y usa sesiones stateful (validadas contra la DB en cada request) en lugar de JWTs stateless, lo que nos permite revocación inmediata de sesiones y máxima seguridad sin el overhead criptográfico.
+- **EJS + Bun SSR**: Elegimos una arquitectura de **Server-Side Rendering (SSR) radical**. En lugar de usar frameworks pesados con Virtual DOM, usamos el motor de plantillas EJS renderizado directamente por las APIs nativas de Bun. Esto garantiza:
+  - **Zero-JS Bundle**: El navegador recibe HTML puro, eliminando el tiempo de "hidratación" y logrando una carga instantánea.
+  - **Simplicidad**: Menos dependencias en el lado del cliente y mayor robustez ante errores de red.
+  - **SEO Nativo**: Al renderizar todo en el servidor, los motores de búsqueda e IAs pueden indexar el contenido sin ejecutar scripts complejos.
+- **Better Auth** es nuestra solución de autenticación porque soporta SQLite de forma nativa (integración directa con `bun:sqlite`, sin adapter adicional), y usa sesiones stateful (validadas contra la DB en cada request) en lugar de JWTs stateless, lo que nos permite revocación inmediata de sesiones y máxima seguridad sin el overhead criptográfico.
 - **SQLite** es perfecta para hackathons: cero setup, un solo archivo, queries rápidas — con FTS5 para búsqueda full-text sin servicios externos
 - **Resend** envía emails con una sola llamada a su API, sin configurar SMTP ni servicios complejos
 
@@ -115,53 +115,28 @@ urloft/
 
 ---
 
-### Estrategia de Renderizado (Híbrida SSR + CSR)
+### Estrategia de Renderizado (SSR Nativo)
 
-Aprovechamos la flexibilidad de SvelteKit para usar **diferentes modos de renderizado según el contexto**:
+Aprovechamos la velocidad de **Bun.serve** para manejar el renderizado en el servidor:
 
-- **Rutas PúbLCAS** → **SSR (Server-Side Rendering)**
-  - Home (`/`), Explore (`/explore`), Perfiles (`/u/:username`)
-  - **Por qué:** Mejor SEO para que los motores de búsqueda indexen el contenido público.
-  - **Config:** `export const ssr = true;` (default en SvelteKit)
-
-- **Rutas PRIVADAS (Dashboard)** → **CSR (Client-Side Rendering)**
-  - Todo lo bajo `/(dashboard)/`
-  - **Por qué:** Experiencia de usuario ultrarrápida tipo SPA. Una vez cargado el JS, todas las navegaciones y filtros son instantáneos sin hit al servidor.
-  - **Config:** `export const ssr = false;` en `frontend/src/routes/(dashboard)/+layout.ts`
-
-**Implementación en SvelteKit:**
-```typescript
-// frontend/src/routes/(dashboard)/+layout.ts
-export const ssr = false; // Client-Side Rendering
-export const csr = true;  // Forzar hydratación en cliente
-```
-
-**Beneficio:** Lo mejor de ambos mundos. SEO perfecto para contenido público + navegación instantánea (0ms) en el dashboard privado.
+- **Todo el sitio** → **SSR (Server-Side Rendering)**
+  - Home (`/`), Explore (`/explore`), Perfiles (`/u/:username`), Dashboard.
+  - **Por qué:** Máxima velocidad de carga percibida y SEO impecable. No hay una "pantalla de carga" mientras el JS se descarga; el usuario recibe el contenido final de inmediato.
+  - **Implementación:** Templates EJS procesados dinámicamente con los datos de la base de datos en cada request.
 
 ### Integración Frontend ↔ Backend
 
-Usamos **SvelteKit Server Actions** para comunicación tipo form-based y type-safe:
+Al no usar una SPA, la comunicación es directa mediante **HTML Forms** y **Redirects**, lo que simplifica enormemente el flujo de datos y elimina la necesidad de una API REST separada para las acciones de la UI:
 
-```svelte
-<!-- +page.svelte -->
-<form method="POST" action="?/createLink">
-  <input name="url" placeholder="https://..." />
-  <button>Guardar</button>
+```html
+<!-- index.ejs -->
+<form method="POST" action="/links/create">
+  <input name="url" placeholder="https://..." required />
+  <button type="submit">Guardar</button>
 </form>
 ```
 
-```typescript
-// +page.server.ts
-import { createLink } from "$lib/services/links.service";
-
-export const actions = {
-  createLink: async ({ request }) => {
-    const data = await request.formData();
-    await createLink(data.get("url"));
-    return { success: true };
-  }
-};
-```
+**Beneficio:** Robustez total. La app funciona incluso con JavaScript desactivado (progressive enhancement), y no hay desincronización de estado entre cliente y servidor.
 
 ### Procesamiento en Segundo Plano (Workers)
 
