@@ -1,0 +1,39 @@
+<%
+  const pageParamDelimiter = baseUrl.includes('?') ? '&' : '?';
+  const canGoNext = (typeof hasNextPage !== 'undefined' && hasNextPage) || page < totalPages;
+  const shouldRenderPagination = page > 1 || totalPages > 1 || canGoNext;
+%>
+<% if (shouldRenderPagination) { %>
+  <nav class="flex items-center justify-center gap-2 py-8" aria-label="Pagination">
+
+    <!-- Previous -->
+    <% if (page > 1) { %>
+      <a href="<%= baseUrl %><%= pageParamDelimiter %>page=<%= page - 1 %>"
+         class="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-accent-primary/50 hover:bg-slate-900/70">
+        ← Anterior
+      </a>
+    <% } else { %>
+      <span class="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-border/70 bg-slate-900/40 px-4 py-2 text-sm font-medium text-text-secondary/60">
+        ← Anterior
+      </span>
+    <% } %>
+
+    <!-- Page indicator -->
+    <span class="px-2 text-sm text-text-secondary">
+      Página <strong class="text-text-primary"><%= page %></strong> de <strong class="text-text-primary"><%= totalPages %></strong>
+    </span>
+
+    <!-- Next -->
+    <% if (canGoNext) { %>
+      <a href="<%= baseUrl %><%= pageParamDelimiter %>page=<%= page + 1 %>"
+         class="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-accent-primary/50 hover:bg-slate-900/70">
+        Siguiente →
+      </a>
+    <% } else { %>
+      <span class="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-border/70 bg-slate-900/40 px-4 py-2 text-sm font-medium text-text-secondary/60">
+        Siguiente →
+      </span>
+    <% } %>
+
+  </nav>
+<% } %>

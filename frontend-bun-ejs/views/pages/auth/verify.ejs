@@ -1,0 +1,43 @@
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12">
+  <div class="w-full max-w-md text-center">
+
+    <a href="/" class="inline-flex items-center mb-6" aria-label="URLoft">
+      <img
+        src="/public/logo-urloft.png"
+        alt="URLoft logo"
+        class="h-9 w-auto object-contain object-center"
+      />
+    </a>
+
+    <% if (verified) { %>
+      <!-- Success -->
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-success/30 bg-success/12 text-4xl">✅</div>
+      <h1 class="mb-3 text-2xl font-bold text-text-primary">¡Email verificado!</h1>
+      <p class="mb-8 text-sm leading-relaxed text-text-secondary">
+        <%= message %>
+      </p>
+      <a href="/auth/login"
+         class="ui-btn-primary inline-block px-8 py-3 text-sm">
+        Iniciar sesión →
+      </a>
+    <% } else { %>
+      <!-- Error -->
+      <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-error/35 bg-error/12 text-4xl">❌</div>
+      <h1 class="mb-3 text-2xl font-bold text-text-primary">Token inválido</h1>
+      <p class="mb-8 text-sm leading-relaxed text-text-secondary">
+        <%= message %>
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="/auth/login"
+           class="ui-btn-primary inline-block px-8 py-3 text-sm">
+          Ir al login
+        </a>
+        <a href="/auth/register"
+           class="ui-btn-secondary inline-block px-8 py-3 text-sm">
+          Crear cuenta
+        </a>
+      </div>
+    <% } %>
+
+  </div>
+</div>

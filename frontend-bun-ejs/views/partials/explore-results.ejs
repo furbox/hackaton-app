@@ -1,0 +1,22 @@
+<%
+  const currentPage = typeof page === "number" && Number.isFinite(page) ? page : 1;
+  const chunkSuffix = `explore-page-${currentPage}`;
+%>
+<% if (links && links.length > 0) { %>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <% links.forEach(function(link) { %>
+      <%- include('./link-card', { link: link, idSuffix: chunkSuffix }) %>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (hasNextPage && nextPageUrl) { %>
+  <div
+    id="explore-load-more-<%= currentPage %>"
+    class="h-1"
+    hx-get="<%= nextPageUrl %>"
+    hx-trigger="revealed once"
+    hx-swap="outerHTML"
+    aria-hidden="true"
+  ></div>
+<% } %>

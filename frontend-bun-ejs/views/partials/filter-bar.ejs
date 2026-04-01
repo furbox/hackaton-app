@@ -1,0 +1,73 @@
+<%
+  /**
+   * Partial: filter-bar.ejs
+   *
+   * Reusable filter and sort bar for link listings.
+   * Used by /dashboard/links and /dashboard/favorites.
+   *
+   * Variables:
+   * @param {string} searchPlaceholder - Placeholder text for search input
+   * @param {Array} categories - Array of category objects { id, name, color }
+   * @param {Object} query - Current query object { q, categoryId, sort, limit, page }
+   * @param {string} action - Form action URL (e.g., '/dashboard/links' or '/dashboard/favorites')
+   */
+%>
+
+<form method="GET" action="<%= action %>" class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+  <div class="flex-1">
+    <label for="search-input" class="sr-only"><%= searchPlaceholder %></label>
+    <input
+      id="search-input"
+      type="text"
+      name="q"
+      value="<%= query.q %>"
+      placeholder="<%= searchPlaceholder %>"
+      class="ui-input"
+    />
+  </div>
+
+  <select
+    name="categoryId"
+    class="ui-select"
+  >
+    <option value="">Todas las categorías</option>
+    <% categories.forEach(function(cat) { %>
+      <option value="<%= cat.id %>" <%= query.categoryId == cat.id ? 'selected' : '' %>>
+        <%= cat.name %>
+      </option>
+    <% }) %>
+  </select>
+
+  <select
+    name="sort"
+    class="ui-select"
+  >
+    <option value="recent" <%= query.sort === 'recent' ? 'selected' : '' %>>Más recientes</option>
+    <option value="likes" <%= query.sort === 'likes' ? 'selected' : '' %>>Más likes</option>
+    <option value="views" <%= query.sort === 'views' ? 'selected' : '' %>>Más vistos</option>
+    <option value="favorites" <%= query.sort === 'favorites' ? 'selected' : '' %>>Más guardados</option>
+  </select>
+
+  <select
+    name="limit"
+    class="ui-select"
+  >
+    <% ;[6, 12, 24, 36].forEach(function(size) { %>
+      <option value="<%= size %>" <%= query.limit === size ? 'selected' : '' %>><%= size %> por página</option>
+    <% }) %>
+  </select>
+
+  <button
+    type="submit"
+    class="ui-btn-primary px-6 py-2.5 text-sm font-semibold"
+  >
+    Aplicar
+  </button>
+
+  <a
+    href="<%= action %>"
+    class="ui-btn-secondary inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium"
+  >
+    Limpiar
+  </a>
+</form>

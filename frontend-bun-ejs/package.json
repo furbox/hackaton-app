@@ -1,0 +1,20 @@
+{
+  "name": "frontend-bun-ejs",
+  "version": "1.0.0",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot index.ts",
+    "start": "bun run index.ts",
+    "build:css": "bunx @tailwindcss/cli -i ./src/input.css -o ./public/styles.css --minify",
+    "dev:css": "bunx @tailwindcss/cli -i ./src/input.css -o ./public/styles.css --watch"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0",
+    "@types/ejs": "^3.1.5",
+    "@types/bun": "latest"
+  }
+}

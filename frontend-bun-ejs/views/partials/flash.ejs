@@ -1,0 +1,29 @@
+<% if (typeof flash !== 'undefined' && flash) { %>
+  <%
+    const colorMap = {
+      error:   'bg-error/12 border-error/40 text-error',
+      success: 'bg-success/12 border-success/40 text-success',
+      info:    'bg-accent-primary/12 border-accent-primary/40 text-accent-primary',
+    };
+    const iconMap = {
+      error:   '❌',
+      success: '✅',
+      info:    'ℹ️',
+    };
+    const type = flash.type || 'info';
+    const colorClass = colorMap[type] || colorMap.info;
+    const icon = iconMap[type] || iconMap.info;
+  %>
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-lg px-4"
+       x-data="{ show: true }" x-show="show" x-transition
+       style="animation: fadeInDown 0.3s ease;">
+    <div class="flex items-start gap-3 rounded-xl border px-4 py-3 shadow-lg shadow-black/35 <%= colorClass %>">
+      <span class="text-lg flex-shrink-0"><%= icon %></span>
+      <p class="flex-1 text-sm font-medium"><%= flash.message %></p>
+      <button onclick="this.closest('[x-data]') ? this.closest('[x-data]').remove() : this.closest('div').remove()"
+              class="flex-shrink-0 text-current opacity-60 hover:opacity-100 transition-opacity text-lg leading-none">
+        ×
+      </button>
+    </div>
+  </div>
+<% } %>

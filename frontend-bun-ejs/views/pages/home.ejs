@@ -1,0 +1,430 @@
+<!-- Hero Section -->
+<section class="bg-gradient-to-br from-bg via-surface to-slate-950 py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+
+    <!-- Badge -->
+    <div class="mb-8 inline-flex items-center gap-2 rounded-full bg-accent-primary/15 px-4 py-1.5 text-sm font-medium text-accent-primary">
+      <span>✨</span>
+      <span>Hackathon 2026 midudev</span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="mb-6 text-4xl font-extrabold leading-tight text-text-primary sm:text-5xl lg:text-6xl">
+      <%= headline %>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-text-secondary sm:text-xl">
+      <%= subtitle %>
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register"
+         class="ui-btn-primary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Empezar gratis
+      </a>
+      <a href="/explore"
+          class="ui-btn-secondary w-full px-8 py-3.5 text-lg font-semibold transition-all duration-200 sm:w-auto">
+        Explorar links públicos
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<!-- Problem + Solution -->
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <article class="ui-card p-6 sm:p-8">
+        <p class="mb-3 inline-flex rounded-full bg-warning/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-warning">
+          Problema
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Tus links están por todos lados</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          Notas rápidas, chats, favoritos del navegador y docs sueltos. Cuando necesitas algo importante,
+          perdés tiempo buscando en cinco lugares distintos.
+        </p>
+      </article>
+
+      <article class="ui-card p-6 sm:p-8 border-accent-primary/40">
+        <p class="mb-3 inline-flex rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-success">
+          Solución URLoft
+        </p>
+        <h2 class="mb-3 text-2xl font-bold text-text-primary">Una sola biblioteca, con control total</h2>
+        <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+          URLoft centraliza todos tus enlaces, permite búsqueda full-text real y te deja decidir si cada link
+          es público o privado según el contexto.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Section (real data) -->
+<section class="border-y border-border bg-surface py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center text-white">
+      <div>
+        <div class="text-4xl font-extrabold mb-1"><%= stats.totalUsers %></div>
+        <div class="font-medium text-text-secondary">Usuarios</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1"><%= stats.totalLinks %></div>
+        <div class="font-medium text-text-secondary">Links guardados</div>
+      </div>
+      <div>
+        <div class="text-4xl font-extrabold mb-1"><%= stats.totalCategories %></div>
+        <div class="font-medium text-text-secondary">Categorias</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Video Demo Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Ver URLoft en acción
+      </h2>
+      <p class="text-text-secondary">
+        Descubrí cómo URLoft resuelve el caos de tus links, sus funcionalidades principales y las ventajas que ofrece para organizar tu conocimiento digital.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <lite-youtube videoid="UvJokqRIBUo" width="1280" height="720" class="w-full aspect-video" style="background-image: url('https://i.ytimg.com/vi/UvJokqRIBUo/maxresdefault.jpg');"></lite-youtube>
+    </div>
+  </div>
+</section>
+
+<!-- Presentation Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Presentación del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Conocé más detalles sobre URLoft, su arquitectura, features y roadmap futuro.
+      </p>
+    </div>
+
+    <div class="ui-card p-4">
+      <div class="relative w-full" style="padding-bottom: 56.25%;">
+        <iframe
+          src="https://docs.google.com/presentation/d/e/2PACX-1vQfad1VgyM3dCAKw21COMDt4yIUBeaWQKxOD-Byk8mdmnlgosV7wb4ouMUJMXyQS2euTJlv7-t-gpdd/pubembed?start=true&loop=true&delayms=3000"
+          frameborder="0"
+          allowfullscreen="true"
+          mozallowfullscreen="true"
+          webkitallowfullscreen="true"
+          class="absolute top-0 left-0 w-full h-full rounded-xl">
+        </iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Infographics Section -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-10">
+      <h2 class="mb-4 text-3xl font-bold text-text-primary">
+        Recursos visuales del proyecto
+      </h2>
+      <p class="text-text-secondary">
+        Infografía y mind map con la arquitectura y diseño de URLoft. Hacé click para expandir.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Infografía -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/infografia.webp" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+             <img
+               src="/public/docs/infografia.webp"
+               alt="Infografía de URLoft"
+               width="1200"
+               height="800"
+               class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+               loading="lazy"
+             >
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Infografía del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Vista general de features y arquitectura</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Mind Map -->
+      <div class="ui-card overflow-hidden group">
+        <a href="/public/docs/NotebookLM_Mind_Map.png" class="glightbox block" data-gallery="urloft-resources">
+          <div class="relative overflow-hidden max-h-[400px] overflow-y-auto">
+             <img
+               src="/public/docs/NotebookLM_Mind_Map.png"
+               alt="Mind Map de URLoft"
+               width="1200"
+               height="800"
+               class="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+               loading="lazy"
+             >
+            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+              <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <svg class="w-16 h-16 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="text-lg font-bold text-text-primary">Mind Map del proyecto</h3>
+            <p class="text-sm text-text-secondary mt-1">Mapa mental generado con NotebookLM</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Links -->
+<% if (featuredLinks && featuredLinks.length > 0) { %>
+<section class="bg-bg py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-bold text-text-primary">Links destacados</h2>
+      <a href="/explore" class="text-sm font-medium text-accent-primary transition-colors hover:text-cyan-300">
+        Ver todos →
+      </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% featuredLinks.forEach(function(link) { %>
+        <%- include('../partials/link-card', { link: link }) %>
+      <% }) %>
+    </div>
+  </div>
+</section>
+<% } %>
+
+<!-- Features Section -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">
+      Features principales para ganar velocidad
+    </h2>
+    <p class="mx-auto mb-16 max-w-xl text-center text-text-secondary">
+      Todo lo necesario para guardar, encontrar y activar conocimiento sin friccion.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔗</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Guardado inteligente + short links</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Guarda cualquier URL con metadata automática y compartila con enlaces cortos listos para usar.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔍</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Búsqueda full-text con filtros</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Encuentra al instante por título, descripción o contenido, filtrando por categoría y popularidad.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📁</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Categorías, favoritos e importación</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Ordena por temas, marca favoritos y migra tus bookmarks de navegador en minutos.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🔐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Privacidad público/privado</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Decide qué compartís con la comunidad y qué queda solo para tu espacio interno.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">🌐</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Descubrimiento social</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Explora perfiles, likes y vistas para detectar rápido lo más valioso de la comunidad.
+        </p>
+      </div>
+
+      <div class="ui-card p-6 transition-shadow hover:shadow-xl hover:shadow-black/30">
+        <div class="text-3xl mb-4">📱</div>
+        <h3 class="mb-2 text-lg font-bold text-text-primary">Productividad diaria</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Dashboard web, extension de Chrome y experiencia PWA para capturar links desde cualquier contexto.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Chrome Extension -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+    <article class="ui-card p-6 lg:col-span-2">
+      <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-accent-primary">Extension Chrome</p>
+      <h2 class="mb-3 text-2xl font-bold text-text-primary">Guarda links sin salir de la página donde estás</h2>
+      <p class="text-sm leading-relaxed text-text-secondary sm:text-base">
+        Con un click capturas URL, título y contexto. Ideal para research, curación de contenido y trabajo diario
+        en equipo durante el hackathon.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Manifest V3</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Popup rapido</span>
+        <span class="rounded-full border border-border bg-slate-900/60 px-3 py-1.5 text-xs text-text-secondary">Flujo 1 click</span>
+      </div>
+    </article>
+    <article class="ui-card p-6">
+      <h3 class="mb-3 text-lg font-bold text-text-primary">Por qué suma</h3>
+      <ul class="space-y-2 text-sm text-text-secondary">
+        <li>Reduce fricción al capturar referencias.</li>
+        <li>Evita perder links entre pestañas abiertas.</li>
+        <li>Acelera la carga de conocimiento compartido.</li>
+      </ul>
+    </article>
+  </div>
+</section>
+
+<!-- AI Integration -->
+<section class="py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Integración con IA</h2>
+    <p class="mx-auto mb-10 max-w-2xl text-center text-text-secondary">
+      URLoft se conecta con asistentes para operar tus links desde lenguaje natural, sin inventar workflows nuevos.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">MCP Server</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Expone herramientas para crear, listar, actualizar y buscar links autenticados via API key.
+        </p>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-2 text-xl font-bold text-text-primary">Web Skill</h3>
+        <p class="text-sm leading-relaxed text-text-secondary">
+          Endpoints de search, lookup y extract para que una IA consulte tu biblioteca con contexto util.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Security -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Seguridad de base, no parche</h2>
+    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Better Auth</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Sesiones seguras</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Revocacion inmediata</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Rate limiting</p>
+      </div>
+      <div class="ui-card p-4 text-center">
+        <p class="text-sm font-semibold text-text-primary">Audit log</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Technology -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-4 text-center text-3xl font-bold text-text-primary">Tecnología completa, sin complejidad innecesaria</h2>
+    <p class="mx-auto mb-12 max-w-3xl text-center text-text-secondary">
+      Stack del producto URLoft pensado para shipping rápido: backend robusto, datos embebidos y ecosistema listo para web, extensión e integraciones IA.
+    </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Core tecnico</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Backend:</span> Bun + TypeScript.</li>
+          <li><span class="text-text-primary font-semibold">Data:</span> SQLite + FTS5 para bús**queda full-text.</li>
+          <li><span class="text-text-primary font-semibold">Auth:</span> Better Auth con sesiones stateful.</li>
+          <li><span class="text-text-primary font-semibold">Workers:</span> procesos asíncronos para tareas pesadas.</li>
+        </ul>
+      </article>
+      <article class="ui-card p-6">
+        <h3 class="mb-4 text-xl font-bold text-text-primary">Ecosistema de producto</h3>
+        <ul class="space-y-2 text-sm leading-relaxed text-text-secondary">
+          <li><span class="text-text-primary font-semibold">Sitio actual:</span> esta home esta renderizada con Bun + EJS.</li>
+          <li><span class="text-text-primary font-semibold">Canales:</span> extensión Chrome + PWA instalable.</li>
+          <li><span class="text-text-primary font-semibold">IA:</span> MCP Server y Web Skill para search/lookup/extract.</li>
+        </ul>
+      </article>
+    </div>
+    <p class="mt-8 text-center text-lg font-semibold text-accent-primary">
+      Menos complejidad operativa, más velocidad de producto.
+    </p>
+  </div>
+</section>
+
+<!-- Use Cases -->
+<section class="bg-surface/60 border-y border-border py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="mb-8 text-center text-3xl font-bold text-text-primary">Casos de uso reales</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Guardar recursos</h3>
+        <p class="text-sm text-text-secondary">Centraliza docs, tutoriales y herramientas en una sola base consultable.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Curar colecciones</h3>
+        <p class="text-sm text-text-secondary">Arma colecciones publicas por tema para compartir conocimiento de valor.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Links privados</h3>
+        <p class="text-sm text-text-secondary">Maneja enlaces internos del equipo sin exponer informacion sensible.</p>
+      </article>
+      <article class="ui-card p-5">
+        <h3 class="mb-2 font-bold text-text-primary">Integracion IA</h3>
+        <p class="text-sm text-text-secondary">Permite que asistentes consulten y operen tu biblioteca con permisos claros.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-20 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+      <h2 class="mb-4 text-3xl sm:text-4xl font-extrabold text-text-primary">
+        Convertí tus links en una biblioteca útil para todo tu equipo
+      </h2>
+      <p class="mx-auto mb-10 max-w-2xl text-text-secondary">
+        Dejá de perder tiempo buscando. Empezá a construir un sistema de conocimiento reutilizable desde hoy.
+      </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+      <a href="/auth/register" class="ui-btn-primary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Crear cuenta</a>
+      <a href="/explore" class="ui-btn-secondary w-full sm:w-auto px-8 py-3.5 text-lg font-semibold">Explorar</a>
+    </div>
+  </div>
+</section>
