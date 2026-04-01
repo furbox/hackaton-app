@@ -6,6 +6,14 @@
 
 ---
 
+## 🎬 URLoft en Resumen: Problema, Solución y Funcionalidades
+
+**[▶️ Ver video completo en YouTube](https://youtu.be/UvJokqRIBUo)**
+
+> **ℹ️ En este video:** Explicación del problema que resuelve URLoft, la solución propuesta y recorrido por las principales funcionalidades del proyecto.
+
+---
+
 ## 🤖 MCP Server: La Memoria de tu IA
 
 A diferencia de otros proyectos que encierran el conocimiento en silos (bases de datos privadas o chats con IA), **URLoft expone tus datos al ecosistema IA** mediante el protocolo **MCP (Model Context Protocol)** de Anthropic.
@@ -30,45 +38,6 @@ A diferencia de otros proyectos que encierran el conocimiento en silos (bases de
 **[▶️ Ver explorador en Google Drive](https://drive.google.com/file/d/1v0Px6umB22cb023yDIcbquA9UuG3BJ7W/preview)**
 
 Explora links públicos con filtros avanzados: likes, views, favoritos, categoría y fecha.
-
----
-
-## 🎬 Página Principal (Home)
-
-<a href="https://drive.google.com/file/d/1K9WFivCHcre_C63yrf3k20bwLH6M2mpT/preview" target="_blank">
-  <img src="https://drive.google.com/thumbnail?id=1K9WFivCHcre_C63yrf3k20bwLH6M2mpT&sz=w800" 
-       alt="URLoft - Video completo del proyecto">
-</a>
-
-**[▶️ Ver video completo en Google Drive (42 horas de contenido)](https://drive.google.com/file/d/1K9WFivCHcre_C63yrf3k20bwLH6M2mpT/preview)**
-
-Documentación completa del proceso de desarrollo durante 6 días del hackathon.
-
----
-
-## 🎥 Búsqueda de Links
-
-<a href="https://drive.google.com/file/d/1QL_rhu1a8bE4xU-fXQG_QjOQF5Apv21y/preview" target="_blank">
-  <img src="https://drive.google.com/thumbnail?id=1QL_rhu1a8bE4xU-fXQG_QjOQF5Apv21y&sz=w800" 
-       alt="URLoft - Presentación del proyecto">
-</a>
-
-**[▶️ Ver presentación en Google Drive](https://drive.google.com/file/d/1QL_rhu1a8bE4xU-fXQG_QjOQF5Apv21y/preview)**
-
-Slides del proyecto con arquitectura, features y roadmap.
-
----
-
-## 🛠️ Cómo lo Hice
-
-<a href="https://drive.google.com/file/d/1XcwHIJlreU1hXlEW183yDs3DCEZ0vOMp/preview" target="_blank">
-  <img src="https://drive.google.com/thumbnail?id=1XcwHIJlreU1hXlEW183yDs3DCEZ0vOMp&sz=w800" 
-       alt="URLoft - Cómo lo hice">
-</a>
-
-**[▶️ Ver proceso completo en Google Drive (42 horas de contenido)](https://drive.google.com/file/d/1XcwHIJlreU1hXlEW183yDs3DCEZ0vOMp/preview)**
-
-Documentación completa del proceso de desarrollo: desde la arquitectura inicial hasta el deployment final, en 6 días de hackathon.
 
 ---
 
