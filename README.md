@@ -6,6 +6,20 @@
 
 ---
 
+## 🤖 MCP Server: La Memoria de tu IA
+
+A diferencia de otros proyectos que encierran el conocimiento en silos (bases de datos privadas o chats con IA), **URLoft expone tus datos al ecosistema IA** mediante el protocolo **MCP (Model Context Protocol)** de Anthropic.
+
+### ¿Por qué esto es REVOLUCIONARIO?
+
+- Tu **Claude Desktop**, tu **GPT-4** y cualquier agente futuro pueden consultar tu biblioteca de links en tiempo real.
+- No dependés de que la IA tenga acceso a internet; **tú le das la memoria**.
+- Instalación con un comando: `npx skills add ... --skill urloft-url-search`
+
+*Esta es la pieza que convierte URLoft en **Infraestructura del Conocimiento**, no solo en una app más.*
+
+---
+
 ## 🌐 Explorador de Links
 
 <a href="https://drive.google.com/file/d/1v0Px6umB22cb023yDIcbquA9UuG3BJ7W/preview" target="_blank">
@@ -383,6 +397,19 @@ Migra todos tus favoritos del navegador a URLoft en segundos:
 
 ---
 
+## 🌱 Eco-Friendly por Diseño
+
+Al usar **Reader Mode**, URLoft elimina anuncios, scripts de tracking y popups intrusivos. Esto ahorra ancho de banda y batería en los dispositivos de los usuarios:
+
+- Un artículo pesado (~3MB con ads) se transforma en ~50KB de texto limpio
+- Ahorrás el **98% de transferencia de datos**
+- Menor consumo de CPU al no ejecutar scripts de tracking
+- Lectura más accesible para lectores de pantalla
+
+*Mientras otros proyectos hablan de sostenibilidad, nosotros la implementamos en cada link guardado.*
+
+---
+
 ## 🔍 SEO Implementation
 
 URLoft has been optimized for search engines with a comprehensive SEO strategy:
@@ -411,6 +438,20 @@ URLoft has been optimized for search engines with a comprehensive SEO strategy:
 
 ---
 
+## 🥊 URLoft vs. La Competencia
+
+| Feature | URLoft | Otros Proyectos |
+|---------|--------|-----------------|
+| **Persistencia del Conocimiento** | ✅ Wayback Machine (Inmortalidad) | ❌ Link rot inevitable |
+| **Acceso IA Universal** | ✅ MCP Server (Ecosistema abierto) | ❌ Solo chat en la app cerrado |
+| **Captura Sin Fricción** | ✅ Extensión Chrome (1-click) | ❌ Copiar/pegar manual |
+| **Arquitectura** | ✅ Zero-framework (Bun + EJS) | ❌ Bundles de 2MB+ (Next.js) |
+| **Documentación** | ✅ 42 horas de video transparentes | ❌ Solo screenshots bonitas |
+
+*Mientras otros construyen demos para hackathons, nosotros construimos **Infraestructura de Conocimiento**.*
+
+---
+
 ## 🛠 Tech Stack
 
 | Capa | Tecnología |
@@ -431,6 +472,15 @@ URLoft has been optimized for search engines with a comprehensive SEO strategy:
 - **SQLite**: Cero setup, un solo archivo, queries rápidas — perfecto para hackathons
 - **Better Auth**: Sesiones stateful con SQLite nativa — seguridad por diseño
 - **Resend**: Emails con una sola llamada a la API — sin configurar SMTP
+
+### ⚡ Zero-Dependency Philosophy
+
+URLoft usa **0 frameworks de frontend** (no React, no Vue, no Svelte, no Angular). Todo es:
+- **Bun.serve** (servidor HTTP nativo)
+- **EJS** (plantillas renderizadas en servidor)
+- **Tailwind CSS v4** (estilos utility-first)
+
+El resultado: Menos superficie de ataque, menos bugs, menos dependencias que rompen. **Menos es más.**
 
 > 📖 **Para más detalles técnicos y arquitectura, ver [AGENTS.md](AGENTS.md)**
 
