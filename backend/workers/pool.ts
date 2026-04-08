@@ -1,11 +1,13 @@
 import {
   updateLinkArchiveUrl,
   updateLinkContentText,
+  updateLinkOgMetadata,
   updateLinkStatusCode,
 } from "../services/links.service.ts";
 import {
   WorkerMessageType,
   type HealthCheckResult,
+  type OgMetadataResult,
   type ReaderModeResult,
   type WaybackResult,
   type WorkerMessage,
@@ -14,14 +16,14 @@ import {
 
 const WORKER_RESTART_DELAY_MS = 5_000;
 
-type WorkerKind = "health" | "reader" | "wayback";
+type WorkerKind = "health" | "reader" | "wayback" | "og";
 
 type WorkerPoolLogger = Pick<Console, "error" | "warn" | "info">;
 
 type WorkerMetrics = {
-  dispatched: Record<WorkerKind, number>;
-  completed: Record<WorkerKind, number>;
-  failed: Record<WorkerKind, number>;
+  dispatched: Record<"health" | "reader" | "wayback" | "og", number>;
+  completed: Record<"health" | "reader" | "wayback" | "og", number>;
+  failed: Record<"health" | "reader" | "wayback" | "og", number>;
 };
 
 type DispatchTracker = Map<string, { kind: WorkerKind; timestamp: number }>;
@@ -47,6 +49,7 @@ type WorkerPoolDeps = {
     updateLinkStatusCode?: typeof updateLinkStatusCode;
     updateLinkContentText?: typeof updateLinkContentText;
     updateLinkArchiveUrl?: typeof updateLinkArchiveUrl;
+    updateLinkOgMetadata?: typeof updateLinkOgMetadata;
   };
 };
 
@@ -82,6 +85,16 @@ function isWaybackResult(value: unknown): value is WaybackResult {
     && typeof candidate.archivedAt === "string";
 }
 
+function isOgMetadataResult(value: unknown): value is OgMetadataResult {
+  if (typeof value !== "object" || value === null) return false;
+  const candidate = value as Partial<OgMetadataResult>;
+  return Number.isInteger(candidate.linkId)
+    && (typeof candidate.ogTitle === "string" || candidate.ogTitle === null)
+    && (typeof candidate.ogDescription === "string" || candidate.ogDescription === null)
+    && (typeof candidate.ogImage === "string" || candidate.ogImage === null)
+    && typeof candidate.extractedAt === "string";
+}
+
 export class WorkerPool {
   private readonly createWorker: WorkerFactory;
   private readonly logger: WorkerPoolLogger;
@@ -91,19 +104,21 @@ export class WorkerPool {
     updateLinkStatusCode: typeof updateLinkStatusCode;
     updateLinkContentText: typeof updateLinkContentText;
     updateLinkArchiveUrl: typeof updateLinkArchiveUrl;
+    updateLinkOgMetadata: typeof updateLinkOgMetadata;
   };
 
   private healthWorker: PoolWorker;
   private readerWorker: PoolWorker;
   private waybackWorker: PoolWorker;
+  private ogWorker: PoolWorker;
   private readonly restartTimers = new Map<WorkerKind, unknown>();
   private shuttingDown = false;
 
   // Observability: metrics and dispatch tracking
   private metrics: WorkerMetrics = {
-    dispatched: { health: 0, reader: 0, wayback: 0 },
-    completed: { health: 0, reader: 0, wayback: 0 },
-    failed: { health: 0, reader: 0, wayback: 0 },
+    dispatched: { health: 0, reader: 0, wayback: 0, og: 0 },
+    completed: { health: 0, reader: 0, wayback: 0, og: 0 },
+    failed: { health: 0, reader: 0, wayback: 0, og: 0 },
   };
   private dispatchTracker: DispatchTracker = new Map();
 
@@ -116,11 +131,13 @@ export class WorkerPool {
       updateLinkStatusCode: deps.updates?.updateLinkStatusCode ?? updateLinkStatusCode,
       updateLinkContentText: deps.updates?.updateLinkContentText ?? updateLinkContentText,
       updateLinkArchiveUrl: deps.updates?.updateLinkArchiveUrl ?? updateLinkArchiveUrl,
+      updateLinkOgMetadata: deps.updates?.updateLinkOgMetadata ?? updateLinkOgMetadata,
     };
 
     this.healthWorker = this.startWorker("health");
     this.readerWorker = this.startWorker("reader");
     this.waybackWorker = this.startWorker("wayback");
+    this.ogWorker = this.startWorker("og");
   }
 
   dispatch(message: WorkerMessage<unknown>): void {
@@ -151,6 +168,11 @@ export class WorkerPool {
       return;
     }
 
+    if (message.type === WorkerMessageType.OG_METADATA) {
+      this.ogWorker.postMessage(message);
+      return;
+    }
+
     this.healthWorker.postMessage(message);
   }
 
@@ -166,6 +188,7 @@ export class WorkerPool {
   private getKindFromMessageType(type: WorkerMessageType): WorkerKind {
     if (type === WorkerMessageType.READER_MODE) return "reader";
     if (type === WorkerMessageType.WAYBACK) return "wayback";
+    if (type === WorkerMessageType.OG_METADATA) return "og";
     return "health";
   }
 
@@ -177,7 +200,7 @@ export class WorkerPool {
     }
     this.restartTimers.clear();
 
-    const workers = [this.healthWorker, this.readerWorker, this.waybackWorker];
+    const workers = [this.healthWorker, this.readerWorker, this.waybackWorker, this.ogWorker];
     await Promise.all(workers.map((worker) => Promise.resolve(worker.terminate()).catch((error) => {
       this.logError("Failed to terminate worker", error);
     })));
@@ -206,7 +229,11 @@ export class WorkerPool {
       return new URL("./reader-mode.worker.ts", import.meta.url);
     }
 
-    return new URL("./wayback.worker.ts", import.meta.url);
+    if (kind === "wayback") {
+      return new URL("./wayback.worker.ts", import.meta.url);
+    }
+
+    return new URL("./og-metadata.worker.ts", import.meta.url);
   }
 
   private handleWorkerMessage(kind: WorkerKind, result: WorkerResult<unknown>): void {
@@ -276,6 +303,27 @@ export class WorkerPool {
         return;
       }
 
+      if (kind === "og") {
+        if (!isOgMetadataResult(result.data)) {
+          this.logger.warn("[worker-pool] Invalid OG worker result payload", {
+            type: result.type,
+            correlationId: result.correlationId,
+          });
+          return;
+        }
+
+        const updateResult = this.updates.updateLinkOgMetadata(
+          result.data.linkId,
+          result.data.ogTitle,
+          result.data.ogDescription,
+          result.data.ogImage
+        );
+        if (!updateResult.ok) {
+          this.logger.warn("[worker-pool] Failed updating link OG metadata", updateResult.error);
+        }
+        return;
+      }
+
       if (!isWaybackResult(result.data)) {
         this.logger.warn("[worker-pool] Invalid wayback worker result payload", {
           type: result.type,
@@ -335,13 +383,19 @@ export class WorkerPool {
       return;
     }
 
-    this.waybackWorker = nextWorker;
+    if (kind === "wayback") {
+      this.waybackWorker = nextWorker;
+      return;
+    }
+
+    this.ogWorker = nextWorker;
   }
 
   private getWorker(kind: WorkerKind): PoolWorker {
     if (kind === "health") return this.healthWorker;
     if (kind === "reader") return this.readerWorker;
-    return this.waybackWorker;
+    if (kind === "wayback") return this.waybackWorker;
+    return this.ogWorker;
   }
 
   private logError(message: string, error: unknown): void {

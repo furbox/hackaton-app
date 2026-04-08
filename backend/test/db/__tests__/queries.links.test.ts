@@ -9,6 +9,7 @@ import {
   toggleFavoriteAndGetSnapshot,
   toggleLikeAndGetSnapshot,
   updateLinkByOwner,
+  updateLinkOgMetadataById,
 } from "../queries.js";
 
 let testDb: Database;
@@ -361,5 +362,57 @@ describe("scoped link helpers", () => {
     expect(second).not.toBeNull();
     expect(second?.favorited_by_me).toBe(false);
     expect(second?.favorites_count).toBe(1);
+  });
+
+  describe("updateLinkOgMetadataById", () => {
+    test("updates OG metadata fields for a link", () => {
+      const link = createLinkScoped({
+        user_id: 1,
+        url: "https://example.com/article",
+        title: "Test Article",
+        short_code: "test01",
+      });
+
+      const result = updateLinkOgMetadataById(link.id, "Test Title", "Test Description", "https://example.com/image.jpg");
+
+      expect(result.changes).toBe(1);
+
+      const updated = testDb.get("SELECT * FROM links WHERE id = ?", [link.id]) as {
+        og_title: string | null;
+        og_description: string | null;
+        og_image: string | null;
+      };
+
+      expect(updated.og_title).toBe("Test Title");
+      expect(updated.og_description).toBe("Test Description");
+      expect(updated.og_image).toBe("https://example.com/image.jpg");
+    });
+
+    test("handles null values for OG metadata", () => {
+      const link = createLinkScoped({
+        user_id: 1,
+        url: "https://example.com/empty",
+        title: "Empty Article",
+        short_code: "empty01",
+      });
+
+      // First set some values
+      updateLinkOgMetadataById(link.id, "Old Title", "Old Description", "https://example.com/old.jpg");
+
+      // Then update with nulls
+      const result = updateLinkOgMetadataById(link.id, null, null, null);
+
+      expect(result.changes).toBe(1);
+
+      const updated = testDb.get("SELECT * FROM links WHERE id = ?", [link.id]) as {
+        og_title: string | null;
+        og_description: string | null;
+        og_image: string | null;
+      };
+
+      expect(updated.og_title).toBeNull();
+      expect(updated.og_description).toBeNull();
+      expect(updated.og_image).toBeNull();
+    });
   });
 });

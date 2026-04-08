@@ -11,6 +11,7 @@ import {
   toggleLikeAndGetSnapshot,
   updateLinkContentTextById,
   updateLinkArchiveUrlById,
+  updateLinkOgMetadataById,
   updateLinkStatusCodeById,
   updateLinkByOwner,
   recalculateAndUpdateRank,
@@ -41,6 +42,7 @@ import {
   type HealthCheckPayload,
   type ReaderModePayload,
   type WaybackPayload,
+  type OgMetadataPayload,
 } from "../workers/types.ts";
 
 export type ServiceActor = { userId: number } | null;
@@ -393,6 +395,7 @@ function dispatchCreateLinkWorkers(linkId: number, url: string): void {
     createWorkerMessage<HealthCheckPayload>(WorkerMessageType.HEALTH_CHECK, basePayload, linkId),
     createWorkerMessage<ReaderModePayload>(WorkerMessageType.READER_MODE, basePayload, linkId),
     createWorkerMessage<WaybackPayload>(WorkerMessageType.WAYBACK, basePayload, linkId),
+    createWorkerMessage<OgMetadataPayload>(WorkerMessageType.OG_METADATA, basePayload, linkId),
   ];
 
   for (const job of jobs) {
@@ -810,6 +813,36 @@ export function updateLinkArchiveUrl(
     return ok({ updated: mutation.changes > 0 });
   } catch {
     return fail("INTERNAL", "Failed to update link archive URL");
+  }
+}
+
+export function updateLinkOgMetadata(
+  linkId: number,
+  ogTitle: string | null,
+  ogDescription: string | null,
+  ogImage: string | null
+): Phase4ServiceResult<{ updated: boolean }> {
+  if (!isPositiveInt(linkId)) {
+    return fail("VALIDATION_ERROR", "linkId must be a positive integer");
+  }
+
+  if (ogTitle !== null && typeof ogTitle !== "string") {
+    return fail("VALIDATION_ERROR", "ogTitle must be a string or null");
+  }
+
+  if (ogDescription !== null && typeof ogDescription !== "string") {
+    return fail("VALIDATION_ERROR", "ogDescription must be a string or null");
+  }
+
+  if (ogImage !== null && typeof ogImage !== "string") {
+    return fail("VALIDATION_ERROR", "ogImage must be a string or null");
+  }
+
+  try {
+    const mutation = updateLinkOgMetadataById(linkId, ogTitle, ogDescription, ogImage);
+    return ok({ updated: mutation.changes > 0 });
+  } catch {
+    return fail("INTERNAL", "Failed to update link OG metadata");
   }
 }
 

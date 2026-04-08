@@ -8,6 +8,9 @@ import {
   WorkerMessageType,
   type WorkerMessage,
   type WorkerResult,
+  type OgMetadataPayload,
+  type OgMetadataResult,
+  type OgMetadataMessage,
 } from "../../../workers/types.ts";
 
 class MockPoolWorker {
@@ -232,5 +235,74 @@ describe("workers/pool", () => {
       await shutdownWorkerPool();
       globalThis.Worker = originalWorker;
     }
+  });
+
+  describe("OG_METADATA worker type support", () => {
+    test("WorkerMessageType enum includes OG_METADATA", () => {
+      // This test verifies the OG_METADATA enum value exists
+      // It's used for dispatching OG metadata extraction jobs
+      expect(WorkerMessageType.OG_METADATA).toBe("OG_METADATA");
+    });
+
+    test("OgMetadataPayload interface exists and has correct shape", () => {
+      // This test verifies the OgMetadataPayload interface exists
+      // It defines the payload structure for OG metadata extraction jobs
+      const payload: OgMetadataPayload = {
+        linkId: 123,
+        url: "https://example.com",
+      };
+      expect(payload.linkId).toBe(123);
+      expect(payload.url).toBe("https://example.com");
+    });
+
+    test("OgMetadataResult interface exists and has correct shape", () => {
+      // This test verifies the OgMetadataResult interface exists
+      // It defines the result structure returned by the OG metadata worker
+      const result: OgMetadataResult = {
+        linkId: 123,
+        ogTitle: "Example Title",
+        ogDescription: "Example description",
+        ogImage: "https://example.com/image.jpg",
+        extractedAt: "2026-04-08T12:00:00.000Z",
+      };
+      expect(result.linkId).toBe(123);
+      expect(result.ogTitle).toBe("Example Title");
+      expect(result.ogDescription).toBe("Example description");
+      expect(result.ogImage).toBe("https://example.com/image.jpg");
+      expect(result.extractedAt).toBe("2026-04-08T12:00:00.000Z");
+    });
+
+    test("OgMetadataResult interface handles null values", () => {
+      // This test verifies the OgMetadataResult interface allows null values
+      // This is important for cases where OG metadata is not available
+      const result: OgMetadataResult = {
+        linkId: 456,
+        ogTitle: null,
+        ogDescription: null,
+        ogImage: null,
+        extractedAt: "2026-04-08T12:00:00.000Z",
+      };
+      expect(result.linkId).toBe(456);
+      expect(result.ogTitle).toBeNull();
+      expect(result.ogDescription).toBeNull();
+      expect(result.ogImage).toBeNull();
+      expect(result.extractedAt).toBe("2026-04-08T12:00:00.000Z");
+    });
+
+    test("OgMetadataMessage type alias exists and is correctly typed", () => {
+      // This test verifies the OgMetadataMessage type alias exists
+      // It's a convenience type for OG metadata worker messages
+      const message: OgMetadataMessage = {
+        type: WorkerMessageType.OG_METADATA,
+        correlationId: "og-metadata-123-1712580000000",
+        payload: {
+          linkId: 789,
+          url: "https://example.com/article",
+        },
+      };
+      expect(message.type).toBe(WorkerMessageType.OG_METADATA);
+      expect(message.payload.linkId).toBe(789);
+      expect(message.payload.url).toBe("https://example.com/article");
+    });
   });
 });

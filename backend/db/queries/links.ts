@@ -375,6 +375,14 @@ const updateLinkArchiveUrlByIdStmt = () => getDb().prepare(`
   WHERE id = ?
 `);
 
+const updateLinkOgMetadataByIdStmt = () => getDb().prepare(`
+  UPDATE links
+  SET og_title = ?,
+      og_description = ?,
+      og_image = ?
+  WHERE id = ?
+`);
+
 const findCategoryByUserAndNameStmt = () => getDb().prepare(`
   SELECT id
   FROM categories
@@ -768,6 +776,17 @@ export function updateLinkContentTextById(linkId: number, contentText: string | 
 export function updateLinkArchiveUrlById(linkId: number, archiveUrl: string | null): LinkMutationResult {
   const stmt = updateLinkArchiveUrlByIdStmt();
   const result = stmt.run(archiveUrl, linkId);
+  return { changes: result.changes };
+}
+
+export function updateLinkOgMetadataById(
+  linkId: number,
+  ogTitle: string | null,
+  ogDescription: string | null,
+  ogImage: string | null
+): LinkMutationResult {
+  const stmt = updateLinkOgMetadataByIdStmt();
+  const result = stmt.run(ogTitle, ogDescription, ogImage, linkId);
   return { changes: result.changes };
 }
 

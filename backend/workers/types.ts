@@ -6,6 +6,7 @@ export enum WorkerMessageType {
   READER_MODE = "READER_MODE",
   WAYBACK = "WAYBACK",
   SWEEP = "SWEEP",
+  OG_METADATA = "OG_METADATA",
 }
 
 export interface WorkerMessage<T = unknown> {
@@ -29,14 +30,17 @@ export interface HealthCheckPayload { linkId: number; url: string; }
 export interface ReaderModePayload  { linkId: number; url: string; }
 export interface WaybackPayload     { linkId: number; url: string; }
 export interface SweepPayload       { links?: HealthCheckPayload[]; }
+export interface OgMetadataPayload  { linkId: number; url: string; }
 
 // Job-specific result types (worker → main)
 export interface HealthCheckResult  { linkId: number; statusCode: number; checkedAt: string; }
 export interface ReaderModeResult   { linkId: number; contentText: string | null; extractedAt: string; }
 export interface WaybackResult      { linkId: number; archiveUrl: string | null; archivedAt: string; }
+export interface OgMetadataResult   { linkId: number; ogTitle: string | null; ogDescription: string | null; ogImage: string | null; extractedAt: string; }
 
 // Convenience message aliases
 export type HealthCheckMessage = WorkerMessage<HealthCheckPayload>;
 export type ReaderModeMessage  = WorkerMessage<ReaderModePayload>;
 export type WaybackMessage     = WorkerMessage<WaybackPayload>;
 export type SweepMessage       = WorkerMessage<SweepPayload>;
+export type OgMetadataMessage  = WorkerMessage<OgMetadataPayload>;
