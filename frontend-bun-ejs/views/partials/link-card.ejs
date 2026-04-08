@@ -1,0 +1,279 @@
+<%
+  const rawUrl = typeof link.url === "string" ? link.url.trim() : "";
+  let hostname = "";
+
+  if (rawUrl.length > 0) {
+    try {
+      hostname = new URL(rawUrl).hostname;
+    } catch {
+      try {
+        hostname = new URL(`https://${rawUrl}`).hostname;
+      } catch {
+        hostname = "";
+      }
+    }
+  }
+
+  const fallbackName = "Link";
+  const displayName =
+    typeof link.title === "string" && link.title.trim().length > 0
+      ? link.title.trim()
+      : fallbackName;
+
+  const shortCode =
+    typeof link.short_code === "string" && link.short_code.trim().length > 0
+      ? link.short_code.trim()
+      : typeof link.shortCode === "string" && link.shortCode.trim().length > 0
+      ? link.shortCode.trim()
+      : "";
+  const shortHref = shortCode ? `/s/${encodeURIComponent(shortCode)}` : "#";
+
+  const ogImage =
+    typeof link.og_image === "string" && link.og_image.trim().length > 0
+      ? link.og_image.trim()
+      : typeof link.ogImage === "string" && link.ogImage.trim().length > 0
+      ? link.ogImage.trim()
+      : "";
+  const hasOgImage = ogImage.length > 0;
+  const faviconUrl = hostname
+    ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`
+    : "";
+
+  const userData = link && typeof link.user === "object" && link.user !== null ? link.user : null;
+  const username =
+    typeof link.username === "string" && link.username.trim().length > 0
+      ? link.username.trim()
+      : userData && typeof userData.username === "string" && userData.username.trim().length > 0
+      ? userData.username.trim()
+      : typeof link.owner_username === "string" && link.owner_username.trim().length > 0
+      ? link.owner_username.trim()
+      : typeof link.ownerUsername === "string" && link.ownerUsername.trim().length > 0
+      ? link.ownerUsername.trim()
+      : "";
+  const avatarUrl =
+    typeof link.avatar_url === "string" && link.avatar_url.trim().length > 0
+      ? link.avatar_url.trim()
+      : typeof link.avatarUrl === "string" && link.avatarUrl.trim().length > 0
+      ? link.avatarUrl.trim()
+      : userData && typeof userData.avatar_url === "string" && userData.avatar_url.trim().length > 0
+      ? userData.avatar_url.trim()
+      : userData && typeof userData.avatarUrl === "string" && userData.avatarUrl.trim().length > 0
+      ? userData.avatarUrl.trim()
+      : "";
+  const userInitial = username.length > 0 ? username.charAt(0).toUpperCase() : "U";
+  const idSuffixRaw = typeof idSuffix === "string" ? idSuffix.trim() : "";
+  const idSuffixSafe = idSuffixRaw.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
+  const cardSuffix = idSuffixSafe.length > 0 ? `-${idSuffixSafe}` : "";
+%>
+
+<article
+  id="favorite-card-<%= link.id %><%= cardSuffix %>"
+  data-favorite-card="true"
+  class="group flex w-full flex-col justify-between gap-3 rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+>
+  <!-- Header: Favicon + Contenido -->
+  <div class="flex gap-3 sm:items-start">
+    <!-- Favicon SIEMPRE en lugar fijo -->
+    <div class="relative shrink-0">
+      <a href="<%= shortHref %>" class="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5 sm:h-14 sm:w-14" target="_blank" rel="noopener noreferrer">
+        <% if (faviconUrl) { %>
+          <img src="<%= faviconUrl %>" alt="Favicon de <%= hostname %>" class="h-8 w-8 rounded-md bg-surface p-1.5 shadow-md shadow-black/35 sm:h-10 sm:w-10" loading="lazy" />
+        <% } else { %>
+          <span class="text-2xl text-text-secondary/70 sm:text-3xl">🌐</span>
+        <% } %>
+      </a>
+
+      <!-- Indicador de estatus HTTP -->
+      <% if (typeof link.status_code === "number") { %>
+        <% const isGoodStatus = link.status_code >= 200 && link.status_code < 400; %>
+        <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-<%= isGoodStatus ? 'emerald-500' : 'red-500' %> text-[10px] font-bold text-white shadow-lg" title="Status: <%= link.status_code %>">
+          <%= isGoodStatus ? '✓' : '✕' %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Contenido del link -->
+    <div class="min-w-0 flex-1">
+      <a href="<%= shortHref %>" target="_blank" rel="noopener noreferrer"
+         class="block max-w-[280px] truncate text-base font-semibold leading-tight tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:max-w-[320px] sm:text-lg"
+         title="<%= displayName %>">
+        <%= displayName %>
+      </a>
+
+      <!-- Usuario y categoría -->
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        <% if (username) { %>
+          <a href="/u/<%= encodeURIComponent(username) %>" class="inline-flex max-w-full items-center gap-1.5 rounded-full border border-border/80 bg-slate-900/40 px-2.5 py-1 text-xs text-text-secondary transition-colors hover:border-accent-primary/40 hover:text-text-primary">
+            <span class="truncate">@<%= username %></span>
+          </a>
+        <% } %>
+
+        <% if (link.category && typeof link.category === 'object' && link.category !== null) { %>
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-border/80 px-2.5 py-1 text-xs" style="background-color: <%= link.category.color %>20; color: <%= link.category.color %>;">
+            <span class="h-1.5 w-1.5 rounded-full" style="background-color: <%= link.category.color %>;"></span>
+            <span class="truncate"><%= link.category.name %></span>
+          </span>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer: Social Stats + Imagen OG -->
+  <div class="flex flex-wrap items-center justify-between gap-2 text-[10px] text-text-secondary/80 px-1">
+    <div id="social-stats-<%= link.id %><%= cardSuffix %>" class="inline-flex items-center gap-1.5 rounded-lg border border-border/70 bg-slate-900/30 px-2 py-0.5">
+      <span class="inline-flex items-center gap-1 text-xs font-medium text-text-secondary/90">
+        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        <span><%= link.views || 0 %></span>
+      </span>
+      <%- include('./like-button', {
+        linkId: link.id,
+        idSuffix: idSuffixSafe,
+        liked: Boolean(link.liked_by_me),
+        count: Number(link.likes_count) || 0,
+      }) %>
+      <%- include('./favorite-button', {
+        linkId: link.id,
+        idSuffix: idSuffixSafe,
+        favorited: Boolean(link.favorited_by_me),
+        count: Number(link.favorites_count) || 0,
+      }) %>
+    </div>
+
+    <!-- Imagen OG thumbnail a la derecha (si existe) -->
+    <% if (hasOgImage) { %>
+      <div class="shrink-0 ml-auto">
+        <button
+          type="button"
+          class="group/img open-modal-btn relative h-12 w-16 overflow-hidden rounded-lg border border-border/70 bg-slate-900/50 ring-1 ring-white/5 transition-all duration-200 hover:border-accent-primary/50 hover:ring-accent-primary/20 sm:h-14 sm:w-20"
+          data-image-url="<%= ogImage %>"
+          data-title="<%= displayName.replace(/"/g, '&quot;').replace(/'/g, '&#39;') %>"
+          data-hostname="<%= hostname %>"
+          data-short-url="<%= shortHref %>"
+          aria-label="Ver imagen de <%= displayName %>"
+        >
+          <img src="<%= ogImage %>" alt="Imagen de <%= displayName %>" class="h-full w-full object-cover transition-transform duration-300 group-hover/img:scale-105" loading="lazy" />
+          <div class="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover/img:bg-black/20 group-hover/img:opacity-100">
+            <svg class="h-5 w-5 text-white drop-shadow-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+          </div>
+        </button>
+      </div>
+    <% } %>
+  </div>
+</article>
+
+  <!-- Modal para imagen (compartido entre todas las cards) -->
+  <div id="image-modal" class="fixed inset-0 z-[100] hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <!-- Backdrop -->
+    <div id="image-modal-backdrop" class="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity cursor-pointer"></div>
+
+    <!-- Modal content -->
+    <div class="relative flex min-h-screen items-center justify-center p-4">
+      <div class="relative max-h-[90vh] max-w-4xl overflow-hidden rounded-2xl bg-surface shadow-2xl">
+        <!-- Close button -->
+        <button
+          type="button"
+          onclick="closeImageModal()"
+          class="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+          aria-label="Cerrar modal"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+      <!-- Image (sin link) -->
+      <img id="modal-image" src="" alt="" class="max-h-[85vh] w-auto object-contain" />
+
+      <!-- Info bar -->
+      <div class="border-t border-border/80 bg-surface/95 p-4">
+        <h3 id="modal-title" class="text-base font-semibold text-text-primary"></h3>
+        <p id="modal-hostname" class="mt-1 text-sm text-text-secondary"></p>
+        <div class="mt-3 flex flex-wrap items-center gap-2">
+          <a id="modal-link" href="" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-accent-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-primary/90">
+            Visitar link
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+          <button
+            type="button"
+            onclick="closeImageModal()"
+            class="inline-flex items-center gap-2 rounded-lg border border-border/80 px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:border-border hover:bg-surface/80"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Prevenir múltiples inits
+  if (window.imageModalInitialized) return;
+  window.imageModalInitialized = true;
+
+  window.openImageModal = function(imageUrl, title, hostname, shortUrl) {
+    const modal = document.getElementById('image-modal');
+    const modalImage = document.getElementById('modal-image');
+    const modalTitle = document.getElementById('modal-title');
+    const modalHostname = document.getElementById('modal-hostname');
+    const modalLink = document.getElementById('modal-link');
+
+    modalImage.src = imageUrl;
+    modalImage.alt = 'Imagen de ' + title;
+    modalTitle.textContent = title;
+    modalHostname.textContent = hostname;
+    modalLink.href = shortUrl;
+
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Focus trap
+    modal.addEventListener('keydown', handleEscape);
+  };
+
+  window.closeImageModal = function() {
+    const modal = document.getElementById('image-modal');
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+    modal.removeEventListener('keydown', handleEscape);
+  };
+
+  function handleEscape(e) {
+    if (e.key === 'Escape') {
+      closeImageModal();
+    }
+  }
+
+  // Event delegation para botones con clase open-modal-btn
+  document.addEventListener('click', function(e) {
+    const button = e.target.closest('.open-modal-btn');
+    if (!button) return;
+
+    const imageUrl = button.getAttribute('data-image-url');
+    const title = button.getAttribute('data-title');
+    const hostname = button.getAttribute('data-hostname');
+    const shortUrl = button.getAttribute('data-short-url');
+
+    if (imageUrl && title && hostname && shortUrl) {
+      openImageModal(imageUrl, title, hostname, shortUrl);
+    }
+  });
+
+  // Close on backdrop click - usar ID directo
+  const backdrop = document.getElementById('image-modal-backdrop');
+  if (backdrop) {
+    backdrop.addEventListener('click', closeImageModal);
+  }
+})();
+</script>

@@ -1,0 +1,122 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <div class="mb-8">
+    <h1 class="mb-1 text-3xl font-bold text-text-primary">Tecnología</h1>
+    <p class="text-text-secondary">Resumen compacto del stack usado y de la estrategia de hosting/deploy.</p>
+  </div>
+
+  <section class="mb-10" aria-labelledby="stack-title">
+    <h2 id="stack-title" class="text-xl font-semibold text-text-primary mb-4">Stack tecnológico usado</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Runtime y backend</h3>
+        <p class="mt-2 text-sm text-text-secondary">Bun + TypeScript para servidor, API y lógica principal.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Frontend actual</h3>
+        <p class="mt-2 text-sm text-text-secondary">Bun + EJS para render SSR, con Alpine.js y HTMX para interacciones puntuales.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Base de datos</h3>
+        <p class="mt-2 text-sm text-text-secondary">SQLite como motor principal + FTS5 para búsqueda full-text.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Autenticación y emails</h3>
+        <p class="mt-2 text-sm text-text-secondary">Better Auth para sesiones y seguridad, Resend para verificación y recuperación de cuenta.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Workers y Reader Mode</h3>
+        <p class="mt-2 text-sm text-text-secondary">Background jobs con Bun.Worker; extracción de contenido con Readability + linkedom.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Integraciones y clientes</h3>
+        <p class="mt-2 text-sm text-text-secondary">MCP Server + Web Skill para IA, Chrome Extension (Manifest V3) para guardado rápido de links.</p>
+      </article>
+    </div>
+
+    <div class="ui-card mt-4 p-5">
+      <h3 class="text-base font-semibold text-text-primary">PWA</h3>
+      <p class="mt-2 text-sm text-text-secondary">No está activa en este frontend Bun + EJS actual. Queda contemplada para la app principal cuando se habilite manifest + service worker.</p>
+    </div>
+  </section>
+
+  <section class="mb-10" aria-labelledby="ia-title">
+    <h2 id="ia-title" class="text-xl font-semibold text-text-primary mb-4">Ecosistema IA</h2>
+
+    <div class="ui-card p-5">
+      <p class="text-sm text-text-secondary">URLoft se apoya en agentes y skills para acelerar desarrollo, testing, documentación y automatización sin perder control técnico del stack.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Skills destacadas</h3>
+        <ul class="mt-2 space-y-2 text-sm text-text-secondary list-disc pl-5">
+          <li><span class="font-medium text-text-primary">bun-development:</span> flujo de desarrollo y performance sobre Bun.</li>
+          <li><span class="font-medium text-text-primary">better-auth-best-practices:</span> autenticación robusta con Better Auth.</li>
+          <li><span class="font-medium text-text-primary">mcp-builder:</span> diseño e implementación de herramientas MCP.</li>
+          <li><span class="font-medium text-text-primary">frontend-design:</span> UI/UX cuidada, consistente y lista para producción.</li>
+          <li><span class="font-medium text-text-primary">playwright-cli y agent-browser:</span> testing E2E y automatización web.</li>
+          <li><span class="font-medium text-text-primary">seo-audit y claude-seo:</span> auditoría técnica SEO, análisis de rendimiento y optimización para motores de búsqueda.</li>
+          <li><span class="font-medium text-text-primary">workflow SDD (sdd-*):</span> propose - design - tasks - apply - verify.</li>
+        </ul>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Modelos de IA utilizados</h3>
+        <div class="mt-3 space-y-2 text-sm text-text-secondary">
+          <div class="border border-border rounded-md p-3"><span class="font-medium text-text-primary">Claude Sonnet 4.6</span> - generación, refactor, debugging de código complejo y documentación técnica clara.</div>
+          <div class="border border-border rounded-md p-3"><span class="font-medium text-text-primary">Gemini 3 Flash / 3.1 / 3 Pro</span> - velocidad, razonamiento general y análisis profundo según la tarea.</div>
+          <div class="border border-border rounded-md p-3"><span class="font-medium text-text-primary">GLM-4.7</span> - capacidades multilingües y comprensión contextual.</div>
+          <div class="border border-border rounded-md p-3"><span class="font-medium text-text-primary">MiniMax M2.5</span> - soporte eficiente para procesamiento y tareas auxiliares.</div>
+        </div>
+      </article>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Gentleman-AI</h3>
+        <p class="mt-2 text-sm text-text-secondary">Aporta memoria persistente, workflow SDD, skills curadas, integración MCP y model routing por fase para mantener trazabilidad y velocidad.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">OpenCode.ai</h3>
+        <p class="mt-2 text-sm text-text-secondary">Agente open-source multi-modelo para terminal/IDE, útil para iterar rápido con foco en privacidad, flexibilidad de proveedor y control del entorno.</p>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="hosting-title">
+    <h2 id="hosting-title" class="text-xl font-semibold text-text-primary mb-4">Hosting y deploy</h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Entorno actual</h3>
+        <p class="mt-2 text-sm text-text-secondary">Infraestructura oficial impulsada por <span class="font-medium text-text-primary">CubePath</span>, sponsor del proyecto y del hackathon, con despliegue optimizado para Bun en servidores Linux.</p>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Hosting oficial CubePath</h3>
+        <ul class="mt-2 space-y-2 text-sm text-text-secondary list-disc pl-5">
+          <li>Performance consistente en demo y producción con tiempos de respuesta estables.</li>
+          <li>Confiabilidad operativa para sostener tráfico real sin fricción.</li>
+          <li>Soporte técnico directo para iterar y desplegar rápido durante el hackathon.</li>
+        </ul>
+      </article>
+
+      <article class="ui-card p-5">
+        <h3 class="text-base font-semibold text-text-primary">Rol de Cloudflare</h3>
+        <p class="mt-2 text-sm text-text-secondary">CDN global para estáticos, SSL, mitigación DDoS y soporte de cache/HTTP/3 para mejorar respuesta percibida.</p>
+      </article>
+    </div>
+
+    <div class="ui-card mt-4 p-5">
+      <h3 class="text-base font-semibold text-text-primary">Escala y continuidad</h3>
+      <p class="mt-2 text-sm text-text-secondary">La estrategia se apoya en CubePath como hosting principal; si hiciera falta redundancia, se evalúan alternativas solo como contingencia secundaria.</p>
+    </div>
+  </section>
+</div>

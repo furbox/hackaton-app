@@ -1,0 +1,120 @@
+{
+  "hero": {
+    "title": "42 Horas en 6 Días Programando con IA, mirá cómo lo hice",
+    "description": "Mirá cómo construí URLoft desde cero en el hackathon. Cada video muestra una parte del proceso, desde la arquitectura inicial hasta el deployment final. ⏱️ Tiempo total grabado: 1 día, 17 horas, 45 minutos (~42 horas) | Desglose: Día 1 (7h 17min), Día 2 (10h 18min - el más intenso), Día 3 (7h 46min), Día 4 (6h 14min), Día 5 (8h 13min), Día 6 (1h 26min)."
+  },
+  "videos": [
+    {
+      "id": 1,
+      "videoId": "6GZePI03qBs",
+      "title": "Video principal - Preparación del proyecto",
+      "description": "Mirá cómo construí URLoft desde cero en el hackathon. Cada video muestra una parte del proceso, desde la arquitectura inicial hasta el deployment final.",
+      "duration": "27:25"
+    },
+    {
+      "id": 2,
+      "videoId": "RP0rlta99qs",
+      "title": "Dia 1 Phase01 Stack BUN + SQLite = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Aquí iniciamos el proyecto URLoft en el hackathon 2026. Espero les guste.",
+      "duration": "1:48:33"
+    },
+    {
+      "id": 3,
+      "videoId": "viJ6JG17Q6c",
+      "title": "Dia 1 Phase02 Stack BUN + SQLite = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Seguimos con la implementación de urloft con un video de 1h 25 minutos de duración.",
+      "duration": "1:25:24"
+    },
+    {
+      "id": 4,
+      "videoId": "HNgXXJtfQXI",
+      "title": "Dia 1 Phase0301 Stack BUN + SQLite = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Seguimos con la implementación de urloft con un video de 4h 3 minutos de duración.",
+      "duration": "4:03:32"
+    },
+    {
+      "id": 5,
+      "videoId": "f1ewSS0B3n8",
+      "title": "Dia 2 Phase0302 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Seguimos con la implementación de urloft con un video de 2h 9| minutos de duración.",
+      "duration": "2:09:23"
+    },
+    {
+      "id": 6,
+      "videoId": "jP3v8SCrdts",
+      "title": "Dia 2 Phase04 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 6h 4 minutos de duración.",
+      "duration": "6:04:46"
+    },
+    {
+      "id": 7,
+      "videoId": "bguG37clCN0",
+      "title": "Dia 2 Phase05 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 58 minutos de duración.",
+      "duration": "58:14"
+    },
+    {
+      "id": 8,
+      "videoId": "Irl8tRvUV-M",
+      "title": "Dia 2 Phase06 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 1 hora y 6 minutos de duración.",
+      "duration": "1:06:34"
+    },
+    {
+      "id": 9,
+      "videoId": "L8v6vtMu-GQ",
+      "title": "Dia Perdido 3 Phase 07 y 08 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urlsoft",
+      "description": "Dia Perdido, seguimos con la implementación de urloft con un video de 4 horas y 2 minutos de duración.",
+      "duration": "4:02:53"
+    },
+    {
+      "id": 10,
+      "videoId": "79TC7hpzeFQ",
+      "title": "Dia 3 Noche solo musica Phase 09 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton2026 Urloft",
+      "description": "Nueva Estrategia, seguimos con la implementación de urloft con un video de 3 horas, 43 minutos y 48 segundos de duración.",
+      "duration": "3:43:48"
+    },
+    {
+      "id": 11,
+      "videoId": "aPmTo6-OlGo",
+      "title": "Dia 4 Phase10 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 6 horas, 14 minutos y 24 segundos de duración.",
+      "duration": "6:14:24"
+    },
+    {
+      "id": 12,
+      "videoId": "WLGwZ1gkk30",
+      "title": "Dia 5 Madrugada Musica Phase11 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 2 horas, 42 minutos y 44 segundos de duración.",
+      "duration": "2:42:44"
+    },
+    {
+      "id": 13,
+      "videoId": "RWFC1y5bN5Y",
+      "title": "Dia 5 Tarde Phase12 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 2 horas, 40 minutos y 4 segundos de duración.",
+      "duration": "2:40:04"
+    },
+    {
+      "id": 14,
+      "videoId": "rqGksy_XXb8",
+      "title": "Dia 5 Noche Phase13 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 13 minutos y 23 segundos de duración.",
+      "duration": "13:23"
+    },
+    {
+      "id": 15,
+      "videoId": "Hh06gfKmy2A",
+      "title": "Dia 5 Noche Phase14 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 2 horas, 37 minutos y 27 segundos de duración.",
+      "duration": "2:37:27"
+    },
+    {
+      "id": 16,
+      "videoId": "cdWVYM4im-Q",
+      "title": "Dia 6 Final Phase15 Stack IA + BUN  + SQLite + EJS = App Completa 🚀 Hackaton 2026 Urloft",
+      "description": "Seguimos con la implementación de urloft con un video de 1 hora, 26 minutos y 41 segundos de duración.",
+      "duration": "1:26:41"
+    }
+  ]
+}

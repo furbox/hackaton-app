@@ -1,0 +1,31 @@
+<%
+  const currentPage = typeof page === "number" && Number.isFinite(page) ? page : 1;
+  const chunkSuffix = `explore-page-${currentPage}`;
+%>
+<% if (links && links.length > 0) { %>
+  <% if (currentPage > 1) { %>
+    <!-- Separador visual entre páginas -->
+    <div class="flex items-center justify-center my-8" aria-hidden="true">
+      <div class="h-px w-24 bg-border/50"></div>
+      <span class="mx-3 text-xs text-text-secondary/50">•</span>
+      <div class="h-px w-24 bg-border/50"></div>
+    </div>
+  <% } %>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <% links.forEach(function(link) { %>
+      <%- include('./link-card', { link: link, idSuffix: chunkSuffix }) %>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (hasNextPage && nextPageUrl) { %>
+  <div
+    id="explore-load-more-<%= currentPage %>"
+    class="h-1"
+    hx-get="<%= nextPageUrl %>"
+    hx-trigger="revealed once"
+    hx-swap="outerHTML"
+    aria-hidden="true"
+  ></div>
+<% } %>

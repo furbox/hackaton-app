@@ -1,0 +1,43 @@
+# URLoft
+
+> Smart link library — save, organize, search and share URLs with full-text search, categories, public/private privacy controls, Chrome extension, PWA, and MCP Server integration for AI workflows.
+
+URLoft is a web application built for the midudev Hackathon 2026. It helps users save, organize, search and share URLs with a focus on productivity and AI integration.
+
+## Site
+
+https://urloft.site
+
+## Pages
+
+- / — Home: landing page and link dashboard for authenticated users
+- /explore — Explore: discover public links shared by the community
+- /como-lo-hice — How it was built: behind-the-scenes of URLoft's development
+- /tecnologia — Technology: tech stack and architecture details
+- /sobre — About: project background and motivation
+
+## Features
+
+- Smart URL saving with automatic title, description and favicon metadata extraction
+- Short links for easy sharing
+- Full-text search with filters powered by SQLite FTS5
+- Categories and favorites for personal organization
+- Browser bookmark import (HTML export format)
+- Per-link public/private privacy control
+- Social link discovery via the /explore feed
+- Chrome Extension (Manifest V3) for one-click saving from any page
+- Installable PWA for mobile and desktop
+- MCP Server integration for AI workflows — lets AI assistants read and save links on your behalf
+
+## Tech Stack
+
+- Runtime: Bun + TypeScript
+- Database: SQLite with FTS5 full-text search
+- Templates: EJS server-side rendering
+- Frontend: Alpine.js + HTMX + Tailwind CSS
+- Auth: Better Auth
+- Infrastructure: Cloudflare
+
+## Built For
+
+Hackathon midudev 2026
