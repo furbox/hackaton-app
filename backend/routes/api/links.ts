@@ -416,9 +416,11 @@ export async function handleLinksRoute(
       return query;
     }
 
-    // Public explore page - always show only public links, even for authenticated users.
-    // This ensures /explore only displays publicly shared content from all users.
-    return responseFromService(resolvedDeps.getLinks(null, query));
+    // Public explore page - show public links with engagement stats for authenticated users.
+    // Non-authenticated users see public links without personal engagement (liked/favorited).
+    const session = await resolvedDeps.getSession(request);
+    const actor = parseActorOptional(session);
+    return responseFromService(resolvedDeps.getLinks(actor, query));
   }
 
   if (path === "/api/links/me" && method === "GET") {

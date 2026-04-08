@@ -38,9 +38,6 @@
   const faviconUrl = hostname
     ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=128`
     : "";
-  const mediaLinkClasses = hasOgImage
-    ? "relative block h-20 w-full shrink-0 overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5 sm:h-24 sm:w-32"
-    : "relative inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5";
 
   const userData = link && typeof link.user === "object" && link.user !== null ? link.user : null;
   const username =
@@ -72,45 +69,77 @@
 <article
   id="favorite-card-<%= link.id %><%= cardSuffix %>"
   data-favorite-card="true"
-  class="group w-full rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
+  class="group flex w-full flex-col justify-between gap-3 rounded-2xl border border-border/80 bg-surface/95 p-4 shadow-[0_10px_30px_-16px_rgba(0,0,0,0.85)] transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-primary/40 hover:bg-surface hover:shadow-[0_18px_40px_-18px_rgba(0,0,0,0.95)]"
 >
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-stretch">
-    <!-- Wrapper relativo para permitir que el badge sobresalga fuera del <a> -->
-    <div class="relative inline-flex shrink-0">
-      <a href="<%= shortHref %>" class="<%= mediaLinkClasses %>" target="_blank" rel="noopener noreferrer">
-        <% if (ogImage) { %>
-          <img src="<%= ogImage %>" alt="Imagen del enlace" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" loading="lazy" />
-         <% } else if (faviconUrl) { %>
-           <img src="<%= faviconUrl %>" alt="Favicon del sitio" class="h-9 w-9 rounded-md bg-surface p-1.5 shadow-md shadow-black/35" loading="lazy" />
-         <% } else { %>
-           <span class="text-xl text-text-secondary/70">🌐</span>
-         <% } %>
-       </a>
-
-        <!-- Indicador de estatus HTTP (CONDICIONAL) -->
-       <% if (typeof link.status_code === "number") { %>
-         <% const isGoodStatus = link.status_code >= 200 && link.status_code < 400; %>
-         <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-<%= isGoodStatus ? 'emerald-500' : 'red-500' %> text-[10px] font-bold text-white shadow-lg" title="Status: <%= link.status_code %>">
-           <%= isGoodStatus ? '✓' : '✕' %>
-         </div>
-       <% } %>
-     </div>
-
-    <div class="min-w-0 flex-1">
-      <a href="<%= shortHref %>" target="_blank" rel="noopener noreferrer" class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]" title="<%= displayName %>">
-        <%= displayName %>
+  <!-- Header: Favicon + Contenido -->
+  <div class="flex gap-3 sm:items-start">
+    <!-- Favicon SIEMPRE en lugar fijo -->
+    <div class="relative shrink-0">
+      <a href="<%= shortHref %>" class="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl border border-border/90 bg-slate-900/70 ring-1 ring-white/5 sm:h-14 sm:w-14" target="_blank" rel="noopener noreferrer">
+        <% if (faviconUrl) { %>
+          <img src="<%= faviconUrl %>" alt="Favicon de <%= hostname %>" class="h-8 w-8 rounded-md bg-surface p-1.5 shadow-md shadow-black/35 sm:h-10 sm:w-10" loading="lazy" />
+        <% } else { %>
+          <span class="text-2xl text-text-secondary/70 sm:text-3xl">🌐</span>
+        <% } %>
       </a>
 
-      <% if (username) { %>
-        <a href="/u/<%= encodeURIComponent(username) %>" class="mt-2 inline-flex max-w-full items-center gap-2 rounded-full border border-border/80 bg-slate-900/40 px-2.5 py-1 text-xs text-text-secondary transition-colors hover:border-accent-primary/40 hover:text-text-primary">
-          <span class="truncate">@<%= username %></span>
-        </a>
+      <!-- Indicador de estatus HTTP -->
+      <% if (typeof link.status_code === "number") { %>
+        <% const isGoodStatus = link.status_code >= 200 && link.status_code < 400; %>
+        <div class="absolute -top-1.5 -right-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-900 bg-<%= isGoodStatus ? 'emerald-500' : 'red-500' %> text-[10px] font-bold text-white shadow-lg" title="Status: <%= link.status_code %>">
+          <%= isGoodStatus ? '✓' : '✕' %>
+        </div>
       <% } %>
     </div>
 
+    <!-- Contenido del link -->
+    <div class="min-w-0 flex-1">
+      <% if (hasOgImage) { %>
+        <!-- Título con preview de imagen al hover -->
+        <div class="group/link-preview relative inline-block">
+          <a href="<%= shortHref %>" target="_blank" rel="noopener noreferrer"
+             class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]"
+             title="<%= displayName %>">
+            <%= displayName %>
+          </a>
+
+          <!-- Preview de imagen al hover -->
+          <div class="pointer-events-none absolute left-0 top-full z-50 mt-2 hidden w-64 rounded-lg border border-border/90 bg-surface p-1 shadow-xl group-hover/link-preview:block sm:w-80">
+            <img src="<%= ogImage %>" alt="Preview de <%= displayName %>" class="h-auto w-full rounded-md object-cover" loading="lazy" />
+            <div class="mt-1 px-1">
+              <p class="text-xs text-text-secondary/70 truncate"><%= hostname %></p>
+            </div>
+          </div>
+        </div>
+      <% } else { %>
+        <!-- Título sin preview -->
+        <a href="<%= shortHref %>" target="_blank" rel="noopener noreferrer"
+           class="block overflow-hidden text-base font-semibold leading-snug tracking-tight text-text-primary transition-colors hover:text-accent-primary sm:text-lg [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]"
+           title="<%= displayName %>">
+          <%= displayName %>
+        </a>
+      <% } %>
+
+      <!-- Usuario y categoría -->
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        <% if (username) { %>
+          <a href="/u/<%= encodeURIComponent(username) %>" class="inline-flex max-w-full items-center gap-1.5 rounded-full border border-border/80 bg-slate-900/40 px-2.5 py-1 text-xs text-text-secondary transition-colors hover:border-accent-primary/40 hover:text-text-primary">
+            <span class="truncate">@<%= username %></span>
+          </a>
+        <% } %>
+
+        <% if (link.category && typeof link.category === 'object' && link.category !== null) { %>
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-border/80 px-2.5 py-1 text-xs" style="background-color: <%= link.category.color %>20; color: <%= link.category.color %>;">
+            <span class="h-1.5 w-1.5 rounded-full" style="background-color: <%= link.category.color %>;"></span>
+            <span class="truncate"><%= link.category.name %></span>
+          </span>
+        <% } %>
+      </div>
+    </div>
   </div>
 
-  <div class="mt-4 flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
+  <!-- Footer: Social Stats SIEMPRE abajo -->
+  <div class="flex flex-wrap items-center gap-2.5 text-xs text-text-secondary/90">
     <div id="social-stats-<%= link.id %><%= cardSuffix %>" class="inline-flex items-center gap-2 rounded-xl border border-border/80 bg-slate-900/45 p-1.5">
       <span class="inline-flex items-center gap-1.5 rounded-lg bg-slate-900/35 px-3 py-1.5 text-sm font-medium text-text-secondary/95">
         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
