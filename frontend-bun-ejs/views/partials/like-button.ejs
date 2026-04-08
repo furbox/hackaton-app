@@ -12,9 +12,9 @@
   hx-trigger="click"
   hx-indicator="#like-loading-<%= linkId %><%= suffixSegment %>"
   aria-label="<%= liked ? 'Quitar like' : 'Dar like' %>"
-  class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors
-         <%= liked ? 'border-error/50 bg-error/15 text-error hover:bg-error/20' : 'border-border bg-slate-900/50 text-text-secondary hover:border-accent-primary/40 hover:text-text-primary' %>">
-  <span><%= liked ? '❤️' : '🤍' %></span>
+  class="inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-xs font-medium transition-colors
+         <%= liked ? 'border-error/50 bg-error/15 text-error hover:bg-error/20' : 'border-border/70 bg-slate-900/40 text-text-secondary/90 hover:border-accent-primary/40 hover:text-text-primary' %>">
+  <span class="text-[13px] leading-none"><%= liked ? '❤️' : '🤍' %></span>
   <span><%= count %></span>
-  <span id="like-loading-<%= linkId %><%= suffixSegment %>" class="htmx-indicator inline-flex items-center text-xs text-text-secondary/70" aria-hidden="true">...</span>
+  <span id="like-loading-<%= linkId %><%= suffixSegment %>" class="htmx-indicator inline-flex items-center text-[10px] text-text-secondary/70" aria-hidden="true">...</span>
 </button>
