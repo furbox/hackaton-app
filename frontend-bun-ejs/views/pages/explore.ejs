@@ -34,20 +34,17 @@
     </button>
   </form>
 
-  <!-- Results -->
-  <% if (links && links.length > 0) { %>
-    <div id="explore-results">
-      <%- include('../partials/explore-results', {
-        links,
-        page: query.page,
-        hasNextPage,
-        nextPageUrl,
-      }) %>
-    </div>
-
-    <!-- Pagination -->
-    <%- include('../partials/pagination', { page: query.page, totalPages: totalPages, hasNextPage: hasNextPage, baseUrl: baseUrl }) %>
-  <% } else { %>
+   <!-- Results -->
+   <% if (links && links.length > 0) { %>
+     <div id="explore-results">
+       <%- include('../partials/explore-results', {
+         links,
+         page: query.page,
+         hasNextPage,
+         nextPageUrl,
+       }) %>
+     </div>
+   <% } else { %>
     <div class="py-20 text-center text-text-secondary">
       <div class="text-5xl mb-4">🔍</div>
       <p class="text-lg font-medium text-text-primary">No se encontraron links</p>
